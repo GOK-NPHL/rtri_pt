@@ -1,4 +1,4 @@
-# RTRI QC/PT
+# RTRI PT/PT
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">

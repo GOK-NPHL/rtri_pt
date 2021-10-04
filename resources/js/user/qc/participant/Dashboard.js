@@ -51,11 +51,11 @@ class Dashboard extends React.Component {
     render() {
         let dashboardHeader = <div key={1} className="row mb-5">
             <div className="col-sm-6">
-                <h1 className="m-0 text-dark">RTRI QC</h1>
+                <h1 className="m-0 text-dark">RTRI PT</h1>
             </div>
             <div className="col-sm-6">
                 <ol className="breadcrumb float-sm-right">
-                    <li className="breadcrumb-item"><a href="/dashboard">RTRI QC</a></li>
+                    <li className="breadcrumb-item"><a href="/dashboard">RTRI PT</a></li>
                     <li className="breadcrumb-item active">Dashboard</li>
                 </ol>
             </div>

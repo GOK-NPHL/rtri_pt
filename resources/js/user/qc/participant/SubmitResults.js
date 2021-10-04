@@ -179,7 +179,7 @@ class SubmitResults extends React.Component {
             <>
                 <div className="row">
                     <div className="col-sm-12 float-left">
-                        <h1>RTRI QC Submission form</h1>
+                        <h1>RTRI PT Submission form</h1>
                         <hr />
                     </div>
 
@@ -226,12 +226,7 @@ class SubmitResults extends React.Component {
                                 {today}
 
                             </div>
-                            <div style={boxLine} className="col-sm-3">
-                                <p><strong>Result Due Date</strong></p>
-                            </div>
-                            <div style={boxLine} className="col-sm-3">
-                                <p>N/A</p>
-                            </div>
+                           
                         </div>
                         {/* end submission form  header */}
                     </div>
@@ -377,7 +372,7 @@ class SubmitResults extends React.Component {
                                 type="checkbox"
                                 value="" id="qcTestDone" />
                             <label className="form-check-label" htmlFor="qcTestDone">
-                                <strong>Was the QC test done?</strong>
+                                <strong>Click here if QC test was not done?</strong>
                             </label>
                         </div>
                         {/* End Test justification */}

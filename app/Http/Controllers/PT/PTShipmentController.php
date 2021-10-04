@@ -190,12 +190,13 @@ class PTShipmentController extends Controller
             $shipments->save();
 
             // save participants
-            $shipments->laboratories()->attach($participantsList);
+            Log::info("rwa=========");
+            Log:info( $request->shipement['selected']);
+            $shipments->laboratories()->sync($participantsList);
 
             // Save samples
             $existingSampls = PtSample::select("id")->where('ptshipment_id', $request->shipement['id'])
                 ->pluck('id')->toArray();
-            Log::info($request->shipement['samples']);
             //          $
             $updatedIds = [];
             foreach ($request->shipement['samples'] as $sample) {

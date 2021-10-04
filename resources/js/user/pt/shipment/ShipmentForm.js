@@ -93,21 +93,11 @@ class ShipmentForm extends React.Component {
             let partsList = await FetchParticipantList();
             if (this.props.pageState == 'edit') {
 
-                let editData = await FetchShipmentById(this.props.id);
-
-                if (editData.status == 500) {
-                    this.setState({
-                        message: editData.data.Message,
-                        pageState: 'edit',
-                    });
-                    $('#addPersonelModal').modal('toggle');
-                } else {
-                    this.getShipementDataById(this.props.id);
-                    this.setState({
-                        dualListptions: partsList,
-                        readinessChecklists: readinessChecklists,
-                    });
-                }
+                this.getShipementDataById(this.props.id);
+                this.setState({
+                    dualListptions: partsList,
+                    readinessChecklists: readinessChecklists,
+                });
 
             } else {
                 this.setState({

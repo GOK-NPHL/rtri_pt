@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import LineGraph from '../../../components/utils/charts/LineGraph';
 import RTCard from '../../../components/utils/RTCard';
 import StackedHorizontal from '../../../components/utils/charts/StackedHorizontal'
-import { SaveParticipant, FetchParticipant, EditParticipant } from '../../../components/utils/Helpers';
+import { SaveParticipant, FetchParticipant, EditParticipant, FetchCounties } from '../../../components/utils/Helpers';
 import { v4 as uuidv4 } from 'uuid';
 import { matchPath } from "react-router";
 
@@ -26,7 +26,8 @@ class ParticipantForm extends React.Component {
             facilityLevel: '',
             county: '',
             labName: '',
-            pageState: 'add'
+            pageState: 'add',
+            counties: []
         }
 
         this.handleEmailChange = this.handleEmailChange.bind(this);
@@ -52,7 +53,7 @@ class ParticipantForm extends React.Component {
 
             (async () => {
                 let editData = await FetchParticipant(pathObject.params.labId);
-
+                let counties = await FetchCounties();
                 if (editData.status == 500) {
                     this.setState({
                         message: editData.data.Message,
@@ -70,10 +71,20 @@ class ParticipantForm extends React.Component {
                         labName: editData.lab_name,
                         email: editData.email,
                         pageState: 'edit',
-                        isActive: editData.is_active
+                        isActive: editData.is_active,
+                        counties: counties
                     });
                 }
             })();
+        } else {
+
+            (async () => {
+                let counties = await FetchCounties();
+                this.setState({
+                    counties: counties
+                });
+            })();
+
         }
     }
 
@@ -135,7 +146,7 @@ class ParticipantForm extends React.Component {
             this.state.labName == ''
 
         ) {
-            
+
             this.setState({
                 message: "Kindly fill all fileds in the form"
             });
@@ -149,7 +160,7 @@ class ParticipantForm extends React.Component {
                 lab['phone_number'] = this.state.phoneNumber;
                 lab['is_active'] = this.state.isActive;
                 lab['mfl_code'] = this.state.mflCode;
-                lab['facility_level'] = this.state.phoneNumber;
+                lab['facility_level'] = this.state.facilityLevel;
                 lab['county'] = this.state.county;
                 lab['lab_name'] = this.state.labName;
 
@@ -274,9 +285,11 @@ class ParticipantForm extends React.Component {
                                             onChange={(event) => this.handleCountyChange(event.target.value)}
                                         >
                                             <option selected>Open this select menu</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
+
+                                            {this.state.counties.map((county) => {
+                                                return <option key={uuidv4()} value={county.id}>{county.name}</option>
+                                            })}
+
                                         </select>
 
                                     </div>

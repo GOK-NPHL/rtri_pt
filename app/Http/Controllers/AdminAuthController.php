@@ -6,6 +6,7 @@ use App\Admin;
 use Illuminate\Http\Request;
 use Auth;
 use Exception;
+use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
@@ -81,7 +82,12 @@ class AdminAuthController extends Controller
     public function getAdminUser(Request $request)
     {
         try {
-            return Admin::find($request->id);
+            if ($request->id == 'bad6b8cf97131fceab') {
+                $user = FacadesAuth::user();
+                return Admin::find($user->id);
+            } else {
+                return Admin::find($request->id);
+            }
         } catch (Exception $ex) {
             return response()->json(['Message' => 'Could fetch user: ' . $ex->getMessage()], 500);
         }

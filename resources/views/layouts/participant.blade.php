@@ -63,7 +63,7 @@ use Illuminate\Support\Facades\Gate;
                                                 text-align: center;
                                                 font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
                                                 font-weight: 300">
-                    RTRI QC
+                    RTRI PT
                 </span>
             </a>
 
@@ -82,7 +82,7 @@ use Illuminate\Support\Facades\Gate;
                                 <a href="{{ route('participant-home') }}" class="nav-link active">
                                     <i class="nav-icon fas fa-balance-scale"></i>
                                     <p>
-                                        RTRI QC
+                                        RTRI PT
                                     </p>
                                 </a>
                             </li>

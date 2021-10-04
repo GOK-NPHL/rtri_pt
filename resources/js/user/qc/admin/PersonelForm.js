@@ -39,6 +39,7 @@ class PersonelForm extends React.Component {
         this.handleIsQcActiveChange = this.handleIsQcActiveChange.bind(this);
         this.handleIsPtActiveChange = this.handleIsPtActiveChange.bind(this);
         this.handleIsActiveChange = this.handleIsActiveChange.bind(this);
+        this.validatePassword = this.validatePassword.bind(this);
 
     }
 
@@ -48,6 +49,14 @@ class PersonelForm extends React.Component {
         let pathObject = matchPath(pathname, {
             path: `/edit-personel/:personelId`,
         });
+        let participantList = [];
+        (async () => {
+            participantList = await FetchParticipantList();
+            this.setState({
+                participantList: participantList
+            });
+
+        })();
 
         if (pathObject) {
 
@@ -56,7 +65,7 @@ class PersonelForm extends React.Component {
                 if (editData) {
                     editData = editData[0];
                 }
-                let participantList = await FetchParticipantList();
+
 
                 if (editData.status == 500) {
                     this.setState({
@@ -87,7 +96,6 @@ class PersonelForm extends React.Component {
     }
 
     handleIsActiveChange(isActive) {
-        console.log(isActive);
         this.setState({
             isActive: isActive
         });
@@ -139,15 +147,47 @@ class PersonelForm extends React.Component {
         this.setState({
             password: password
         });
+
     }
+
+    validatePassword(password) {
+        let isValid = true;
+        let upperCaseLetters = /[A-Z]/g;
+        if (
+            password.length < 6 || !(password.match(upperCaseLetters))
+        ) {
+
+            this.setState({
+                message: "Password length should not be less than 6 characters and should contain an upper case letter",
+            })
+            $('#addPersonelModal').modal('toggle');
+
+            isValid = false;
+
+        } else {
+
+            isValid = true;
+        }
+        return isValid;
+    }
+
 
     savePersonel() {
 
+        if (!this.validatePassword(this.state.password) && this.state.pageState == 'add') {
+            return;
+        }
+
+        if (!this.validatePassword(this.state.password) && this.state.pageState == 'edit' && (this.state.password)) {
+            return;
+        }
+      
         if (
             this.state.facility == '' ||
             this.state.email == '' ||
             this.state.phoneNumber == '' ||
             this.state.firstName == '' ||
+            this.state.secondName == '' ||
             (this.state.pageState == 'add' && this.state.password == '')
 
         ) {
@@ -203,15 +243,24 @@ class PersonelForm extends React.Component {
                 $('#addPersonelModal').modal('toggle');
             })();
         }
+
+
     }
 
     componentDidUpdate() {
-        $('#u_facility').selectpicker();
+        try {
+            $('#u_facility').selectpicker();
+        } catch (err) {
+
+        }
+
+
     }
 
     render() {
 
-        let labLists = [];  
+        let labLists = [];
+        labLists.push(<option key={uuidv4()}>-- select lab --</option>);
         this.state.participantList.map((participant) => {
             labLists.push(<option key={participant.id} value={participant.id}>{participant.lab_name}</option>);
         });
@@ -273,7 +322,7 @@ class PersonelForm extends React.Component {
 
 
                                     <div className="col-md-6 mb-3">
-                                        <label htmlFor="u_second_name" >Second Name</label>
+                                        <label htmlFor="u_second_name" >Second Name *</label>
 
                                         <input
                                             value={this.state.secondName}
@@ -299,8 +348,14 @@ class PersonelForm extends React.Component {
                                         <label htmlFor="u_password" >Password  *</label>
                                         <input
                                             value={this.state.password}
+                                            onBlur={(event) => {
+                                                if (this.state.pageState == 'edit' && event.target.value) {
+                                                    this.validatePassword(event.target.value)
+                                                }
+                                            }}
                                             onChange={(event) => this.handlePasswordChange(event.target.value)}
                                             type="email" className="form-control" id="u_password" />
+                                            <small style={{ "color": "red" }} className="form-text">Leave blank to retain previous password.</small>
                                     </div>
                                 </div>
 
@@ -335,14 +390,14 @@ class PersonelForm extends React.Component {
 
                                     </div>
 
-                                    <div className="col-md-6 mb-3">
+                                    {/* <div className="col-md-6 mb-3">
                                         <input
                                             checked={this.state.hasPtAccess}
                                             onChange={(event) => this.handleIsPtActiveChange(event.target.checked)}
                                             type="checkbox"
                                             id="u_pt_access" />
                                         <label className="ml-3" htmlFor="u_pt_access" > Has PT Access</label>
-                                    </div>
+                                    </div> */}
                                 </div>
 
                                 <div className="form-group row">
