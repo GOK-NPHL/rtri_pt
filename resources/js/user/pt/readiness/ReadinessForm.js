@@ -40,11 +40,11 @@ class ReadinessForm extends React.Component {
             path: `/edit-readiness/:readinessId`,
         });
 
-        if (pathObject) {
 
-            (async () => {
+        (async () => {
 
-                let partsList = await FetchParticipantList();
+            let partsList = await FetchParticipantList();
+            if (pathObject) {
                 let editData = await FetchReadinessById(pathObject.params.readinessId);
                 if (editData.status == 500) {
                     this.setState({
@@ -67,8 +67,14 @@ class ReadinessForm extends React.Component {
                         pageState: 'edit',
                     });
                 }
-            })();
-        }
+            } else {
+                this.setState({
+                    dualListptions: partsList,
+                });
+            }
+
+        })();
+
 
     }
 

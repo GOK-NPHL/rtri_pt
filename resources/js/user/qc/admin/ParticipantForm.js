@@ -61,6 +61,7 @@ class ParticipantForm extends React.Component {
                     })
                     $('#addLabModal').modal('toggle');
                 } else {
+
                     this.setState({
                         id: editData.id,
                         instituteName: editData.institute_name,
@@ -148,7 +149,7 @@ class ParticipantForm extends React.Component {
         ) {
 
             this.setState({
-                message: "Kindly fill all fileds in the form"
+                message: "Kindly fill all fileds in the form and that they have the right values"
             });
             $('#addLabModal').modal('toggle');
         } else {
@@ -198,7 +199,7 @@ class ParticipantForm extends React.Component {
     }
 
     render() {
-
+        
         return (
             <React.Fragment>
 
@@ -225,7 +226,7 @@ class ParticipantForm extends React.Component {
                                         <input
                                             value={this.state.mflCode}
                                             onChange={(event) => this.handleMflCodeChange(event.target.value)}
-                                            type="text" className="form-control" id="u_mfl" />
+                                            type="number" className="form-control" id="u_mfl" />
                                     </div>
                                 </div>
 
@@ -237,7 +238,7 @@ class ParticipantForm extends React.Component {
                                         <input
                                             value={this.state.facilityLevel}
                                             onChange={(event) => this.handleFacilityLevelChange(event.target.value)}
-                                            type="text" className="form-control" id="u_facility_level" />
+                                            type="number" className="form-control" id="u_facility_level" />
                                     </div>
 
 
@@ -268,7 +269,7 @@ class ParticipantForm extends React.Component {
                                         <label htmlFor="u_phone" >Phone No. *</label>
                                         <input
                                             value={this.state.phoneNumber}
-                                            onChange={(event) => this.handlePhoneChange(event.target.value)} type="text"
+                                            onChange={(event) => this.handlePhoneChange(event.target.value)} type="number"
                                             className="form-control" id="u_phone" />
                                     </div>
 
@@ -286,9 +287,12 @@ class ParticipantForm extends React.Component {
                                         >
                                             <option selected>Open this select menu</option>
 
-                                            {this.state.counties.map((county) => {
-                                                return <option key={uuidv4()} value={county.id}>{county.name}</option>
-                                            })}
+                                            {
+                                                this.state.counties.length>0 ?
+                                                    this.state.counties.map((county) => {
+                                                        return <option key={uuidv4()} value={county.id}>{county.name}</option>
+                                                    }) : ''
+                                            }
 
                                         </select>
 

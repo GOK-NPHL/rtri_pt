@@ -340,7 +340,7 @@ class PersonelForm extends React.Component {
                                         <label htmlFor="u_phone" >Phone Number  *</label>
                                         <input
                                             value={this.state.phoneNumber}
-                                            onChange={(event) => this.handlePhoneChange(event.target.value)} type="text"
+                                            onChange={(event) => this.handlePhoneChange(event.target.value)} type="number"
                                             className="form-control" id="u_phone" />
                                     </div>
 
