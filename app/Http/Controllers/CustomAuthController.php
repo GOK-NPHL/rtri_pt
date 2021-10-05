@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+// use Auth;
 use Hash;
 use Session;
 use App\User;
@@ -29,19 +30,38 @@ class CustomAuthController extends Controller
 
     public function doLogin(Request $request)
     {
+        // $request->validate([
+        //     'email' => 'required',
+        //     'password' => 'required',
+        // ]);
+        // Log::info($request);
+        // $credentials = $request->only('email', 'password');
+        // if (Auth::attempt($credentials)) {
+        //     return redirect()->route('participant-home');
+        // } else {
+        //     return Redirect::back()->withErrors(['Email or Password incorrect']);
+        // }
+
+        // return redirect()->route('login')->withSuccess('Login details are not valid');
+
+
         $request->validate([
             'email' => 'required',
             'password' => 'required',
+
         ]);
-        Log::info($request);
+
         $credentials = $request->only('email', 'password');
+        Log::info($credentials);
         if (Auth::attempt($credentials)) {
+            Log::info($request);
             return redirect()->route('participant-home');
         } else {
+            Log::info("refuse == >>");
             return Redirect::back()->withErrors(['Email or Password incorrect']);
         }
+        // return redirect()->back()->withInput($request->only('email', 'remember'));
 
-        return redirect()->route('login')->withSuccess('Login details are not valid');
     }
 
 

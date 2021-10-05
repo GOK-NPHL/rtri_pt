@@ -25,9 +25,7 @@ class QCParticipantController extends Controller
      */
     public function participantHome()
     {
-        if (Gate::allows('view_qc_component')) {
-            return view('user.qc.participant.dashboard');
-        } else if (Gate::allows('view_pt_component')) {
+        if (Gate::allows('view_pt_component')) {
             return view('user.pt.participant.dashboard');
         } else {
             return view('user.general.dashboard');
@@ -37,8 +35,15 @@ class QCParticipantController extends Controller
     {
         if (Gate::allows('view_pt_component')) {
             return view('user.pt.participant.dashboard');
-        } else if (Gate::allows('view_qc_component')) {
-            return view('user.qc.participant.dashboard');
+        } else {
+            return view('user.general.dashboard');
+        }
+    }
+
+    public function participantDemographicsPage()
+    {
+        if (Gate::allows('view_pt_component')) {
+            return view('user.pt.participant.participant_demo');
         } else {
             return view('user.general.dashboard');
         }

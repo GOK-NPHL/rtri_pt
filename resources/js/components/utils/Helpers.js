@@ -439,6 +439,36 @@ export async function FetchUserSamples() {
 
 }
 
+export async function FetchCurrentParticipantDemographics() {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_participant_demographics`);
+        const responseData = response.data;
+        return responseData;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+
+}
+
+export async function UpdateOwnBio(personel) {
+    try {
+        const response = await axios({
+            method: 'post',
+            url: `${settings.serverBaseApi}/own_bio_update`,
+            data: {
+                personel: personel,
+            }
+        });
+        return response;
+    } catch (err) {
+        // Handle Error Here
+        console.log(err);
+        return err.response
+    }
+}
+
 export async function FetchAdminUsers() {
 
     try {

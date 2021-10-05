@@ -35,9 +35,10 @@ Route::post('participant-login', [CustomAuthController::class, 'doLogin'])->name
 Route::get('registration', [CustomAuthController::class, 'registration'])->name('register-user');
 Route::post('custom-registration', [CustomAuthController::class, 'customRegistration'])->name('register.custom');
 Route::get('logout', [CustomAuthController::class, 'signOut'])->name('logout');
+Route::get('participant-pt-demographics', [QCParticipantController::class, 'participantDemographicsPage'])->name('participant-pt-demographics');
 
-Route::get('participant-home',[QCParticipantController::class, 'participantHome'])->name('participant-home');
-Route::get('participant-pt-home',[QCParticipantController::class, 'participantPTHome'])->name('participant-pt-home');
+Route::get('participant-home', [QCParticipantController::class, 'participantHome'])->name('participant-home');
+Route::get('participant-pt-home', [QCParticipantController::class, 'participantPTHome'])->name('participant-pt-home');
 
 Route::get('admin-logout', [AdminAuthController::class, 'signOut'])->name('admin-logout');
 Route::post('admin-login', [AdminAuthController::class, 'doLogin'])->name('admin-login');
@@ -45,8 +46,8 @@ Route::get('admin-login', [AdminAuthController::class, 'adminLogin'])->name('adm
 
 Route::get('admin-home', 'QC\QCAdminController@adminHome')->name('admin-home');
 
-Route::get('add-admin-user', 'QC\QCAdminController@addUser')->name('add-admin-user'); 
-Route::get('edit-admin-user/{userId}', 'QC\QCAdminController@editUser')->name('edit-admin-user'); 
+Route::get('add-admin-user', 'QC\QCAdminController@addUser')->name('add-admin-user');
+Route::get('edit-admin-user/{userId}', 'QC\QCAdminController@editUser')->name('edit-admin-user');
 Route::get('list-admin-user', 'QC\QCAdminController@listUser')->name('list-admin-user');
 
 Route::get('add-personel', 'QC\QCAdminController@addPersonel')->name('add-personel');
@@ -61,6 +62,6 @@ Route::get('pt-shipment', 'PT\PTAdminController@ptShipment')->name('pt-shipment'
 Route::get('edit-shipment/{shipmentId}', [PTAdminController::class, 'editShipment'])->name('edit-shipment');
 
 
-Route::get('list-readiness',[PTAdminController::class, 'listReadiness'])->name('list-readiness');
-Route::get('edit-readiness/{readinessId}',[PTAdminController::class, 'editReadiness'])->name('edit-readiness');
-Route::get('add-readiness',[PTAdminController::class, 'addReadiness'])->name('add-readiness');
+Route::get('list-readiness', [PTAdminController::class, 'listReadiness'])->name('list-readiness');
+Route::get('edit-readiness/{readinessId}', [PTAdminController::class, 'editReadiness'])->name('edit-readiness');
+Route::get('add-readiness', [PTAdminController::class, 'addReadiness'])->name('add-readiness');

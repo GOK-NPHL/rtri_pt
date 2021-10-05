@@ -77,17 +77,6 @@ use Illuminate\Support\Facades\Gate;
                         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
 
-                        <?php if (Gate::allows('view_qc_component')) { ?>
-                            <li class="nav-item has-treeview menu-open">
-                                <a href="{{ route('participant-home') }}" class="nav-link active">
-                                    <i class="nav-icon fas fa-balance-scale"></i>
-                                    <p>
-                                        RTRI PT
-                                    </p>
-                                </a>
-                            </li>
-                        <?php } ?>
-
                         <?php
                         if (Gate::allows('view_pt_component')) { ?>
                             <li class="nav-item has-treeview menu-open">
@@ -116,12 +105,12 @@ use Illuminate\Support\Facades\Gate;
                                         <p>Individual reports</p>
                                     </a>
                                 </li>
-                                <li class="nav-item">
+                                <!-- <li class="nav-item">
                                     <a href="pages/layout/top-nav-sidebar.html" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Summary</p>
                                     </a>
-                                </li>
+                                </li> -->
                             </ul>
                         </li>
                         <!-- end system actions -->
@@ -138,17 +127,17 @@ use Illuminate\Support\Facades\Gate;
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="pages/layout/top-nav.html" class="nav-link">
+                                    <a href="{{ route('participant-pt-demographics') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>My Login Information</p>
                                     </a>
                                 </li>
-                                <li class="nav-item">
+                                <!-- <li class="nav-item">
                                     <a href="pages/layout/top-nav-sidebar.html" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Change password</p>
                                     </a>
-                                </li>
+                                </li> -->
                             </ul>
                         </li>
                         <!-- end account features -->

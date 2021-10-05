@@ -1,4 +1,4 @@
-# RTRI PT/PT
+# RTRI PT
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">
@@ -21,7 +21,7 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-The RTRI PT/QC
+The RTRI PT
 .
 
 <!-- GETTING STARTED -->

@@ -58,3 +58,6 @@ Route::get('/get_shipment_by_id/{id}', [PTShipmentController::class, 'getShipmen
 
 Route::get('/get_user_samples', [PTShipmentController::class, 'getUserSamples'])->middleware('auth');
 Route::get('/get_counties', [CommonsController::class, 'getCounties']);
+
+Route::get('/get_participant_demographics', [ParticipantController::class, 'getParticipantDemographics']);
+Route::post('/own_bio_update', [ParticipantController::class, 'editOwnPersonalBio'])->name('own_bio_update')->middleware('auth');
