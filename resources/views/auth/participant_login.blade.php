@@ -16,6 +16,9 @@
                 </div>
                 <form name="loginForm" id="login_form" class="form-vertical" method="POST" action="{{ route('participant-login') }}">
                     @csrf
+                    @if($errors->any())
+                    <span style="color:red">{{$errors->first()}}</span>
+                    @endif
                     <input id="user_type" type="text" class="form-control" value="participant" name="user_type" hidden>
                     <div class="form-group">
                         <label for="email" class="uname" data-icon="u"> Email address </label>
