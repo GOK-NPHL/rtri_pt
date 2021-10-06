@@ -31,10 +31,12 @@ class PtShipment extends React.Component {
             this.setState({
                 isShowEditShipmentPage: !this.state.isShowEditShipmentPage,
                 shipmentId: shipmentId,
+                currentPage: 'edit'
             })
         } else if (page == 'add') {
             this.setState({
                 isShowNewShipmentPage: !this.state.isShowNewShipmentPage,
+                currentPage: 'add'
             })
         }
 
@@ -58,14 +60,14 @@ class PtShipment extends React.Component {
                                         this.toggleView('edit');
                                     } else if (this.state.isShowNewShipmentPage) {
                                         this.toggleView('add');
-                                    }else{
+                                    } else {
                                         this.toggleView('add');
                                     }
                                 }
                             }
                             type="button" href="#"
                             className="btn btn-info 
-                float-right">{this.state.isShowNewShipmentPage ? 'Close new shipment page' : 'Add new PT shipment'}</a>
+                float-right">{this.state.isShowNewShipmentPage ? 'Close open shipment' : 'Add new PT shipment'}</a>
                     </div>
                 </div>
                 {this.state.isShowNewShipmentPage ? <AddShipement toggleView={this.toggleView} /> : ''}
