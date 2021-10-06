@@ -85,12 +85,47 @@ class ReadinessForm extends React.Component {
     }
 
     handleStartDateChange(startDate) {
+
+        try {
+            if (this.state.endDate != null && this.state.endDate.length != 0) {
+                let srtDate = Date.parse(startDate);
+                let enDate = Date.parse(this.state.endDate);
+                if (srtDate > enDate) {
+                    this.setState({
+                        message: "Start date cannot be greater than end date",
+                        startDate: this.state.startDate
+                    });
+                    $('#addAdminUserModal').modal('toggle');
+                    return;
+                }
+            }
+        } catch (err) {
+
+        }
+
         this.setState({
             startDate: startDate
         });
     }
 
     handleEndDateChange(endDate) {
+        try {
+            if (this.state.startDate != null && this.state.startDate.length != 0) {
+                let srtDate = Date.parse(this.state.startDate);
+                let enDate = Date.parse(endDate);
+                if (srtDate > enDate) {
+                    this.setState({
+                        message: "Start date cannot be greater than end date",
+                        startDate: this.state.endDate
+                    });
+                    $('#addAdminUserModal').modal('toggle');
+                    return;
+                }
+            }
+        } catch (err) {
+
+        }
+
         this.setState({
             endDate: endDate
         });
