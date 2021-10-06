@@ -148,21 +148,21 @@ class ReadinessForm extends React.Component {
                 let qstElement =
                     <div key={id} className="form-group">
                         <a href="#" onClick={
-                        (event) => {
-                            event.preventDefault();
-                            let readinessItems = this.state.readinessItems;
-                            let questions = this.state.readinessQuestions;
-                            readinessItems[itemIndex] = null;
-                            questions[itemIndex] = null;
+                            (event) => {
+                                event.preventDefault();
+                                let readinessItems = this.state.readinessItems;
+                                let questions = this.state.readinessQuestions;
+                                readinessItems[itemIndex] = null;
+                                questions[itemIndex] = null;
 
-                            this.setState({
+                                this.setState({
 
-                                readinessQuestions: questions,
-                                readinessItems: readinessItems
-                            })
+                                    readinessQuestions: questions,
+                                    readinessItems: readinessItems
+                                })
+                            }
                         }
-                    }
-                        className="float-right" style={{ "color": "red" }}>Delete</a>
+                            className="float-right" style={{ "color": "red" }}>Delete</a>
                         <label className="float-left" htmlFor={id + "qst_answer"}>{readiness['question']}</label>
                         <select
                             className="custom-select" id={id + "qst_answer"}>
@@ -182,21 +182,21 @@ class ReadinessForm extends React.Component {
                 let qstElement =
                     <div key={id} className="form-group">
                         <a href="#" onClick={
-                        (event) => {
-                            event.preventDefault();
-                            let readinessItems = this.state.readinessItems;
-                            let questions = this.state.readinessQuestions;
-                            readinessItems[itemIndex] = null;
-                            questions[itemIndex] = null;
+                            (event) => {
+                                event.preventDefault();
+                                let readinessItems = this.state.readinessItems;
+                                let questions = this.state.readinessQuestions;
+                                readinessItems[itemIndex] = null;
+                                questions[itemIndex] = null;
 
-                            this.setState({
+                                this.setState({
 
-                                readinessQuestions: questions,
-                                readinessItems: readinessItems
-                            })
+                                    readinessQuestions: questions,
+                                    readinessItems: readinessItems
+                                })
+                            }
                         }
-                    }
-                        className="float-right" style={{ "color": "red" }}>Delete</a>
+                            className="float-right" style={{ "color": "red" }}>Delete</a>
                         <label className="float-left" htmlFor={id + "qst_answer"}>{readiness['question']}</label>
                         <input type="number" className="form-control" id={id + "qst_answer"} aria-describedby="qst_answer" placeholder="Enter your answer" />
                     </div>
