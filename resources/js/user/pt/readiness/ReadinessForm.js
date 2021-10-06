@@ -139,7 +139,7 @@ class ReadinessForm extends React.Component {
 
         let rdItems = this.state.readinessItems;
         rdItems.push(readiness);
-
+        let itemIndex = rdItems.length - 1;
         if (readiness['qustion_type'] == 'question') {
 
             if (readiness['answer_type'] == 'list') {
@@ -147,6 +147,22 @@ class ReadinessForm extends React.Component {
                 let qstOptins = readiness['answer_options'].split(',');
                 let qstElement =
                     <div key={id} className="form-group">
+                        <a href="#" onClick={
+                        (event) => {
+                            event.preventDefault();
+                            let readinessItems = this.state.readinessItems;
+                            let questions = this.state.readinessQuestions;
+                            readinessItems[itemIndex] = null;
+                            questions[itemIndex] = null;
+
+                            this.setState({
+
+                                readinessQuestions: questions,
+                                readinessItems: readinessItems
+                            })
+                        }
+                    }
+                        className="float-right" style={{ "color": "red" }}>Delete</a>
                         <label className="float-left" htmlFor={id + "qst_answer"}>{readiness['question']}</label>
                         <select
                             className="custom-select" id={id + "qst_answer"}>
@@ -165,6 +181,22 @@ class ReadinessForm extends React.Component {
                 let id = uuidv4();
                 let qstElement =
                     <div key={id} className="form-group">
+                        <a href="#" onClick={
+                        (event) => {
+                            event.preventDefault();
+                            let readinessItems = this.state.readinessItems;
+                            let questions = this.state.readinessQuestions;
+                            readinessItems[itemIndex] = null;
+                            questions[itemIndex] = null;
+
+                            this.setState({
+
+                                readinessQuestions: questions,
+                                readinessItems: readinessItems
+                            })
+                        }
+                    }
+                        className="float-right" style={{ "color": "red" }}>Delete</a>
                         <label className="float-left" htmlFor={id + "qst_answer"}>{readiness['question']}</label>
                         <input type="number" className="form-control" id={id + "qst_answer"} aria-describedby="qst_answer" placeholder="Enter your answer" />
                     </div>
@@ -180,6 +212,22 @@ class ReadinessForm extends React.Component {
             let id = uuidv4();
             let qstElement =
                 <div className="form-group">
+                    <a href="#" onClick={
+                        (event) => {
+                            event.preventDefault();
+                            let readinessItems = this.state.readinessItems;
+                            let questions = this.state.readinessQuestions;
+                            readinessItems[itemIndex] = null;
+                            questions[itemIndex] = null;
+
+                            this.setState({
+
+                                readinessQuestions: questions,
+                                readinessItems: readinessItems
+                            })
+                        }
+                    }
+                        className="float-right" style={{ "color": "red" }}>Delete</a>
                     <label className="float-left" htmlFor={id + "qst_answer"}>{readiness['question']}</label>
                     <textarea className="form-control" id={id + "qst_answer"} aria-describedby="qst_answer" placeholder="Enter your comment" />
                 </div>
