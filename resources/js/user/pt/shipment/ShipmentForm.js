@@ -161,6 +161,15 @@ class ShipmentForm extends React.Component {
     }
 
     handleResultDueDateChange(resultDueDate) {
+        let today = new Date();
+        let rstlDate = Date.parse(resultDueDate);
+        if (rstlDate < today) {
+            this.setState({
+                message: "Result due date cannot be less than todays date"
+            });
+            $('#addShipmentModal').modal('toggle');
+            return;
+        }
 
         this.setState({
             resultDueDate: resultDueDate
