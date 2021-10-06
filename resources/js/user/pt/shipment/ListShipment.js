@@ -164,6 +164,8 @@ class ListShipment extends React.Component {
 
         return (
             <React.Fragment>
+                {this.props.isShowEditShipmentPage ? <hr /> : ""}
+                {this.props.isShowEditShipmentPage ? <h3>All Shipments</h3> : ""}
                 {pageContent}
             </React.Fragment>
         );

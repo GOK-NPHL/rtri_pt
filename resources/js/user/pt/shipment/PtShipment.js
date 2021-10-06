@@ -70,7 +70,7 @@ class PtShipment extends React.Component {
                 </div>
                 {this.state.isShowNewShipmentPage ? <AddShipement toggleView={this.toggleView} /> : ''}
                 {this.state.isShowEditShipmentPage ? <EditShipment id={this.state.shipmentId} toggleView={this.toggleView} /> : ''}
-                <ListShipment toggleView={this.toggleView} isShowNewShipmentPage={this.state.isShowNewShipmentPage} />
+                <ListShipment isShowEditShipmentPage={this.state.isShowEditShipmentPage} toggleView={this.toggleView} isShowNewShipmentPage={this.state.isShowNewShipmentPage} />
             </React.Fragment>
         );
     }

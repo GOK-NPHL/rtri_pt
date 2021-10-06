@@ -552,7 +552,9 @@ class ShipmentForm extends React.Component {
                         <div className="form-group row mt-4">
                             <div className="col-sm-12 text-center">
                                 <a href="#" onClick={() => this.saveShipment()} type="" className="d-inline m-2 btn btn-info m">
-                                    Ship Round
+
+                                    {this.props.pageState == 'edit' ? "Update Shipment" : "Ship Round"}
+
                                 </a>
                                 <a
                                     onClick={() => {
