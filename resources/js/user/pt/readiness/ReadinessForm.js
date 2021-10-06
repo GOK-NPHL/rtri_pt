@@ -140,6 +140,7 @@ class ReadinessForm extends React.Component {
         let rdItems = this.state.readinessItems;
         rdItems.push(readiness);
         let itemIndex = rdItems.length - 1;
+        readiness['delete_status'] = 0;
         if (readiness['qustion_type'] == 'question') {
 
             if (readiness['answer_type'] == 'list') {
@@ -152,7 +153,15 @@ class ReadinessForm extends React.Component {
                                 event.preventDefault();
                                 let readinessItems = this.state.readinessItems;
                                 let questions = this.state.readinessQuestions;
-                                readinessItems[itemIndex] = null;
+
+                                if (this.state.pageState == 'edit') { //for edit mark as one to be deleted from controller and database
+                                    let qItem = readinessItems[itemIndex];
+                                    qItem['delete_status'] = 1;
+                                    readinessItems[itemIndex] = qItem;
+                                } else {
+                                    readinessItems[itemIndex] = null;
+                                }
+
                                 questions[itemIndex] = null;
 
                                 this.setState({
@@ -186,7 +195,6 @@ class ReadinessForm extends React.Component {
                                 event.preventDefault();
                                 let readinessItems = this.state.readinessItems;
                                 let questions = this.state.readinessQuestions;
-                                readinessItems[itemIndex] = null;
                                 questions[itemIndex] = null;
 
                                 this.setState({
@@ -217,8 +225,16 @@ class ReadinessForm extends React.Component {
                             event.preventDefault();
                             let readinessItems = this.state.readinessItems;
                             let questions = this.state.readinessQuestions;
-                            readinessItems[itemIndex] = null;
+
                             questions[itemIndex] = null;
+
+                            if (this.state.pageState == 'edit') { //for edit mark as one to be deleted from controller and database
+                                let qItem = readinessItems[itemIndex];
+                                qItem['delete_status'] = 1;
+                                readinessItems[itemIndex] = qItem;
+                            } else {
+                                readinessItems[itemIndex] = null;
+                            }
 
                             this.setState({
 

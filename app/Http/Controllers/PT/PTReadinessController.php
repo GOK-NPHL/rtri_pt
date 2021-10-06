@@ -43,17 +43,19 @@ class PTReadinessController extends Controller
 
             // Save questions
             foreach ($request->readiness['readiness_questions'] as $questionItem) {
-                $readinessQuestion = new ReadinessQuestion();
+                if ($questionItem != null) {
+                    $readinessQuestion = new ReadinessQuestion();
 
-                $readinessQuestion->question = $questionItem['question'];
-                $readinessQuestion->answer_options = $questionItem['answer_options'];
-                $readinessQuestion->answer_type = $questionItem['answer_type'];
-                $readinessQuestion->qustion_position = $questionItem['qustion_position'];
-                $readinessQuestion->qustion_type = $questionItem['qustion_type'];
+                    $readinessQuestion->question = $questionItem['question'];
+                    $readinessQuestion->answer_options = $questionItem['answer_options'];
+                    $readinessQuestion->answer_type = $questionItem['answer_type'];
+                    $readinessQuestion->qustion_position = $questionItem['qustion_position'];
+                    $readinessQuestion->qustion_type = $questionItem['qustion_type'];
 
-                // $readiness->readinessQuestion()->associate($readinessQuestion);
-                $readinessQuestion->readiness()->associate($readiness);
-                $readinessQuestion->save();
+                    // $readiness->readinessQuestion()->associate($readinessQuestion);
+                    $readinessQuestion->readiness()->associate($readiness);
+                    $readinessQuestion->save();
+                }
             }
 
             // Save laboratiories
@@ -81,21 +83,32 @@ class PTReadinessController extends Controller
             // Save questions
             foreach ($request->readiness['readiness_questions'] as $questionItem) {
                 $readinessQuestion = null;
+
                 if (empty($questionItem['id'])) {
                     $readinessQuestion = new ReadinessQuestion();
                 } else {
                     $readinessQuestion = ReadinessQuestion::find($questionItem['id']);
                 }
 
-                $readinessQuestion->question = $questionItem['question'];
-                $readinessQuestion->answer_options = $questionItem['answer_options'];
-                $readinessQuestion->answer_type = $questionItem['answer_type'];
-                $readinessQuestion->qustion_position = $questionItem['qustion_position'];
-                $readinessQuestion->qustion_type = $questionItem['qustion_type'];
+                if ($questionItem['delete_status'] == 1) {
 
-                $readinessQuestion->readiness()->associate($checklist);
+                    try {
+                        DB::table('readiness_questions')->where('id', $questionItem['id'])->delete();
 
-                $readinessQuestion->save();
+                    } catch (Exception $ex) {
+                        Log::error($ex);
+                    }
+                } else {
+                    $readinessQuestion->question = $questionItem['question'];
+                    $readinessQuestion->answer_options = $questionItem['answer_options'];
+                    $readinessQuestion->answer_type = $questionItem['answer_type'];
+                    $readinessQuestion->qustion_position = $questionItem['qustion_position'];
+                    $readinessQuestion->qustion_type = $questionItem['qustion_type'];
+
+                    $readinessQuestion->readiness()->associate($checklist);
+
+                    $readinessQuestion->save();
+                }
             }
 
             // Save laboratiories
