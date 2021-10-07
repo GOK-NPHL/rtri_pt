@@ -6,9 +6,9 @@ use App\Http\Controllers\PT\PTReadinessController;
 use App\Http\Controllers\PT\PTShipmentController;
 use App\Http\Controllers\QC\QCAdminUsersController;
 use App\Http\Controllers\Service\CommonsController;
+use App\Http\Controllers\Service\Submission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
 
 
 /*
@@ -27,9 +27,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
-
-Route::post('/save_submission', 'Service\Submission@createSubmission');
-Route::get('/get_submissions', 'Service\Submission@getSubmissions');
+Route::post('/save_submission', [Submission::class, 'createSubmission']);
+Route::get('/get_submissions', [Submission::class, 'getSubmissions']);
 
 Route::get('/get_admin_users', [QCAdminUsersController::class, 'getAdminUsers']);
 Route::get('/get_admin_user/{id}', [AdminAuthController::class, 'getAdminUser']);

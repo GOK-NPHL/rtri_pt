@@ -13,31 +13,28 @@ class CreateSubmissionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('qcsubmissions', function (Blueprint $table) {
+        Schema::create('ptsubmissions', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
 
             $table->date("testing_date");
+            $table->string("name_of_test");
+            $table->string("kit_lot_no");
             $table->date("kit_date_received");
-            $table->date("lot_date_received");
             $table->date("kit_expiry_date");
-            $table->integer("kit_lot_no");
 
-            $table->integer("result_lt_control_line");
-            $table->integer("result_lt_verification_line");
-            $table->integer("result_lt_longterm_line");
+            $table->string("qc_lot_no");
+            $table->date("lot_date_received");
+            $table->date("sample_reconstituion_date");
+            $table->integer("lab_id");
+            $table->integer("user_id");
+            $table->string("sample_type");
+            $table->string("test_justification");
 
-            $table->integer("result_recent_control_line");
-            $table->integer("result_recent_verification_line");
-            $table->integer("result_recent_longterm_line");
-
-            $table->integer("result_negative_control_line");
-            $table->integer("result_negative_verification_line");
-            $table->integer("result_negative_longterm_line");
-
-            $table->string("interpretation_longterm");
-            $table->string("interpretation_recent");
-            $table->string("interpretation_negative");
+            $table->integer("qc_tested");
+            $table->string("not_test_reason")->nullable();;
+            $table->string("other_not_tested_reason")->nullable();
+            $table->string("tester_name")->nullable();
         });
     }
 
@@ -48,6 +45,6 @@ class CreateSubmissionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('qcsubmissions');
+        Schema::dropIfExists('ptsubmissions');
     }
 }

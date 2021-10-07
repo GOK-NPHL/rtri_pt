@@ -12,17 +12,16 @@ require('./bootstrap');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-require('./user/qc/participant/Dashboard');
-require('./user/qc/admin/Dashboard');
-require('./user/qc/admin/AddLab');
-require('./user/qc/admin/EditLab');
-require('./user/qc/admin/AddPersonel');
-require('./user/qc/admin/EditPersonel');
-require('./user/qc/admin/AddUser');
-require('./user/qc/admin/EditUser');
-require('./user/qc/admin/ListLab');
-require('./user/qc/admin/ListPersonel');
-require('./user/qc/admin/ListUser');
+require('./user/pt/admin/Dashboard');
+require('./user/pt/admin/AddLab');
+require('./user/pt/admin/EditLab');
+require('./user/pt/admin/AddPersonel');
+require('./user/pt/admin/EditPersonel');
+require('./user/pt/admin/AddUser');
+require('./user/pt/admin/EditUser');
+require('./user/pt/admin/ListLab');
+require('./user/pt/admin/ListPersonel');
+require('./user/pt/admin/ListUser');
 
 require('./user/pt/shipment/PtShipment');
 require('./user/pt/readiness/AddReadiness');
