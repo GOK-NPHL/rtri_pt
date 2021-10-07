@@ -17,13 +17,14 @@ class CreateSubmissionsTable extends Migration
             $table->id();
             $table->timestamps();
 
+            $table->integer("pt_shipements_id");
             $table->date("testing_date");
             $table->string("name_of_test");
             $table->string("kit_lot_no");
             $table->date("kit_date_received");
             $table->date("kit_expiry_date");
 
-            $table->string("qc_lot_no");
+            $table->string("pt_lot_no");
             $table->date("lot_date_received");
             $table->date("sample_reconstituion_date");
             $table->integer("lab_id");
@@ -31,7 +32,7 @@ class CreateSubmissionsTable extends Migration
             $table->string("sample_type");
             $table->string("test_justification");
 
-            $table->integer("qc_tested");
+            $table->integer("pt_tested");
             $table->string("not_test_reason")->nullable();;
             $table->string("other_not_tested_reason")->nullable();
             $table->string("tester_name")->nullable();

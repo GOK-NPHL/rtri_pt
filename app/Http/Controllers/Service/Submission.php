@@ -34,57 +34,58 @@ class Submission extends Controller
 
                 "testing_date" => $submission["testingDate"],
                 "kit_date_received" => $submission["kitReceivedDate"],
-                "lot_date_received" => $submission["qcLotReceivedDate"],
+                "lot_date_received" => $submission["ptLotReceivedDate"],
                 "kit_expiry_date" => $submission["kitExpiryDate"],
                 "kit_lot_no" => $submission["kitLotNo"],
                 "name_of_test" => $submission["nameOfTest"],
-                "qc_lot_no" => $submission["qcLotNumber"],
+                "pt_lot_no" => $submission["ptLotNumber"],
                 "lab_id" => $submission["labId"],
                 "user_id" => $submission["userId"],
-                "sample_reconstituion_date" => $submission["qcReconstituionDate"],
+                "sample_reconstituion_date" => $submission["ptReconstituionDate"],
                 "sample_type" => $submission["sampleType"],
                 "tester_name" => $submission["testerName"],
                 "test_justification" => $submission["testJustification"],
-                "qc_tested" => $submission["isQCTested"],
-                "not_test_reason" => $submission["qcNotTestedReason"],
-                "other_not_tested_reason" => $submission["qcNotTestedOtherReason"],
-
+                "pt_tested" => $submission["isPTTested"],
+                "not_test_reason" => $submission["ptNotTestedReason"],
+                "other_not_tested_reason" => $submission["ptNotTestedOtherReason"],
+                "pt_shipements_id" => $submission["ptShipementId"]
+               
             ]);
 
             $submissionModel->save();
             $submissionId = $submissionModel->id;
 
-            // $qcLtResult = new PtSubmissionResult([
+            // $ptLtResult = new PtSubmissionResult([
             //     "control_line" => $submission["resultLongterm"]["c"],
             //     "verification_line" => $submission["resultLongterm"]["v"],
-            //     "interpretation" => $submission["qcLongtermIntepreation"],
+            //     "interpretation" => $submission["ptLongtermIntepreation"],
             //     "longterm_line" => $submission["resultLongterm"]["lt"],
-            //     "qcsubmission_id" => $submissionId,
+            //     "ptsubmission_id" => $submissionId,
             //     "type" => "longterm"
             // ]);
-            // $qcLtResult->save();
+            // $ptLtResult->save();
 
-            // $qcNegativeResult = new PtSubmissionResult([
+            // $ptNegativeResult = new PtSubmissionResult([
             //     "control_line" => $submission["resultNegative"]["c"],
             //     "verification_line" => $submission["resultNegative"]["v"],
-            //     "interpretation" => $submission["qcNegativeIntepreation"],
+            //     "interpretation" => $submission["ptNegativeIntepreation"],
             //     "longterm_line" => $submission["resultNegative"]["lt"],
-            //     "qcsubmission_id" => $submissionId,
+            //     "ptsubmission_id" => $submissionId,
             //     "type" => "negative"
 
             // ]);
-            // $qcNegativeResult->save();
+            // $ptNegativeResult->save();
 
-            // $qcRecentResult = new PtSubmissionResult([
+            // $ptRecentResult = new PtSubmissionResult([
 
             //     "control_line" => $submission["resultRecent"]["c"],
             //     "verification_line" => $submission["resultRecent"]["v"],
-            //     "interpretation" => $submission["qcRecentIntepreation"],
+            //     "interpretation" => $submission["ptRecentIntepreation"],
             //     "longterm_line" => $submission["resultRecent"]["lt"],
-            //     "qcsubmission_id" => $submissionId,
+            //     "ptsubmission_id" => $submissionId,
             //     "type" => "recent"
             // ]);
-            // $qcRecentResult->save();
+            // $ptRecentResult->save();
 
             // $this->saveNegativeRepeats($submission, $submissionId);
             // $this->saveRecentRepeats($submission, $submissionId);

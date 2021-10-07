@@ -191,7 +191,8 @@ class PTShipmentController extends Controller
 
             // save participants
             Log::info("rwa=========");
-            Log:info( $request->shipement['selected']);
+            Log:
+            info($request->shipement['selected']);
             $shipments->laboratories()->sync($participantsList);
 
             // Save samples
@@ -238,6 +239,7 @@ class PTShipmentController extends Controller
 
             $labs = PtShipement::select(
                 "pt_shipements.id",
+                "pt_shipements.id as pt_shipements_id",
                 "pt_shipements.round_name",
                 "pt_shipements.code",
                 "pt_shipements.start_date",
@@ -266,6 +268,7 @@ class PTShipmentController extends Controller
 
                     $payload[$lab->id]['test_instructions'] = $lab->test_instructions;
                     $payload[$lab->id]['id'] = $lab->id;
+                    $payload[$lab->id]['pt_shipements_id'] = $lab->pt_shipements_id;
                     $payload[$lab->id]['start_date'] = $lab->start_date;
                     $payload[$lab->id]['code'] = $lab->code;
                     $payload[$lab->id]['end_date'] = $lab->end_date;

@@ -11,23 +11,23 @@ class SubmitResults extends React.Component {
         super(props);
         this.state = {
             message: '',
-            qcLotReceivedDate: '',
-            qcReconstituionDate: '',
+            ptLotReceivedDate: '',
+            ptReconstituionDate: '',
             kitExpiryDate: '',
             testJustification: 'Periodic testing as per the protocol',
             kitReceivedDate: '',
             kitLotNo: '',
             nameOfTest: '',
-            qcLotNumber: '',
+            ptLotNumber: '',
             testingDate: '',
             sampleType: 'DTS',
             labId: '',
             userId: '',
-            qcNegativeIntepreation: '',
+            ptNegativeIntepreation: '',
 
-            qcRecentIntepreation: '',
-            qcLongtermIntepreation: '',
-            isQcDone: true,
+            ptRecentIntepreation: '',
+            ptLongtermIntepreation: '',
+            isPtDone: true,
             resultNegative: { c: 0, v: 0, lt: 0 },
 
             resultRecent: { c: 0, v: 0, lt: 0 },
@@ -36,11 +36,12 @@ class SubmitResults extends React.Component {
             otherComments: '',
             notTestedReason: 'Issue with sample',
             edittableSubmission: {},
-            testerName: ''
+            testerName: '',
+            pt_shipements_id: ''
 
         }
         this.onNameOfTestHandler = this.onNameOfTestHandler.bind(this);
-        this.onQcLotReceiceDateHandler = this.onQcLotReceiceDateHandler.bind(this);
+        this.onPtLotReceiceDateHandler = this.onPtLotReceiceDateHandler.bind(this);
         this.onKitExpiryDateHandler = this.onKitExpiryDateHandler.bind(this);
         this.onKitReceivedDateHandler = this.onKitReceivedDateHandler.bind(this);
         this.onKitLotHandler = this.onKitLotHandler.bind(this);
@@ -48,8 +49,8 @@ class SubmitResults extends React.Component {
         this.validateTestingAndRecivedDate = this.validateTestingAndRecivedDate.bind(this);
         this.onReconstitutionDateHandler = this.onReconstitutionDateHandler.bind(this);
         this.validateTestingAndReconstituionDate = this.validateTestingAndReconstituionDate.bind(this);
-        this.validateTestingAndQCLotRecivedDate = this.validateTestingAndQCLotRecivedDate.bind(this);
-        this.onQcLotNumberHandler = this.onQcLotNumberHandler.bind(this);
+        this.validateTestingAndPTLotRecivedDate = this.validateTestingAndPTLotRecivedDate.bind(this);
+        this.onPtLotNumberHandler = this.onPtLotNumberHandler.bind(this);
         this.onTestJustificationHandler = this.onTestJustificationHandler.bind(this);
         this.onSampleTypeHandler = this.onSampleTypeHandler.bind(this);
         this.validateTestingDateAndCurrentDate = this.validateTestingDateAndCurrentDate.bind(this);
@@ -61,13 +62,13 @@ class SubmitResults extends React.Component {
         this.notTestedReasonHandler = this.notTestedReasonHandler.bind(this);
 
         this.resultLongterm = this.resultLongterm.bind(this);
-        this.qcInterpretationLongterm = this.qcInterpretationLongterm.bind(this);
+        this.ptInterpretationLongterm = this.ptInterpretationLongterm.bind(this);
 
         this.resultRecent = this.resultRecent.bind(this);
-        this.qcInterpretationRecent = this.qcInterpretationRecent.bind(this);
+        this.ptInterpretationRecent = this.ptInterpretationRecent.bind(this);
 
         this.resultNegative = this.resultNegative.bind(this);
-        this.qcInterpretationNegative = this.qcInterpretationNegative.bind(this);
+        this.ptInterpretationNegative = this.ptInterpretationNegative.bind(this);
 
 
         this.onTesternameChangeHandler = this.onTesternameChangeHandler.bind(this);
@@ -88,60 +89,60 @@ class SubmitResults extends React.Component {
                 let resultRecent = { c: 0, v: 0, lt: 0 };
                 let resultLongterm = { c: 0, v: 0, lt: 0 };
 
-                let qcRecentIntepreation = '';
-                let qcLongtermIntepreation = '';
-                let qcNegativeIntepreation = '';
+                let ptRecentIntepreation = '';
+                let ptLongtermIntepreation = '';
+                let ptNegativeIntepreation = '';
 
                 edittableSubmission['test_results'].map((result) => {
                     if (result.type == 'longterm') {
                         resultLongterm['c'] = result.control_line;
                         resultLongterm['lt'] = result.longterm_line;
                         resultLongterm['v'] = result.verification_line;
-                        qcLongtermIntepreation = result.interpretation;
+                        ptLongtermIntepreation = result.interpretation;
                     }
                     if (result.type == 'negative') {
                         resultNegative['c'] = result.control_line;
                         resultNegative['lt'] = result.longterm_line;
                         resultNegative['v'] = result.verification_line;
-                        qcNegativeIntepreation = result.interpretation;
+                        ptNegativeIntepreation = result.interpretation;
                     }
                     if (result.type == 'recent') {
                         resultRecent['c'] = result.control_line;
                         resultRecent['lt'] = result.longterm_line;
                         resultRecent['v'] = result.verification_line;
-                        qcRecentIntepreation = result.interpretation;
+                        ptRecentIntepreation = result.interpretation;
                     }
                 });
 
                 this.setState({
-                    qcLotReceivedDate: edittableSubmission['data']['lot_date_received'],
-                    qcReconstituionDate: edittableSubmission['data']['sample_reconstituion_date'],
+                    ptLotReceivedDate: edittableSubmission['data']['lot_date_received'],
+                    ptReconstituionDate: edittableSubmission['data']['sample_reconstituion_date'],
                     kitExpiryDate: edittableSubmission['data']['kit_expiry_date'],
                     testJustification: edittableSubmission['data']['test_justification'],
                     kitReceivedDate: edittableSubmission['data']['kit_date_received'],
                     kitLotNo: edittableSubmission['data']['kit_lot_no'],
                     testerName: edittableSubmission['data']['tester_name'],
                     nameOfTest: edittableSubmission['data']['name_of_test'],
-                    qcLotNumber: edittableSubmission['data']['qc_lot_no'],
+                    ptLotNumber: edittableSubmission['data']['pt_lot_no'],
                     testingDate: edittableSubmission['data']['testing_date'],
                     sampleType: edittableSubmission['data']['sample_type'],
                     labId: edittableSubmission['data']['lab_id'],
                     userId: edittableSubmission['data']['user_id'],
 
-                    isQcDone: edittableSubmission['data']['qc_tested'] == 1 ? true : false,
+                    isPtDone: edittableSubmission['data']['pt_tested'] == 1 ? true : false,
 
                     resultNegative: resultNegative,
                     resultRecent: resultRecent,
                     resultLongterm: resultLongterm,
 
-                    qcRecentIntepreation: qcRecentIntepreation,
-                    qcLongtermIntepreation: qcLongtermIntepreation,
-                    qcNegativeIntepreation: qcNegativeIntepreation,
+                    ptRecentIntepreation: ptRecentIntepreation,
+                    ptLongtermIntepreation: ptLongtermIntepreation,
+                    ptNegativeIntepreation: ptNegativeIntepreation,
 
                     userDemographics: userDemographics,
                     otherComments: edittableSubmission['data']['not_test_reason'] ? edittableSubmission['data']['not_test_reason'] : '',
                     notTestedReason: edittableSubmission['data']['other_not_tested_reason'] ? edittableSubmission['data']['other_not_tested_reason'] : 'Issue with sample',
-
+                    pt_shipements_id: this.props.shipment.pt_shipements_id
                 });
 
             } else {
@@ -165,21 +166,21 @@ class SubmitResults extends React.Component {
 
 
     submitForm() {
-
+        
         if (
-            this.state.qcLotReceivedDate.length == 0 ||
+            this.state.ptLotReceivedDate.length == 0 ||
             this.state.kitExpiryDate.length == 0 ||
             this.state.kitReceivedDate.length == 0 ||
             this.state.kitLotNo.length == 0 ||
             this.state.nameOfTest.length == 0 ||
             this.state.testerName.length == 0 ||
-            this.state.qcLotNumber.length == 0 ||
-            this.state.qcReconstituionDate.length == 0 ||
+            this.state.ptLotNumber.length == 0 ||
+            this.state.ptReconstituionDate.length == 0 ||
             this.state.testingDate.length == 0
             // ||
-            // (this.state.qcNegativeIntepreation.length == 0 && this.state.isQcDone) ||
-            // (this.state.qcRecentIntepreation.length == 0 && this.state.isQcDone) ||
-            // (this.state.qcLongtermIntepreation.length == 0 && this.state.isQcDone)
+            // (this.state.ptNegativeIntepreation.length == 0 && this.state.isPtDone) ||
+            // (this.state.ptRecentIntepreation.length == 0 && this.state.isPtDone) ||
+            // (this.state.ptLongtermIntepreation.length == 0 && this.state.isPtDone)
         ) {
             this.setState({
                 message: "Fill in all the fields marked *"
@@ -187,29 +188,30 @@ class SubmitResults extends React.Component {
             $('#messageModal').modal('toggle');
         } else {
             let submission = {};
-            submission["qcLotReceivedDate"] = this.state.qcLotReceivedDate;
+            submission["ptLotReceivedDate"] = this.state.ptLotReceivedDate;
             submission["kitExpiryDate"] = this.state.kitExpiryDate;
             submission["kitReceivedDate"] = this.state.kitReceivedDate;
             submission["kitLotNo"] = this.state.kitLotNo;
-            submission["qcReconstituionDate"] = this.state.qcReconstituionDate;
+            submission["ptReconstituionDate"] = this.state.ptReconstituionDate;
             submission["testingDate"] = this.state.testingDate;
-            submission["qcLotNumber"] = this.state.qcLotNumber;
-            submission["qcNegativeIntepreation"] = this.state.qcNegativeIntepreation;
-            submission["qcRecentIntepreation"] = this.state.qcRecentIntepreation;
-            submission["qcLongtermIntepreation"] = this.state.qcLongtermIntepreation;
+            submission["ptLotNumber"] = this.state.ptLotNumber;
+            submission["ptNegativeIntepreation"] = this.state.ptNegativeIntepreation;
+            submission["ptRecentIntepreation"] = this.state.ptRecentIntepreation;
+            submission["ptLongtermIntepreation"] = this.state.ptLongtermIntepreation;
             submission["resultNegative"] = this.state.resultNegative;
             submission["resultRecent"] = this.state.resultRecent;
             submission["resultLongterm"] = this.state.resultLongterm;
             submission["nameOfTest"] = this.state.nameOfTest;
             submission["testerName"] = this.state.testerName;
-            submission["isQCTested"] = this.state.isQcDone;
+            submission["isPTTested"] = this.state.isPtDone;
             submission["testJustification"] = this.state.testJustification;
-            submission["qcNotTestedReason"] = !this.state.isQcDone ? this.state.notTestedReason : "";
-            submission["qcNotTestedOtherReason"] = !this.state.isQcDone ? this.state.otherComments : "";
+            submission["ptNotTestedReason"] = !this.state.isPtDone ? this.state.notTestedReason : "";
+            submission["ptNotTestedOtherReason"] = !this.state.isPtDone ? this.state.otherComments : "";
             submission["labId"] = this.state.labId;
             submission["userId"] = this.state.userId;
             submission["sampleType"] = this.state.sampleType;
-
+            submission["ptShipementId"] = this.props.shipment.pt_shipements_id;
+            
 
             (async () => {
                 let response = await SaveSubmission(submission);
@@ -224,24 +226,24 @@ class SubmitResults extends React.Component {
         }
     }
 
-    qcInterpretationNegative(event, type, index) {
+    ptInterpretationNegative(event, type, index) {
         this.setState({
-            qcNegativeIntepreation: event.target.value,
+            ptNegativeIntepreation: event.target.value,
         });
 
     }
-    qcInterpretationRecent(event, type, index) {
+    ptInterpretationRecent(event, type, index) {
 
         this.setState({
-            qcRecentIntepreation: event.target.value
+            ptRecentIntepreation: event.target.value
         });
 
 
     }
-    qcInterpretationLongterm(event, type, index) {
+    ptInterpretationLongterm(event, type, index) {
 
         this.setState({
-            qcLongtermIntepreation: event.target.value
+            ptLongtermIntepreation: event.target.value
         });
 
 
@@ -288,19 +290,19 @@ class SubmitResults extends React.Component {
 
 
     }
-    onQcLotReceiceDateHandler(event) {
-        let isValid = this.validateTestingAndQCLotRecivedDate(this.state.testingDate, event.target.value);
+    onPtLotReceiceDateHandler(event) {
+        let isValid = this.validateTestingAndPTLotRecivedDate(this.state.testingDate, event.target.value);
 
         if (isValid) {
             this.setState({
-                qcLotReceivedDate: event.target.value
+                ptLotReceivedDate: event.target.value
             });
         }
     }
 
-    onQcLotNumberHandler(event) {
+    onPtLotNumberHandler(event) {
         this.setState({
-            qcLotNumber: event.target.value
+            ptLotNumber: event.target.value
         });
     }
 
@@ -346,8 +348,8 @@ class SubmitResults extends React.Component {
         });
         this.validateTestingDateAndCurrentDate(event.target.value);
         this.validateTestingAndRecivedDate(event.target.value, this.state.kitReceivedDate);
-        this.validateTestingAndQCLotRecivedDate(event.target.value, this.state.qcLotReceivedDate);
-        this.validateTestingAndReconstituionDate(this.state.qcReconstituionDate, event.target.value)
+        this.validateTestingAndPTLotRecivedDate(event.target.value, this.state.ptLotReceivedDate);
+        this.validateTestingAndReconstituionDate(this.state.ptReconstituionDate, event.target.value)
     }
 
     onNameOfTestHandler(event) {
@@ -361,7 +363,7 @@ class SubmitResults extends React.Component {
         let isValid = this.validateTestingAndReconstituionDate(event.target.value, this.state.testingDate);
         if (isValid) {
             this.setState({
-                qcReconstituionDate: event.target.value
+                ptReconstituionDate: event.target.value
             });
         }
     }
@@ -369,7 +371,7 @@ class SubmitResults extends React.Component {
     validateTestingAndRecivedDate(testingDate, receiveData) {
         if (testingDate < receiveData && (testingDate && receiveData)) {
             this.setState({
-                message: "QC lot Date received cannot be greater than testing date",
+                message: "PT lot Date received cannot be greater than testing date",
                 testingDate: '',
                 kitReceivedDate: ''
             })
@@ -401,7 +403,7 @@ class SubmitResults extends React.Component {
             this.setState({
                 message: "Kit testing Date cannot be greater than reconstitution date",
                 testingDate: '',
-                qcReconstituionDate: ''
+                ptReconstituionDate: ''
             })
             $('#messageModal').modal('show');
             return false;
@@ -410,12 +412,12 @@ class SubmitResults extends React.Component {
         }
     }
 
-    validateTestingAndQCLotRecivedDate(testingDate, receiveDate) {
+    validateTestingAndPTLotRecivedDate(testingDate, receiveDate) {
         if (testingDate < receiveDate && (testingDate && receiveDate)) {
             this.setState({
-                message: "QC lot Date received cannot be greater than testing date",
+                message: "PT lot Date received cannot be greater than testing date",
                 testingDate: '',
-                qcLotReceivedDate: ''
+                ptLotReceivedDate: ''
             })
             $('#messageModal').modal('show');
             return false;
@@ -469,7 +471,7 @@ class SubmitResults extends React.Component {
 
 
                     <div className="col-sm-12 float-left">
-                        <h1>RTRI QC Submission form</h1>
+                        <h1>RTRI PT Submission form</h1>
                         <hr />
                     </div>
 
@@ -582,36 +584,36 @@ class SubmitResults extends React.Component {
 
                     <div className="col-sm-12  pl-4 pr-4 mt-2">
                         {/* Test Kit Information */}
-                        QC sample Information
+                        PT sample Information
                         {/* end Test Kit Information */}
                     </div>
 
                     <div className="col-sm-12  pl-4 pr-4">
-                        {/* QC Lot info */}
+                        {/* PT Lot info */}
                         <div className="row">
                             <div style={boxLine} className="col-sm-3">
-                                <p><strong>QC Lot Number: *</strong></p>
+                                <p><strong>PT Lot Number: *</strong></p>
                             </div>
                             <div style={boxLine} className="col-sm-3">
 
-                                <input value={this.state.qcLotNumber} onChange={() => this.onQcLotNumberHandler(event)} className="form-control" type="text" />
+                                <input value={this.state.ptLotNumber} onChange={() => this.onPtLotNumberHandler(event)} className="form-control" type="text" />
                             </div>
 
                             <div style={boxLineLeft} className="col-sm-3">
-                                <p><strong>QC Lot Date Received *</strong></p>
+                                <p><strong>PT Lot Date Received *</strong></p>
                             </div>
                             <div style={boxLine} className="col-sm-3">
-                                <input value={this.state.qcLotReceivedDate} onChange={() => this.onQcLotReceiceDateHandler(event)} className="form-control" type="date" />
+                                <input value={this.state.ptLotReceivedDate} onChange={() => this.onPtLotReceiceDateHandler(event)} className="form-control" type="date" />
                             </div>
 
                         </div>
 
                         <div className="row">
                             <div style={boxLine} className="col-sm-3">
-                                <p><strong>Date QC Samples Reconstituted:</strong></p>
+                                <p><strong>Date PT Samples Reconstituted:</strong></p>
                             </div>
                             <div style={boxLine} className="col-sm-3">
-                                <input value={this.state.qcReconstituionDate} onChange={() => this.onReconstitutionDateHandler(event)} className="form-control" type="date" />
+                                <input value={this.state.ptReconstituionDate} onChange={() => this.onReconstitutionDateHandler(event)} className="form-control" type="date" />
                             </div>
 
                             <div style={boxLine} className="col-sm-3">
@@ -622,7 +624,7 @@ class SubmitResults extends React.Component {
                             </div>
 
                         </div>
-                        {/* end  QC Lot info  */}
+                        {/* end  PT Lot info  */}
                         <hr />
                     </div>
 
@@ -631,7 +633,7 @@ class SubmitResults extends React.Component {
                         {/* Test justification */}
                         <div className="row">
                             <div style={boxLine} className="col-sm-3">
-                                <p><strong>Jutification for QC testing: *</strong></p>
+                                <p><strong>Jutification for PT testing: *</strong></p>
                             </div>
                             <div style={boxLine} className="col-sm-3">
                                 <select
@@ -667,16 +669,16 @@ class SubmitResults extends React.Component {
                             <input
                                 className="form-check-input"
                                 onClick={() => {
-                                    $("#qc-test-results").toggle();
+                                    $("#pt-test-results").toggle();
                                     $("#test-not-done-section").toggle();
                                     this.setState({
-                                        isQcDone: !this.state.isQcDone
+                                        isPtDone: !this.state.isPtDone
                                     })
                                 }}
                                 type="checkbox"
-                                value="" id="qcTestDone" />
-                            <label className="form-check-label" htmlFor="qcTestDone">
-                                <strong>Click here if QC test was not done?</strong>
+                                value="" id="ptTestDone" />
+                            <label className="form-check-label" htmlFor="ptTestDone">
+                                <strong>Click here if PT test was not done?</strong>
                             </label>
                         </div>
                         {/* End Test justification */}
@@ -702,23 +704,6 @@ class SubmitResults extends React.Component {
                         {/* End why test not done */}
 
                     </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
                     <div id='PT-test-results' className="col-sm-12 ">
 
@@ -748,13 +733,13 @@ class SubmitResults extends React.Component {
                                         {/*  PT - Long Term*/}
 
                                         {this.props.shipment.samples.map((sample) => {
-
+                                            
                                             return <tr key={uuidv4()}>
                                                 <td>{sample.sample_name}</td>
                                                 <td ><input onClick={this.resultLongterm.bind(this)} value="c" type="checkbox" /></td>
                                                 <td ><input onClick={this.resultLongterm.bind(this)} value="v" type="checkbox" /></td>
                                                 <td ><input onClick={this.resultLongterm.bind(this)} value="lt" type="checkbox" /></td>
-                                                <td onChange={this.qcInterpretationLongterm.bind(this)}>
+                                                <td onChange={this.ptInterpretationLongterm.bind(this)}>
                                                     <div className="form-check form-check-inline">
                                                         <input className="form-check-input" type="radio" value="lt"
                                                             name="long-term-radio" id="result_lt" />

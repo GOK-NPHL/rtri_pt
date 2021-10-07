@@ -16,7 +16,8 @@ class CreatePtSubmissionResultsTable extends Migration
         Schema::create('pt_submission_results', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->integer('qcsubmission_id');
+            $table->integer('ptsubmission_id');
+            $table->integer('sample_id');
             $table->string('type');
             $table->integer("control_line")->nullable();
             $table->integer("verification_line")->nullable();
