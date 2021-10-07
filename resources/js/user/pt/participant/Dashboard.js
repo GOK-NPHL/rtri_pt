@@ -75,17 +75,16 @@ class Dashboard extends React.Component {
         let tableElem = [];
 
         console.log("trying");
-            console.log(this.state.data);
+        console.log(this.state.data);
         if (Object.keys(this.state.data).length != 0 && this.state.page == 'list') {
             let index = 1;
-            
+
             for (const [key, element] of Object.entries(this.state.data)) {
 
                 tableElem.push(<tr key={index}>
                     <th scope="row">{index + 1}</th>
                     <td>{element.round_name}</td>
                     <td>{element.code}</td>
-                    <td>{element.start_date}</td>
                     <td>{element.end_date}</td>
 
                     {
@@ -155,7 +154,6 @@ class Dashboard extends React.Component {
                             <th scope="col">#</th>
                             <th scope="col">Round</th>
                             <th scope="col">Code</th>
-                            <th scope="col">Start Date</th>
                             <th scope="col">End Date</th>
                             <th scope="col">Action</th>
 

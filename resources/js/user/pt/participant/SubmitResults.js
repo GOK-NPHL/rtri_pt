@@ -131,6 +131,18 @@ class SubmitResults extends React.Component {
 
 
     submitForm() {
+        //check if results filled
+        if (this.state.isPtDone) {
+            for (const [key, value] of Object.entries(this.state.samples)) {
+                if (value['interpretation'] == null) {
+                    this.setState({
+                        message: "Fill in all the fields marked *"
+                    })
+                    $('#messageModal').modal('toggle');
+                    return;
+                }
+            }
+        }
 
         if (
             this.state.ptLotReceivedDate.length == 0 ||
@@ -631,7 +643,7 @@ class SubmitResults extends React.Component {
 
                     </div>
 
-                    <div id='PT-test-results' className="col-sm-12 ">
+                    <div id='pt-test-results' className="col-sm-12 ">
 
                         {/* PT Test results fields */}
                         <div className="row ml-5 mr-5">
@@ -652,7 +664,7 @@ class SubmitResults extends React.Component {
                                                     </tbody>
                                                 </table>
                                             </th>
-                                            <th>Interpretation</th>
+                                            <th>Interpretation *</th>
                                         </tr>
                                     </thead>
                                     <tbody>
