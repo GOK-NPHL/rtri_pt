@@ -38,12 +38,12 @@ This project is powered by the laravel framework.
 
 * clone project
   ```sh
-  git clone https://github.com/GOK-NPHL/rtri_pt_qc.git
+  git clone https://github.com/GOK-NPHL/rtri_pc.git
   ```
 
 * cd
   ```sh
-  cd rtri_pt_qc/
+  cd rtri_pt/
   ```
 
 Edit the the .evn file and update with needed parameters like your ODK username and password, database connection, and set the SESSION_DOMAIN to the relevant server domain.
