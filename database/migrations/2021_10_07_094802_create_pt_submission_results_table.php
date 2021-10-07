@@ -18,7 +18,6 @@ class CreatePtSubmissionResultsTable extends Migration
             $table->timestamps();
             $table->integer('ptsubmission_id');
             $table->integer('sample_id');
-            $table->string('type');
             $table->integer("control_line")->nullable();
             $table->integer("verification_line")->nullable();
             $table->integer("longterm_line")->nullable();

@@ -28,18 +28,17 @@ class SubmitResults extends React.Component {
             ptRecentIntepreation: '',
             ptLongtermIntepreation: '',
             isPtDone: true,
-            resultNegative: { c: 0, v: 0, lt: 0 },
 
-            resultRecent: { c: 0, v: 0, lt: 0 },
-            resultLongterm: { c: 0, v: 0, lt: 0 },
             userDemographics: [],
             otherComments: '',
             notTestedReason: 'Issue with sample',
             edittableSubmission: {},
             testerName: '',
-            pt_shipements_id: ''
+            pt_shipements_id: '',
+            samples: {}
 
         }
+
         this.onNameOfTestHandler = this.onNameOfTestHandler.bind(this);
         this.onPtLotReceiceDateHandler = this.onPtLotReceiceDateHandler.bind(this);
         this.onKitExpiryDateHandler = this.onKitExpiryDateHandler.bind(this);
@@ -61,15 +60,8 @@ class SubmitResults extends React.Component {
         this.otherCommentsHandler = this.otherCommentsHandler.bind(this);
         this.notTestedReasonHandler = this.notTestedReasonHandler.bind(this);
 
-        this.resultLongterm = this.resultLongterm.bind(this);
-        this.ptInterpretationLongterm = this.ptInterpretationLongterm.bind(this);
-
-        this.resultRecent = this.resultRecent.bind(this);
-        this.ptInterpretationRecent = this.ptInterpretationRecent.bind(this);
-
-        this.resultNegative = this.resultNegative.bind(this);
-        this.ptInterpretationNegative = this.ptInterpretationNegative.bind(this);
-
+        this.visualResultsHandler = this.visualResultsHandler.bind(this);
+        this.ptInterpretation = this.ptInterpretation.bind(this);
 
         this.onTesternameChangeHandler = this.onTesternameChangeHandler.bind(this);
     }
@@ -82,37 +74,19 @@ class SubmitResults extends React.Component {
             if (this.props.isEdit) {
                 edittableSubmission = await FetchSubmission(this.props.editId);
             }
+            let samples = {};
+
+            this.props.shipment.samples.map((sample) => {
+                samples[sample.sample_id] = {
+                    "visual": { c: 0, v: 0, lt: 0 },
+                    "interpretation": null
+                }
+            });
 
             if (this.props.isEdit) {
 
-                let resultNegative = { c: 0, v: 0, lt: 0 };
-                let resultRecent = { c: 0, v: 0, lt: 0 };
-                let resultLongterm = { c: 0, v: 0, lt: 0 };
-
-                let ptRecentIntepreation = '';
                 let ptLongtermIntepreation = '';
                 let ptNegativeIntepreation = '';
-
-                edittableSubmission['test_results'].map((result) => {
-                    if (result.type == 'longterm') {
-                        resultLongterm['c'] = result.control_line;
-                        resultLongterm['lt'] = result.longterm_line;
-                        resultLongterm['v'] = result.verification_line;
-                        ptLongtermIntepreation = result.interpretation;
-                    }
-                    if (result.type == 'negative') {
-                        resultNegative['c'] = result.control_line;
-                        resultNegative['lt'] = result.longterm_line;
-                        resultNegative['v'] = result.verification_line;
-                        ptNegativeIntepreation = result.interpretation;
-                    }
-                    if (result.type == 'recent') {
-                        resultRecent['c'] = result.control_line;
-                        resultRecent['lt'] = result.longterm_line;
-                        resultRecent['v'] = result.verification_line;
-                        ptRecentIntepreation = result.interpretation;
-                    }
-                });
 
                 this.setState({
                     ptLotReceivedDate: edittableSubmission['data']['lot_date_received'],
@@ -131,14 +105,6 @@ class SubmitResults extends React.Component {
 
                     isPtDone: edittableSubmission['data']['pt_tested'] == 1 ? true : false,
 
-                    resultNegative: resultNegative,
-                    resultRecent: resultRecent,
-                    resultLongterm: resultLongterm,
-
-                    ptRecentIntepreation: ptRecentIntepreation,
-                    ptLongtermIntepreation: ptLongtermIntepreation,
-                    ptNegativeIntepreation: ptNegativeIntepreation,
-
                     userDemographics: userDemographics,
                     otherComments: edittableSubmission['data']['not_test_reason'] ? edittableSubmission['data']['not_test_reason'] : '',
                     notTestedReason: edittableSubmission['data']['other_not_tested_reason'] ? edittableSubmission['data']['other_not_tested_reason'] : 'Issue with sample',
@@ -150,8 +116,8 @@ class SubmitResults extends React.Component {
                     userDemographics: userDemographics,
                     labId: userDemographics[0].lab_id,
                     userId: userDemographics[0].user_id,
-                    edittableSubmission: edittableSubmission
-
+                    edittableSubmission: edittableSubmission,
+                    samples: samples
                 });
 
             }
@@ -164,9 +130,8 @@ class SubmitResults extends React.Component {
     }
 
 
-
     submitForm() {
-        
+
         if (
             this.state.ptLotReceivedDate.length == 0 ||
             this.state.kitExpiryDate.length == 0 ||
@@ -195,12 +160,6 @@ class SubmitResults extends React.Component {
             submission["ptReconstituionDate"] = this.state.ptReconstituionDate;
             submission["testingDate"] = this.state.testingDate;
             submission["ptLotNumber"] = this.state.ptLotNumber;
-            submission["ptNegativeIntepreation"] = this.state.ptNegativeIntepreation;
-            submission["ptRecentIntepreation"] = this.state.ptRecentIntepreation;
-            submission["ptLongtermIntepreation"] = this.state.ptLongtermIntepreation;
-            submission["resultNegative"] = this.state.resultNegative;
-            submission["resultRecent"] = this.state.resultRecent;
-            submission["resultLongterm"] = this.state.resultLongterm;
             submission["nameOfTest"] = this.state.nameOfTest;
             submission["testerName"] = this.state.testerName;
             submission["isPTTested"] = this.state.isPtDone;
@@ -211,7 +170,7 @@ class SubmitResults extends React.Component {
             submission["userId"] = this.state.userId;
             submission["sampleType"] = this.state.sampleType;
             submission["ptShipementId"] = this.props.shipment.pt_shipements_id;
-            
+            submission["samples"] = this.state.samples;
 
             (async () => {
                 let response = await SaveSubmission(submission);
@@ -226,70 +185,37 @@ class SubmitResults extends React.Component {
         }
     }
 
-    ptInterpretationNegative(event, type, index) {
-        this.setState({
-            ptNegativeIntepreation: event.target.value,
-        });
+    ptInterpretation(event, sample_id) {
 
-    }
-    ptInterpretationRecent(event, type, index) {
+        let samples = this.state.samples;
+        let interpretValue = event.target.value;
+        let status = event.target.checked ? 1 : 0;
 
-        this.setState({
-            ptRecentIntepreation: event.target.value
-        });
+        samples[sample_id]["interpretation"] = interpretValue;
 
-
-    }
-    ptInterpretationLongterm(event, type, index) {
-
-        this.setState({
-            ptLongtermIntepreation: event.target.value
-        });
-
+        // this.setState({
+        //     samples: samples
+        // });
 
     }
 
-    resultLongterm(event, type, index) {
+    visualResultsHandler(event, sample_id) {
 
+        let samples = this.state.samples;
+        let visualValue = event.target.value;
+        let status = event.target.checked ? 1 : 0;
 
-        let result = this.state.resultLongterm;
+        let results = samples[sample_id]["visual"]; //{ c: 0, v: 0, lt: 0 };
+        results[visualValue] = status;
+        samples[sample_id]["visual"] = results;
 
-        let reslt = event.target.checked ? 1 : 0;
-        result[event.target.value] = reslt;
-
-        this.setState({
-            resultLongterm: result
-        });
-
-    }
-
-    resultRecent(event, type, index) {
-
-
-        let result = this.state.resultRecent;
-        let reslt = event.target.checked ? 1 : 0;
-        result[event.target.value] = reslt;
-        this.setState({
-            resultRecent: result
-        });
-
+        // this.setState({
+        //     samples: samples
+        // });
 
     }
 
-    resultNegative(event, type, index) {
 
-        let result = this.state.resultNegative;
-
-        let reslt = event.target.checked ? 1 : 0;
-        result[event.target.value] = reslt;
-
-        this.setState({
-            resultNegative: result
-        });
-
-
-
-    }
     onPtLotReceiceDateHandler(event) {
         let isValid = this.validateTestingAndPTLotRecivedDate(this.state.testingDate, event.target.value);
 
@@ -733,37 +659,40 @@ class SubmitResults extends React.Component {
                                         {/*  PT - Long Term*/}
 
                                         {this.props.shipment.samples.map((sample) => {
-                                            
+
                                             return <tr key={uuidv4()}>
                                                 <td>{sample.sample_name}</td>
-                                                <td ><input onClick={this.resultLongterm.bind(this)} value="c" type="checkbox" /></td>
-                                                <td ><input onClick={this.resultLongterm.bind(this)} value="v" type="checkbox" /></td>
-                                                <td ><input onClick={this.resultLongterm.bind(this)} value="lt" type="checkbox" /></td>
-                                                <td onChange={this.ptInterpretationLongterm.bind(this)}>
+                                                <td ><input onClick={(event) => this.visualResultsHandler(event, sample.sample_id)} value="c" type="checkbox" /></td>
+                                                <td ><input onClick={(event) => this.visualResultsHandler(event, sample.sample_id)} value="v" type="checkbox" /></td>
+                                                <td ><input onClick={(event) => this.visualResultsHandler(event, sample.sample_id)} value="lt" type="checkbox" /></td>
+                                                <td onChange={(event) => this.ptInterpretation(event, sample.sample_id)}>
                                                     <div className="form-check form-check-inline">
                                                         <input className="form-check-input" type="radio" value="lt"
-                                                            name="long-term-radio" id="result_lt" />
+                                                            name={`interpret-radio-${sample.sample_id}`} id="result_lt" />
                                                         <label className="form-check-label" htmlFor="result_lt">
                                                             LT
                                                         </label>
                                                     </div>
                                                     <div className="form-check form-check-inline">
                                                         <input className="form-check-input" type="radio" value="recent"
-                                                            name="long-term-radio" id="result_recent" />
+                                                            name={`interpret-radio-${sample.sample_id}`}
+                                                            id="result_recent" />
                                                         <label className="form-check-label" htmlFor="result_recent">
                                                             recent
                                                         </label>
                                                     </div>
                                                     <div className="form-check form-check-inline">
                                                         <input className="form-check-input" type="radio" value="neg"
-                                                            name="long-term-radio" id="result_neg" />
+                                                            name={`interpret-radio-${sample.sample_id}`}
+                                                            id="result_neg" />
                                                         <label className="form-check-label" htmlFor="result_neg">
                                                             neg
                                                         </label>
                                                     </div>
                                                     <div className="form-check form-check-inline">
                                                         <input className="form-check-input" type="radio" value="invalid"
-                                                            name="long-term-radio" id="result_invalid" />
+                                                            name={`interpret-radio-${sample.sample_id}`}
+                                                            id="result_invalid" />
                                                         <label className="form-check-label" htmlFor="result_invalid">
                                                             invalid
                                                         </label>
