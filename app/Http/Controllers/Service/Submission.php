@@ -49,47 +49,27 @@ class Submission extends Controller
                 "not_test_reason" => $submission["ptNotTestedReason"],
                 "other_not_tested_reason" => $submission["ptNotTestedOtherReason"],
                 "pt_shipements_id" => $submission["ptShipementId"]
-               
+
             ]);
 
             $submissionModel->save();
             $submissionId = $submissionModel->id;
 
-            // $ptLtResult = new PtSubmissionResult([
-            //     "control_line" => $submission["resultLongterm"]["c"],
-            //     "verification_line" => $submission["resultLongterm"]["v"],
-            //     "interpretation" => $submission["ptLongtermIntepreation"],
-            //     "longterm_line" => $submission["resultLongterm"]["lt"],
-            //     "ptsubmission_id" => $submissionId,
-            //     "type" => "longterm"
-            // ]);
-            // $ptLtResult->save();
 
-            // $ptNegativeResult = new PtSubmissionResult([
-            //     "control_line" => $submission["resultNegative"]["c"],
-            //     "verification_line" => $submission["resultNegative"]["v"],
-            //     "interpretation" => $submission["ptNegativeIntepreation"],
-            //     "longterm_line" => $submission["resultNegative"]["lt"],
-            //     "ptsubmission_id" => $submissionId,
-            //     "type" => "negative"
+            // if (count($submission["samples"]) > 0) {
 
-            // ]);
-            // $ptNegativeResult->save();
+            foreach ($submission["samples"] as $key => $val) {
 
-            // $ptRecentResult = new PtSubmissionResult([
-
-            //     "control_line" => $submission["resultRecent"]["c"],
-            //     "verification_line" => $submission["resultRecent"]["v"],
-            //     "interpretation" => $submission["ptRecentIntepreation"],
-            //     "longterm_line" => $submission["resultRecent"]["lt"],
-            //     "ptsubmission_id" => $submissionId,
-            //     "type" => "recent"
-            // ]);
-            // $ptRecentResult->save();
-
-            // $this->saveNegativeRepeats($submission, $submissionId);
-            // $this->saveRecentRepeats($submission, $submissionId);
-            // $this->saveLongtermRepeats($submission, $submissionId);
+                $ptLtResult = new PtSubmissionResult([
+                    "control_line" => $val["visual"]["c"],
+                    "verification_line" => $val["visual"]["v"],
+                    "interpretation" => $val["interpretation"],
+                    "longterm_line" => $val["visual"]["lt"],
+                    "ptsubmission_id" => $submissionId,
+                    "sample_id" => $key
+                ]);
+                $ptLtResult->save();
+            }
 
             return response()->json(['Message' => 'Saved successfully'], 200);
         } catch (Exception $ex) {
