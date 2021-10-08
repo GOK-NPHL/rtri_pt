@@ -128,7 +128,7 @@ class Submission extends Controller
                 ->where('ptsubmission_id', $request->id)
                 ->get();
 
-            $payload = ['data' => $submission, 'test_results' => $submissionResults];
+            $payload = ['data' => $submission[0], 'test_results' => $submissionResults];
 
             return $payload;
             // return SubmissionModel::all();

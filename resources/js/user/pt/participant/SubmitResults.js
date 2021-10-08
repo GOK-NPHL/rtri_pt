@@ -395,7 +395,7 @@ class SubmitResults extends React.Component {
             display: "inline-block",
         }
         let today = new Date().toLocaleDateString();
-
+        let isPtDone = this.state.isPtDone;
         return (
 
             <>
@@ -602,7 +602,8 @@ class SubmitResults extends React.Component {
                         <div className="form-check text-center">
                             <input
                                 className="form-check-input"
-                                onClick={() => {
+                                checked={isPtDone ? false : true}
+                                onChange={() => {
                                     $("#pt-test-results").toggle();
                                     $("#test-not-done-section").toggle();
                                     this.setState({
@@ -619,7 +620,7 @@ class SubmitResults extends React.Component {
 
                     </div>
 
-                    <div id="test-not-done-section" style={{ "display": "none" }} className="col-sm-12 mb-4 ">
+                    <div id="test-not-done-section" style={{ "display": this.state.isPtDone ? "none" : "" }} className="col-sm-12 mb-4 ">
                         {/* why test not done */}
                         <form style={{ "paddingRight": "20%", "paddingLeft": "20%" }}>
                             <div className="form-group" >
@@ -639,7 +640,7 @@ class SubmitResults extends React.Component {
 
                     </div>
 
-                    <div id='pt-test-results' className="col-sm-12 ">
+                    <div id='pt-test-results' style={{ "display": this.state.isPtDone ? "" : "none" }} className="col-sm-12 ">
 
                         {/* PT Test results fields */}
                         <div className="row ml-5 mr-5">
