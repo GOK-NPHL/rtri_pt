@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Pagination from "react-js-pagination";
 import { FetchUserSamples } from '../../../components/utils/Helpers';
+import DashTable from './DashTable';
 import SubmitResults from './SubmitResults';
 
 
@@ -60,10 +61,23 @@ class Dashboard extends React.Component {
     toggleView(page) {
         this.setState({
             page: page
-        });
+        })
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.page !== this.state.page) {
+            (async () => {
+                let response = await FetchUserSamples();
+                this.setState({
+                    allTableElements: [],
+                    data: response,
+                })
+            })();
+        }
     }
 
     render() {
+
         const imgStyle = {
             width: "100%"
         };
@@ -74,8 +88,7 @@ class Dashboard extends React.Component {
 
         let tableElem = [];
 
-        console.log("trying");
-        console.log(this.state.data);
+
         if (Object.keys(this.state.data).length != 0 && this.state.page == 'list') {
             let index = 1;
 
@@ -91,17 +104,32 @@ class Dashboard extends React.Component {
 
                         <td>
 
-                            <button
-                                onClick={() => {
-                                    this.setState({
-                                        selectedElement: element,
-                                        page: 'edit'
-                                    });
-                                }}
-                                type="button"
-                                className="btn btn-success">
-                                <i className="far fa-edit"></i> View/Edit
-                            </button>
+                            {
+                                element.submission_id ?
+                                    <button
+                                        onClick={() => {
+                                            this.setState({
+                                                selectedElement: element,
+                                                page: 'edit'
+                                            });
+                                        }}
+                                        type="button"
+                                        className="btn btn-success">
+                                        <i className="far fa-edit"></i> Edit
+                                    </button>
+                                    :
+                                    <button
+                                        onClick={() => {
+                                            this.setState({
+                                                selectedElement: element,
+                                                page: 'edit'
+                                            });
+                                        }}
+                                        type="button"
+                                        className="btn btn-success">
+                                        <i className="far fa-edit"></i> Submit
+                                    </button>
+                            }
                             {/* <a
                                 onClick={() => {
                                     this.setState({
@@ -165,15 +193,20 @@ class Dashboard extends React.Component {
 
                 </table>
                 <br />
-                <Pagination
+                <DashTable
+                    activePage={this.state.activePage}
+                    totalItemsCount={this.state.currElementsTableEl.length}
+                    onChange={this.handlePageChange}
+                />
+                {/* <Pagination
                     itemClass="page-item"
                     linkClass="page-link"
                     activePage={this.state.activePage}
                     itemsCountPerPage={10}
                     totalItemsCount={this.state.currElementsTableEl.length}
                     pageRangeDisplayed={5}
-                    onChange={this.handlePageChange.bind(this)}
-                />
+                    onChange={this.handlePageChange}
+                /> */}
             </div>
         </div>;
 

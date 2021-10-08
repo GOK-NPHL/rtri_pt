@@ -191,7 +191,7 @@ class SubmitResults extends React.Component {
                 });
                 $('#messageModal').modal('toggle');
                 if (response.status == 200) {
-                    this.props.toggleView();
+                    this.props.toggleView("list");
                 }
             })();
         }
