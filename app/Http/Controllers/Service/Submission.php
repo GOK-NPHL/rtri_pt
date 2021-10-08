@@ -136,4 +136,55 @@ class Submission extends Controller
             return response()->json(['Message' => 'Error getting org units: ' . $ex->getMessage()], 500);
         }
     }
+
+
+    public function updateSubmission(Request $request)
+    {
+
+        try {
+            $submission = $request->submission;
+
+            $submissionModel = SubmissionModel::find($submission['id']);
+
+            $submissionModel->testing_date = $submission["testingDate"];
+            $submissionModel->kit_date_received = $submission["kitReceivedDate"];
+            $submissionModel->lot_date_received = $submission["ptLotReceivedDate"];
+            $submissionModel->kit_expiry_date = $submission["kitExpiryDate"];
+            $submissionModel->kit_lot_no = $submission["kitLotNo"];
+            $submissionModel->name_of_test = $submission["nameOfTest"];
+            $submissionModel->pt_lot_no = $submission["ptLotNumber"];
+            $submissionModel->lab_id = $submission["labId"];
+            $submissionModel->user_id = $submission["userId"];
+            $submissionModel->sample_reconstituion_date = $submission["ptReconstituionDate"];
+            $submissionModel->sample_type = $submission["sampleType"];
+            $submissionModel->tester_name = $submission["testerName"];
+            $submissionModel->test_justification = $submission["testJustification"];
+            $submissionModel->pt_tested = $submission["isPTTested"];
+            $submissionModel->not_test_reason = $submission["ptNotTestedReason"];
+            $submissionModel->other_not_tested_reason = $submission["ptNotTestedOtherReason"];
+            $submissionModel->pt_shipements_id = $submission["ptShipementId"];
+
+            $submissionModel->save();
+
+            DB::table('pt_submission_results')->where('ptsubmission_id', $submission['id'])->delete();
+
+            foreach ($submission["samples"] as $key => $val) {
+
+                $ptLtResult = new PtSubmissionResult([
+                    "control_line" => $val["visual"]["c"],
+                    "verification_line" => $val["visual"]["v"],
+                    "interpretation" => $val["interpretation"],
+                    "longterm_line" => $val["visual"]["lt"],
+                    "ptsubmission_id" =>  $submission['id'],
+                    "sample_id" => $key
+                ]);
+                $ptLtResult->save();
+            }
+
+            return response()->json(['Message' => 'Updated successfully'], 200);
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return response()->json(['Message' => 'Could not save sumbmission: ' . $ex->getMessage()], 500);
+        }
+    }
 }

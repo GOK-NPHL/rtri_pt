@@ -120,16 +120,7 @@ class PTShipmentController extends Controller
 
                 $participantsList = $request->shipement['selected'];
             }
-            // if (empty($request->shipement['readiness_id'] != true)) {
-            //     $readiness = Readiness::find($request->shipement['readiness_id']);
-            //     foreach ($readiness->laboratories as $lab) {
-            //         $participantsList[] = $lab->pivot->laboratory_id;
-            //     }
-            // } else {
-            //     $participantsList = $request->shipement['selected'];
-            // }
-            // $table->unsignedBigInteger('readiness_id')->nullable();
-
+            
             $shipment = PtShipement::create([
                 'pass_mark' => $request->shipement['pass_mark'],
                 'round_name' => $request->shipement['round'],
@@ -165,8 +156,7 @@ class PTShipmentController extends Controller
     {
 
         try {
-            // Log::info("======================================");
-            // Log::info($request->shipement);
+   
             $shipments = PtShipement::find($request->shipement['id']);
 
             if (empty($request->shipement['readiness_id']) && count($request->shipement['selected']) == 0) {
@@ -190,9 +180,7 @@ class PTShipmentController extends Controller
             $shipments->save();
 
             // save participants
-            Log::info("rwa=========");
-            Log:
-            info($request->shipement['selected']);
+      
             $shipments->laboratories()->sync($participantsList);
 
             // Save samples
@@ -285,7 +273,7 @@ class PTShipmentController extends Controller
             foreach ($shipments2 as $lab) {
 
                 if ($lab->round_name == "round 20") {
-                    Log::info($lab);
+                    // Log::info($lab);
                 }
                 if (array_key_exists($lab->id, $payload)) {
                     if (!array_key_exists($lab->sample_id, $sampleIds)) {

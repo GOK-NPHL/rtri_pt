@@ -1,6 +1,6 @@
 import React from 'react';
 import StatsLabel from '../../../components/utils/stats/StatsLabel';
-import { SaveSubmission, FetchSubmission, FetchCurrentParticipantDemographics } from '../../../components/utils/Helpers';
+import { SaveSubmission, UpdateSubmission, FetchSubmission, FetchCurrentParticipantDemographics } from '../../../components/utils/Helpers';
 import './Results.css';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -35,8 +35,8 @@ class SubmitResults extends React.Component {
             edittableSubmission: {},
             testerName: '',
             pt_shipements_id: '',
-            samples: {}
-
+            samples: {},
+            submissionId: ''
         }
 
         this.onNameOfTestHandler = this.onNameOfTestHandler.bind(this);
@@ -104,7 +104,8 @@ class SubmitResults extends React.Component {
                     userDemographics: userDemographics,
                     otherComments: edittableSubmission['data']['not_test_reason'] ? edittableSubmission['data']['not_test_reason'] : '',
                     notTestedReason: edittableSubmission['data']['other_not_tested_reason'] ? edittableSubmission['data']['other_not_tested_reason'] : 'Issue with sample',
-                    pt_shipements_id: this.props.shipment.pt_shipements_id
+                    pt_shipements_id: this.props.shipment.pt_shipements_id,
+                    submissionId: edittableSubmission['data']['id']
                 });
 
             } else {
@@ -179,9 +180,17 @@ class SubmitResults extends React.Component {
             submission["sampleType"] = this.state.sampleType;
             submission["ptShipementId"] = this.props.shipment.pt_shipements_id;
             submission["samples"] = this.state.samples;
+            submission["id"] = this.state.submissionId;
+
 
             (async () => {
-                let response = await SaveSubmission(submission);
+                let response;
+                if (this.props.selectedElementHasSubmmisions) {
+                    response = await UpdateSubmission(submission);
+                } else {
+                    response = await SaveSubmission(submission);
+                }
+
                 this.setState({
                     message: response.data.Message,
                 });

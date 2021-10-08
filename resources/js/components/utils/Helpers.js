@@ -465,6 +465,24 @@ export async function FetchSubmission(shipmentId) {
 
 }
 
+export async function UpdateSubmission(submission) {
+    try {
+        const response = await axios({
+            method: 'post',
+            url: `${settings.serverBaseApi}/update_submission`,
+            data: {
+                submission: submission,
+            }
+        });
+        return response;
+    } catch (err) {
+        // Handle Error Here
+        console.log(err);
+        return err.response
+    }
+}
+
+
 export async function UpdateOwnBio(personel) {
     try {
         const response = await axios({
