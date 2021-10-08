@@ -64,6 +64,8 @@ class SubmitResults extends React.Component {
         this.ptInterpretation = this.ptInterpretation.bind(this);
 
         this.onTesternameChangeHandler = this.onTesternameChangeHandler.bind(this);
+        this.isChecked = this.isChecked.bind(this);
+
     }
 
     componentDidMount() {
@@ -71,16 +73,35 @@ class SubmitResults extends React.Component {
             let edittableSubmission = null;
             let userDemographics = await FetchCurrentParticipantDemographics();
             if (this.props.selectedElementHasSubmmisions) {
-                edittableSubmission = await FetchSubmission(this.props.shipment.id);
+                edittableSubmission = await FetchSubmission(this.props.shipment.submission_id);
             }
             let samples = {};
 
-            this.props.shipment.samples.map((sample) => {
-                samples[sample.sample_id] = {
-                    "visual": { c: 0, v: 0, lt: 0 },
-                    "interpretation": null
+            if (this.props.selectedElementHasSubmmisions) {
+                if (edittableSubmission['test_results'].length == 0) {
+                    this.props.shipment.samples.map((sample) => {
+                        samples[sample.sample_id] = {
+                            "visual": { c: 0, v: 0, lt: 0 },
+                            "interpretation": null
+                        }
+                    });
+                } else {
+                    edittableSubmission['test_results'].map((sample) => {
+                        samples[sample.sample_id] = {
+                            "visual": { c: sample.control_line, v: sample.verification_line, lt: sample.longterm_line },
+                            "interpretation": sample.interpretation
+                        }
+                    });
                 }
-            });
+            } else {
+                this.props.shipment.samples.map((sample) => {
+                    samples[sample.sample_id] = {
+                        "visual": { c: 0, v: 0, lt: 0 },
+                        "interpretation": null
+                    }
+                });
+            }
+
 
             if (this.props.selectedElementHasSubmmisions) {
 
@@ -105,7 +126,8 @@ class SubmitResults extends React.Component {
                     otherComments: edittableSubmission['data']['not_test_reason'] ? edittableSubmission['data']['not_test_reason'] : '',
                     notTestedReason: edittableSubmission['data']['other_not_tested_reason'] ? edittableSubmission['data']['other_not_tested_reason'] : 'Issue with sample',
                     pt_shipements_id: this.props.shipment.pt_shipements_id,
-                    submissionId: edittableSubmission['data']['id']
+                    submissionId: edittableSubmission['data']['id'],
+                    samples: samples
                 });
 
             } else {
@@ -203,16 +225,13 @@ class SubmitResults extends React.Component {
     }
 
     ptInterpretation(event, sample_id) {
-
+        console.log("sample_id");
+        console.log(sample_id);
         let samples = this.state.samples;
         let interpretValue = event.target.value;
         let status = event.target.checked ? 1 : 0;
 
         samples[sample_id]["interpretation"] = interpretValue;
-
-        // this.setState({
-        //     samples: samples
-        // });
 
     }
 
@@ -225,10 +244,6 @@ class SubmitResults extends React.Component {
         let results = samples[sample_id]["visual"]; //{ c: 0, v: 0, lt: 0 };
         results[visualValue] = status;
         samples[sample_id]["visual"] = results;
-
-        // this.setState({
-        //     samples: samples
-        // });
 
     }
 
@@ -381,12 +396,25 @@ class SubmitResults extends React.Component {
         });
     }
 
+    isChecked(sample) {
+        try {
+            return this.props.selectedElementHasSubmmisions
+                &&
+                this.state.samples[sample.sample_id]["visual"]['c'] == 1
+                ? true : false
+        } catch (err) {
+            return false;
+        }
+
+    }
+
     render() {
-
-
-
-
-
+        let samplesToDisplay = [];
+        if (this.props.selectedElementHasSubmmisions) {
+            samplesToDisplay = this.state.samples;
+        } else {
+            samplesToDisplay = this.props.shipment.samples;
+        }
 
         const labInfo = {
             backgroundColor: "#f9f9f9",
@@ -680,13 +708,60 @@ class SubmitResults extends React.Component {
 
                                             return <tr key={uuidv4()}>
                                                 <td>{sample.sample_name}</td>
-                                                <td ><input onClick={(event) => this.visualResultsHandler(event, sample.sample_id)} value="c" type="checkbox" /></td>
-                                                <td ><input onClick={(event) => this.visualResultsHandler(event, sample.sample_id)} value="v" type="checkbox" /></td>
-                                                <td ><input onClick={(event) => this.visualResultsHandler(event, sample.sample_id)} value="lt" type="checkbox" /></td>
+                                                <td ><input onChange={(event) => this.visualResultsHandler(event, sample.sample_id)}
+                                                    defaultChecked={
+
+                                                        // samples[sample.sample_id] = {
+                                                        //     "visual": { c: 0, v: 0, lt: 0 },
+                                                        //     "interpretation": null
+                                                        // }
+
+                                                        this.props.selectedElementHasSubmmisions
+                                                            &&
+                                                            Object.keys(this.state.samples).length !== 0
+                                                            &&
+                                                            this.state.samples[sample.sample_id]["visual"]['c'] == 1
+                                                            ? true : false
+
+                                                    }
+                                                    value="c" type="checkbox" /></td>
+                                                <td ><input onChange={(event) => this.visualResultsHandler(event, sample.sample_id)}
+                                                    defaultChecked={
+
+                                                        this.props.selectedElementHasSubmmisions
+                                                            &&
+                                                            Object.keys(this.state.samples).length !== 0
+                                                            &&
+                                                            this.state.samples[sample.sample_id]["visual"]['v'] == 1
+                                                            ? true : false
+
+                                                    }
+
+                                                    value="v" type="checkbox" /></td>
+                                                <td ><input onChange={(event) => this.visualResultsHandler(event, sample.sample_id)}
+                                                    defaultChecked={
+                                                        this.props.selectedElementHasSubmmisions
+                                                            &&
+                                                            Object.keys(this.state.samples).length !== 0
+                                                            &&
+                                                            this.state.samples[sample.sample_id]["visual"]['lt'] == 1
+                                                            ? true : false
+                                                    }
+
+                                                    value="lt" type="checkbox" /></td>
                                                 <td onChange={(event) => this.ptInterpretation(event, sample.sample_id)}>
                                                     <div className="form-check form-check-inline">
                                                         <input className="form-check-input" type="radio" value="lt"
-                                                            name={`interpret-radio-${sample.sample_id}`} id="result_lt" />
+                                                            name={`interpret-radio-${sample.sample_id}`} id="result_lt"
+                                                            defaultChecked={
+                                                                this.props.selectedElementHasSubmmisions
+                                                                    &&
+                                                                    Object.keys(this.state.samples).length !== 0
+                                                                    &&
+                                                                    this.state.samples[sample.sample_id]["interpretation"] == 'lt'
+                                                                    ? true : false
+                                                            }
+                                                        />
                                                         <label className="form-check-label" htmlFor="result_lt">
                                                             LT
                                                         </label>
@@ -694,7 +769,16 @@ class SubmitResults extends React.Component {
                                                     <div className="form-check form-check-inline">
                                                         <input className="form-check-input" type="radio" value="recent"
                                                             name={`interpret-radio-${sample.sample_id}`}
-                                                            id="result_recent" />
+                                                            id="result_recent"
+                                                            defaultChecked={
+                                                                this.props.selectedElementHasSubmmisions
+                                                                    &&
+                                                                    Object.keys(this.state.samples).length !== 0
+                                                                    &&
+                                                                    this.state.samples[sample.sample_id]["interpretation"] == 'recent'
+                                                                    ? true : false
+                                                            }
+                                                        />
                                                         <label className="form-check-label" htmlFor="result_recent">
                                                             recent
                                                         </label>
@@ -702,7 +786,16 @@ class SubmitResults extends React.Component {
                                                     <div className="form-check form-check-inline">
                                                         <input className="form-check-input" type="radio" value="neg"
                                                             name={`interpret-radio-${sample.sample_id}`}
-                                                            id="result_neg" />
+                                                            id="result_neg"
+                                                            defaultChecked={
+                                                                this.props.selectedElementHasSubmmisions
+                                                                    &&
+                                                                    Object.keys(this.state.samples).length !== 0
+                                                                    &&
+                                                                    this.state.samples[sample.sample_id]["interpretation"] == 'neg'
+                                                                    ? true : false
+                                                            }
+                                                        />
                                                         <label className="form-check-label" htmlFor="result_neg">
                                                             neg
                                                         </label>
@@ -710,7 +803,16 @@ class SubmitResults extends React.Component {
                                                     <div className="form-check form-check-inline">
                                                         <input className="form-check-input" type="radio" value="invalid"
                                                             name={`interpret-radio-${sample.sample_id}`}
-                                                            id="result_invalid" />
+                                                            id="result_invalid"
+                                                            defaultChecked={
+                                                                this.props.selectedElementHasSubmmisions
+                                                                    &&
+                                                                    Object.keys(this.state.samples).length !== 0
+                                                                    &&
+                                                                    this.state.samples[sample.sample_id]["interpretation"] == 'invalid'
+                                                                    ? true : false
+                                                            }
+                                                        />
                                                         <label className="form-check-label" htmlFor="result_invalid">
                                                             invalid
                                                         </label>

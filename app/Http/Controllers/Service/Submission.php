@@ -119,7 +119,7 @@ class Submission extends Controller
             )->join('laboratories', 'laboratories.id', '=', 'ptsubmissions.lab_id')
 
                 ->where('ptsubmissions.lab_id', '=', $user->laboratory_id)
-                ->where('ptsubmissions.pt_shipements_id', '=', $request->id)
+                ->where('ptsubmissions.id', '=', $request->id)
                 ->get();
 
 
