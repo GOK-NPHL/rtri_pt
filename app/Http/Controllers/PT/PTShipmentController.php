@@ -237,7 +237,7 @@ class PTShipmentController extends Controller
 
         try {
 
-            $shipments = PtShipement::select(
+            $shipments = PtShipement::select( //when using labs
                 "pt_shipements.id",
                 "pt_shipements.id as pt_shipements_id",
                 "pt_shipements.round_name",
@@ -256,7 +256,7 @@ class PTShipmentController extends Controller
                 ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
                 ->where('users.id', $user->id);
 
-            $shipments2 = PtShipement::select(
+            $shipments2 = PtShipement::select( //when using readiness
                 "pt_shipements.id",
                 "pt_shipements.id as pt_shipements_id",
                 "pt_shipements.round_name",
