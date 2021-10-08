@@ -237,7 +237,7 @@ class PTShipmentController extends Controller
 
         try {
 
-            $labs = PtShipement::select(
+            $shipments = PtShipement::select(
                 "pt_shipements.id",
                 "pt_shipements.id as pt_shipements_id",
                 "pt_shipements.round_name",
@@ -246,33 +246,69 @@ class PTShipmentController extends Controller
                 "pt_shipements.end_date",
                 "pt_shipements.test_instructions",
                 "pt_samples.id as sample_id",
-                "pt_samples.name as sample_name"
-            )->join('laboratory_pt_shipement', 'laboratory_pt_shipement.pt_shipement_id', '=', 'pt_shipements.id')
+                "pt_samples.name as sample_name",
+                "ptsubmissions.id as submission_id"
+            )
+                ->leftJoin('ptsubmissions', 'pt_shipements.id', '=', 'ptsubmissions.pt_shipements_id')
+                ->join('laboratory_pt_shipement', 'laboratory_pt_shipement.pt_shipement_id', '=', 'pt_shipements.id')
                 ->join('pt_samples', 'pt_samples.ptshipment_id', '=', 'pt_shipements.id')
                 ->join('laboratories', 'laboratory_pt_shipement.laboratory_id', '=', 'laboratories.id')
                 ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
+                ->where('users.id', $user->id);
+
+            $shipments2 = PtShipement::select(
+                "pt_shipements.id",
+                "pt_shipements.id as pt_shipements_id",
+                "pt_shipements.round_name",
+                "pt_shipements.code",
+                "pt_shipements.start_date",
+                "pt_shipements.end_date",
+                "pt_shipements.test_instructions",
+                "pt_samples.id as sample_id",
+                "pt_samples.name as sample_name",
+                "ptsubmissions.id as submission_id"
+            )
+                ->leftJoin('ptsubmissions', 'pt_shipements.id', '=', 'ptsubmissions.pt_shipements_id')
+                ->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'pt_shipements.readiness_id')
+                ->join('pt_samples', 'pt_samples.ptshipment_id', '=', 'pt_shipements.id')
+                ->join('laboratories', 'laboratory_readiness.laboratory_id', '=', 'laboratories.id')
+                ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
+
                 ->where('users.id', $user->id)
+                ->union($shipments)
+                // ->orderBy('pt_shipements.end_date')
                 ->get();
 
             $payload = [];
+            $sampleIds = [];
 
-            foreach ($labs as $lab) {
-                Log::info($lab);
+            foreach ($shipments2 as $lab) {
 
+                if ($lab->round_name == "round 20") {
+                    Log::info($lab);
+                }
                 if (array_key_exists($lab->id, $payload)) {
-                    $payload[$lab->id]['samples'][] = ['sample_name' => $lab->sample_name, 'sample_id' => $lab->sample_id];
+                    if (!array_key_exists($lab->sample_id, $sampleIds)) {
+                        $payload[$lab->id]['samples'][] = ['sample_name' => $lab->sample_name, 'sample_id' => $lab->sample_id];
+                        $sampleIds[$lab->sample_id] = 1;
+                    }
                 } else {
-                    $payload[$lab->id] = [];
-                    $payload[$lab->id]['samples'] = [];
-                    $payload[$lab->id]['samples'][] = ['sample_name' => $lab->sample_name, 'sample_id' => $lab->sample_id];
 
-                    $payload[$lab->id]['test_instructions'] = $lab->test_instructions;
-                    $payload[$lab->id]['id'] = $lab->id;
-                    $payload[$lab->id]['pt_shipements_id'] = $lab->pt_shipements_id;
-                    $payload[$lab->id]['start_date'] = $lab->start_date;
-                    $payload[$lab->id]['code'] = $lab->code;
-                    $payload[$lab->id]['end_date'] = $lab->end_date;
-                    $payload[$lab->id]['round_name'] = $lab->round_name;
+                    if (!array_key_exists($lab->sample_id, $sampleIds)) {
+                        $sampleIds[$lab->sample_id] = 1;
+                        $payload[$lab->id] = [];
+                        $payload[$lab->id]['samples'] = [];
+                        $payload[$lab->id]['samples'][] = ['sample_name' => $lab->sample_name, 'sample_id' => $lab->sample_id];
+
+                        $payload[$lab->id]['test_instructions'] = $lab->test_instructions;
+                        $payload[$lab->id]['id'] = $lab->id;
+                        $payload[$lab->id]['pt_shipements_id'] = $lab->pt_shipements_id;
+                        $payload[$lab->id]['start_date'] = $lab->start_date;
+                        $payload[$lab->id]['code'] = $lab->code;
+                        $payload[$lab->id]['end_date'] = $lab->end_date;
+                        $payload[$lab->id]['round_name'] = $lab->round_name;
+                        $payload[$lab->id]['submission_id'] = $lab->submission_id;
+                    }
                 }
             }
 
