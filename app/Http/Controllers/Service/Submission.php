@@ -7,6 +7,8 @@ use App\PtSubmissionResult;
 use App\ptsubmission as SubmissionModel;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class Submission extends Controller
@@ -81,6 +83,55 @@ class Submission extends Controller
 
         try {
             return SubmissionModel::all();
+        } catch (Exception $ex) {
+            return response()->json(['Message' => 'Error getting org units: ' . $ex->getMessage()], 500);
+        }
+    }
+
+    public function getSubmissionById(Request $request)
+    {
+
+        $user = Auth::user();
+        try {
+
+            $submission = SubmissionModel::select(
+                'ptsubmissions.id',
+                'ptsubmissions.testing_date',
+                'ptsubmissions.name_of_test',
+                'ptsubmissions.kit_lot_no',
+                'ptsubmissions.kit_date_received',
+                'ptsubmissions.kit_expiry_date',
+                'ptsubmissions.pt_lot_no',
+                'ptsubmissions.lot_date_received',
+                'ptsubmissions.sample_reconstituion_date',
+                'ptsubmissions.user_id',
+                'ptsubmissions.sample_type',
+                'ptsubmissions.tester_name',
+                'ptsubmissions.test_justification',
+                'ptsubmissions.pt_tested',
+                'ptsubmissions.not_test_reason',
+                'ptsubmissions.other_not_tested_reason',
+                'laboratories.email',
+                'ptsubmissions.lab_id',
+                'laboratories.lab_name',
+                'laboratories.mfl_code'
+
+            )->join('laboratories', 'laboratories.id', '=', 'ptsubmissions.lab_id')
+
+                ->where('ptsubmissions.lab_id', '=', $user->laboratory_id)
+                ->where('ptsubmissions.pt_shipements_id', '=', $request->id)
+                ->get();
+
+
+            $submissionResults = DB::table('pt_submission_results')
+                ->select('sample_id', 'control_line', 'verification_line', 'longterm_line', 'interpretation')
+                ->where('ptsubmission_id', $request->id)
+                ->get();
+
+            $payload = ['data' => $submission, 'test_results' => $submissionResults];
+
+            return $payload;
+            // return SubmissionModel::all();
         } catch (Exception $ex) {
             return response()->json(['Message' => 'Error getting org units: ' . $ex->getMessage()], 500);
         }

@@ -110,6 +110,7 @@ class Dashboard extends React.Component {
                                         onClick={() => {
                                             this.setState({
                                                 selectedElement: element,
+                                                selectedElementHasSubmmisions: true,
                                                 page: 'edit'
                                             });
                                         }}
@@ -122,6 +123,7 @@ class Dashboard extends React.Component {
                                         onClick={() => {
                                             this.setState({
                                                 selectedElement: element,
+                                                selectedElementHasSubmmisions: false,
                                                 page: 'edit'
                                             });
                                         }}
@@ -211,7 +213,10 @@ class Dashboard extends React.Component {
         </div>;
 
         if (this.state.page == 'edit') {
-            pageContent = <SubmitResults shipment={this.state.selectedElement} toggleView={this.toggleView} />
+            pageContent = <SubmitResults
+                selectedElementHasSubmmisions={this.state.selectedElementHasSubmmisions}
+                shipment={this.state.selectedElement}
+                toggleView={this.toggleView} />
         }
 
         return (

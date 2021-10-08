@@ -29,6 +29,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('/save_submission', [Submission::class, 'createSubmission']);
 Route::get('/get_submissions', [Submission::class, 'getSubmissions']);
+Route::get('/get_submission_by_id/{id}', [Submission::class, 'getSubmissionById']);
 
 Route::get('/get_admin_users', [QCAdminUsersController::class, 'getAdminUsers']);
 Route::get('/get_admin_user/{id}', [AdminAuthController::class, 'getAdminUser']);

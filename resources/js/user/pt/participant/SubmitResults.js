@@ -1,6 +1,6 @@
 import React from 'react';
 import StatsLabel from '../../../components/utils/stats/StatsLabel';
-import { SaveSubmission, FetchUserSamples, FetchCurrentParticipantDemographics } from '../../../components/utils/Helpers';
+import { SaveSubmission, FetchSubmission, FetchCurrentParticipantDemographics } from '../../../components/utils/Helpers';
 import './Results.css';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -67,12 +67,11 @@ class SubmitResults extends React.Component {
     }
 
     componentDidMount() {
-
         (async () => {
             let edittableSubmission = null;
             let userDemographics = await FetchCurrentParticipantDemographics();
-            if (this.props.isEdit) {
-                edittableSubmission = await FetchSubmission(this.props.editId);
+            if (this.props.selectedElementHasSubmmisions) {
+                edittableSubmission = await FetchSubmission(this.props.shipment.id);
             }
             let samples = {};
 
@@ -83,10 +82,7 @@ class SubmitResults extends React.Component {
                 }
             });
 
-            if (this.props.isEdit) {
-
-                let ptLongtermIntepreation = '';
-                let ptNegativeIntepreation = '';
+            if (this.props.selectedElementHasSubmmisions) {
 
                 this.setState({
                     ptLotReceivedDate: edittableSubmission['data']['lot_date_received'],
