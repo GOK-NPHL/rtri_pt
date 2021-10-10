@@ -114,10 +114,11 @@ class Submission extends Controller
                 'laboratories.email',
                 'ptsubmissions.lab_id',
                 'laboratories.lab_name',
-                'laboratories.mfl_code'
+                'laboratories.mfl_code',
+                'pt_shipements.test_instructions',
 
             )->join('laboratories', 'laboratories.id', '=', 'ptsubmissions.lab_id')
-
+                ->join('pt_shipements', 'pt_shipements.id', '=', 'ptsubmissions.pt_shipements_id')
                 ->where('ptsubmissions.lab_id', '=', $user->laboratory_id)
                 ->where('ptsubmissions.id', '=', $request->id)
                 ->get();

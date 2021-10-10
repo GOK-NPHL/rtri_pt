@@ -36,7 +36,8 @@ class SubmitResults extends React.Component {
             testerName: '',
             pt_shipements_id: '',
             samples: {},
-            submissionId: ''
+            submissionId: '',
+            test_instructions: ''
         }
 
         this.onNameOfTestHandler = this.onNameOfTestHandler.bind(this);
@@ -127,15 +128,18 @@ class SubmitResults extends React.Component {
                     notTestedReason: edittableSubmission['data']['other_not_tested_reason'] ? edittableSubmission['data']['other_not_tested_reason'] : 'Issue with sample',
                     pt_shipements_id: this.props.shipment.pt_shipements_id,
                     submissionId: edittableSubmission['data']['id'],
+                    test_instructions: edittableSubmission['data']['test_instructions'],
                     samples: samples
                 });
 
             } else {
+
                 this.setState({
                     userDemographics: userDemographics,
                     labId: userDemographics[0].lab_id,
                     userId: userDemographics[0].user_id,
                     edittableSubmission: edittableSubmission,
+                    test_instructions: this.props.shipment.test_instructions,
                     samples: samples
                 });
 
@@ -632,6 +636,14 @@ class SubmitResults extends React.Component {
                         {/* End Test justification */}
 
                         <hr />
+                    </div>
+
+                    <div className="col-sm-12  pl-4 pr-4 mb-3">
+
+                        <label htmlFor="test_instructions" >Testing Instructions</label>
+                        <textarea readOnly
+                            value={this.state.test_instructions}
+                            className="form-control" id="test_instructions" rows="3"></textarea>
                     </div>
 
                     <div className="col-sm-12 mb-4  pl-4 pr-4">

@@ -129,7 +129,7 @@ class Dashboard extends React.Component {
                                         }}
                                         type="button"
                                         className="btn btn-success">
-                                        <i className="far fa-edit"></i> Submit
+                                        <i className="fas fa-paper-plane"></i> Submit
                                     </button>
                             }
                             {/* <a
