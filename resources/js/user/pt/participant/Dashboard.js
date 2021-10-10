@@ -41,7 +41,6 @@ class Dashboard extends React.Component {
 
         (async () => {
             let response = await FetchUserSamples();
-            console.log(response);
             this.setState({
                 data: response
             })
@@ -88,9 +87,12 @@ class Dashboard extends React.Component {
     }
 
     toggleView(page) {
+
         this.setState({
-            page: page
+            page: page,
         })
+
+
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -99,6 +101,10 @@ class Dashboard extends React.Component {
                 let response = await FetchUserSamples();
                 this.setState({
                     allTableElements: [],
+                    allTableElements: [],
+                    allSubmittedTableElements: [],
+                    currElementsTableEl: [],
+                    currSubmittedElementsTableEl: [],
                     data: response,
                 })
             })();
@@ -126,7 +132,7 @@ class Dashboard extends React.Component {
 
 
                 let datRow = <tr key={index++}>
-                    <th scope="row">{element.submission_id == null ? unsubmittedIndex ++ : submittedIndex++}</th>
+                    <th scope="row">{element.submission_id == null ? unsubmittedIndex++ : submittedIndex++}</th>
                     <td>{element.round_name}</td>
                     <td>{element.code}</td>
                     <td>{element.end_date}</td>
@@ -185,14 +191,15 @@ class Dashboard extends React.Component {
 
                 index += 1;
             }
-            if (this.state.allTableElements.length == 0) {
+            if (this.state.allTableElements.length == 0 && tableElem.length != 0) {
                 this.setState({
                     allTableElements: tableElem,
                     currElementsTableEl: tableElem
+
                 })
             }
 
-            if (this.state.allSubmittedTableElements.length == 0) {
+            if (this.state.allSubmittedTableElements.length == 0 && submittedTableElem.length != 0) {
                 this.setState({
                     allSubmittedTableElements: submittedTableElem,
                     currSubmittedElementsTableEl: submittedTableElem
