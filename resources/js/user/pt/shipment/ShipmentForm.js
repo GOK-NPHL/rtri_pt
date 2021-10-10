@@ -558,8 +558,7 @@ class ShipmentForm extends React.Component {
                                 </a>
                                 <a
                                     onClick={() => {
-                                        this.state.pageState == 'edit' ? this.props.toggleView('edit') : '';
-                                        this.state.pageState == 'add' ? this.props.toggleView('add') : ''
+                                        this.props.toggleView('list');
                                     }
 
                                     }

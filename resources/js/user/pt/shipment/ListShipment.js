@@ -24,14 +24,22 @@ class ListShipment extends React.Component {
     }
 
     componentDidMount() {
+        this.fetchListing();
+    }
 
+    fetchListing() {
         (async () => {
             let response = await FetchShipments();
             this.setState({
                 data: response
             });
-            console.log(response);
         })();
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps.currentPage !== this.props.currentPage) {
+            this.fetchListing();
+        }
 
     }
 
@@ -55,6 +63,7 @@ class ListShipment extends React.Component {
     }
 
     render() {
+        console.log("rendering")
         const imgStyle = {
             width: "100%"
         };

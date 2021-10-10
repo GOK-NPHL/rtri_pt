@@ -12,11 +12,9 @@ class PtShipment extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            isShowNewShipmentPage: false,
-            isShowEditShipmentPage: false,
             newShipmentButtonText: 'Add new PT shipment',
             shipmentId: null,
-            currentPage: ''
+            currentPage: 'list'
         }
         this.toggleView = this.toggleView.bind(this);
     }
@@ -25,18 +23,26 @@ class PtShipment extends React.Component {
 
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.currentPage !== this.state.currentPage) {
+            return true;
+        }
+    }
+
     toggleView(page, shipmentId) {
 
         if (page == 'edit') {
             this.setState({
-                isShowEditShipmentPage: !this.state.isShowEditShipmentPage,
                 shipmentId: shipmentId,
                 currentPage: 'edit'
             })
         } else if (page == 'add') {
             this.setState({
-                isShowNewShipmentPage: !this.state.isShowNewShipmentPage,
                 currentPage: 'add'
+            })
+        } else if (page == 'list') {
+            this.setState({
+                currentPage: 'list'
             })
         }
 
@@ -48,18 +54,16 @@ class PtShipment extends React.Component {
             <React.Fragment>
                 <div id='user_table' className='row'>
                     <div className="col-sm-12 mb-3 mt-3">
-                        {this.state.isShowNewShipmentPage ? <h3 className="float-left">New Shipment</h3> : ''}
-                        {this.state.isShowEditShipmentPage ? <h3 className="float-left">Edit Shipment</h3> : ''}
-                        {!(this.state.isShowNewShipmentPage) && !(this.state.isShowEditShipmentPage)
+                        {this.state.currentPage == 'add' ? <h3 className="float-left">New Shipment</h3> : ''}
+                        {this.state.currentPage == 'edit' ? <h3 className="float-left">Edit Shipment</h3> : ''}
+                        {this.state.currentPage == 'list'
                             ? <h3 className="float-left">All Shipments</h3> : ''}
                         <a style={{ "color": "white" }}
                             onClick={
 
                                 () => {
-                                    if (this.state.isShowEditShipmentPage) {
-                                        this.toggleView('edit');
-                                    } else if (this.state.isShowNewShipmentPage) {
-                                        this.toggleView('add');
+                                    if (this.state.currentPage == 'edit' || this.state.currentPage == 'add') {
+                                        this.toggleView('list');
                                     } else {
                                         this.toggleView('add');
                                     }
@@ -67,12 +71,18 @@ class PtShipment extends React.Component {
                             }
                             type="button" href="#"
                             className="btn btn-info 
-                float-right">{this.state.isShowNewShipmentPage ? 'Close open shipment' : 'Add new PT shipment'}</a>
+                float-right">{this.state.currentPage == 'edit' || this.state.currentPage == 'add' ?
+                                'Close open shipment' : 'Add new PT shipment'}</a>
                     </div>
                 </div>
-                {this.state.isShowNewShipmentPage ? <AddShipement toggleView={this.toggleView} /> : ''}
-                {this.state.isShowEditShipmentPage ? <EditShipment id={this.state.shipmentId} toggleView={this.toggleView} /> : ''}
-                <ListShipment isShowEditShipmentPage={this.state.isShowEditShipmentPage} toggleView={this.toggleView} isShowNewShipmentPage={this.state.isShowNewShipmentPage} />
+                {this.state.currentPage == 'add' ? <AddShipement toggleView={this.toggleView} /> : ''}
+                {this.state.currentPage == 'edit' ? <EditShipment id={this.state.shipmentId} toggleView={this.toggleView} /> : ''}
+                {
+                    this.state.currentPage == 'list' ?
+                        <ListShipment isShowEditShipmentPage={this.state.isShowEditShipmentPage} toggleView={this.toggleView} isShowNewShipmentPage={this.state.isShowNewShipmentPage} /> :
+                        ''
+                }
+
             </React.Fragment>
         );
     }

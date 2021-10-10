@@ -103,7 +103,6 @@ use Illuminate\Support\Facades\Gate;
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="#">PT Indicator Reports</a>
-                                    <a class="dropdown-item" href="#">QC Indicator Reports</a>
 
                                 </div>
                             </li>
