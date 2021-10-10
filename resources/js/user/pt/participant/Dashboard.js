@@ -171,7 +171,7 @@ class Dashboard extends React.Component {
                                             <i className="fas fa-paper-plane"></i> Submit
                                         </button> :
                                     <span>
-                                        Submission elapsed
+                                        Submission closed
                                     </span>
 
                             }
