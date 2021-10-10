@@ -274,7 +274,14 @@ class Dashboard extends React.Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {this.state.currSubmittedElementsTableEl.slice(this.state.startSubmittedTableData, this.state.endeSubmittedTableData)}
+                        {this.state.currSubmittedElementsTableEl.length > 0 ?
+                            this.state.currSubmittedElementsTableEl.slice(this.state.startSubmittedTableData, this.state.endeSubmittedTableData) :
+                            <tr>
+                                <td colSpan={5}>
+                                    No submissions done
+                                </td>
+                            </tr>
+                        }
                     </tbody>
 
                 </table>
@@ -319,7 +326,15 @@ class Dashboard extends React.Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {this.state.currElementsTableEl.slice(this.state.startTableData, this.state.endeTableData)}
+                        {
+                            this.state.currElementsTableEl.length > 0 ?
+                                this.state.currElementsTableEl.slice(this.state.startTableData, this.state.endeTableData) :
+                                <tr>
+                                    <td colSpan={5}>
+                                        No pending samples to fill
+                                    </td>
+                                </tr>
+                        }
                     </tbody>
 
                 </table>
