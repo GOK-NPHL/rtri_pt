@@ -142,32 +142,38 @@ class Dashboard extends React.Component {
                         <td>
 
                             {
-                                element.submission_id ?
-                                    <button
-                                        onClick={() => {
-                                            this.setState({
-                                                selectedElement: element,
-                                                selectedElementHasSubmmisions: true,
-                                                page: 'edit'
-                                            });
-                                        }}
-                                        type="button"
-                                        className="btn btn-success">
-                                        <i className="far fa-edit"></i> Edit
-                                    </button>
-                                    :
-                                    <button
-                                        onClick={() => {
-                                            this.setState({
-                                                selectedElement: element,
-                                                selectedElementHasSubmmisions: false,
-                                                page: 'edit'
-                                            });
-                                        }}
-                                        type="button"
-                                        className="btn btn-success">
-                                        <i className="fas fa-paper-plane"></i> Submit
-                                    </button>
+                                Date.parse(element.end_date) > new Date() ?
+                                    element.submission_id ?
+
+                                        <button
+                                            onClick={() => {
+                                                this.setState({
+                                                    selectedElement: element,
+                                                    selectedElementHasSubmmisions: true,
+                                                    page: 'edit'
+                                                });
+                                            }}
+                                            type="button"
+                                            className="btn btn-success">
+                                            <i className="far fa-edit"></i> Edit
+                                        </button>
+                                        :
+                                        <button
+                                            onClick={() => {
+                                                this.setState({
+                                                    selectedElement: element,
+                                                    selectedElementHasSubmmisions: false,
+                                                    page: 'edit'
+                                                });
+                                            }}
+                                            type="button"
+                                            className="btn btn-success">
+                                            <i className="fas fa-paper-plane"></i> Submit
+                                        </button> :
+                                    <span>
+                                        Submission elapsed
+                                    </span>
+
                             }
                             {/* <a
                                 onClick={() => {
