@@ -119,13 +119,14 @@ class Dashboard extends React.Component {
         let submittedTableElem = [];
 
         if (Object.keys(this.state.data).length != 0 && this.state.page == 'list') {
-            let index = 1;
-
+            let unsubmittedIndex = 1;
+            let submittedIndex = 1;
+            let index = 0;
             for (const [key, element] of Object.entries(this.state.data)) {
 
 
-                let datRow = <tr key={index}>
-                    <th scope="row">{index + 1}</th>
+                let datRow = <tr key={index++}>
+                    <th scope="row">{element.submission_id == null ? unsubmittedIndex ++ : submittedIndex++}</th>
                     <td>{element.round_name}</td>
                     <td>{element.code}</td>
                     <td>{element.end_date}</td>
