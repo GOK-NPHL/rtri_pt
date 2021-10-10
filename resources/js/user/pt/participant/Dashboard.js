@@ -12,15 +12,25 @@ class Dashboard extends React.Component {
         super(props);
         this.state = {
             data: {},
-            currElementsTableEl: [],
-            allTableElements: [],
             selectedElement: null,
             allowedPermissions: [],
             userActionState: 'userList',
+            //pending submissions
+            currElementsTableEl: [],
+            allTableElements: [],
             startTableData: 0,
             endeTableData: 10,
             activePage: 1,
-            page: 'list'
+            //submitted submissions
+            currSubmittedElementsTableEl: [],
+            allSubmittedTableElements: [],
+            startSubmittedTableData: 0,
+            endeSubmittedTableData: 10,
+            activeSubmittedPage: 1,
+            //
+            page: 'list',
+            listingName: 'Pending tests',
+            listing: 'pending'
         }
         this.handlePageChange = this.handlePageChange.bind(this);
         this.toggleView = this.toggleView.bind(this);
@@ -40,7 +50,6 @@ class Dashboard extends React.Component {
     }
 
     handlePageChange(pageNumber) {
-        console.log(`active page is ${pageNumber}`);
         let pgNumber = pageNumber * 10 + 1;
         this.setState({
             startTableData: pgNumber - 11,
@@ -49,12 +58,32 @@ class Dashboard extends React.Component {
         });
     }
 
+    handleSubmittedPageChange(pageNumber) {
+        console.log(`active page is ${pageNumber}`);
+        let pgNumber = pageNumber * 10 + 1;
+        this.setState({
+            startSubmittedTableData: pgNumber - 11,
+            endeSubmittedTableData: pgNumber - 1,
+            activeSubmittedPage: pageNumber
+        });
+    }
+
+
     updatedSearchItem(currElementsTableEl) {
         this.setState({
             currElementsTableEl: currElementsTableEl,
             activePage: 1,
             startTableData: 0,
             endeTableData: 10,
+        })
+    }
+
+    updatedSubmittedSearchItem(currSubmittedElementsTableEl) {
+        this.setState({
+            currSubmittedElementsTableEl: currSubmittedElementsTableEl,
+            activeSubmittedPage: 1,
+            startSubmittedTableData: 0,
+            endeSubmittedTableData: 10,
         })
     }
 
@@ -87,14 +116,15 @@ class Dashboard extends React.Component {
         };
 
         let tableElem = [];
-
+        let submittedTableElem = [];
 
         if (Object.keys(this.state.data).length != 0 && this.state.page == 'list') {
             let index = 1;
 
             for (const [key, element] of Object.entries(this.state.data)) {
 
-                tableElem.push(<tr key={index}>
+
+                let datRow = <tr key={index}>
                     <th scope="row">{index + 1}</th>
                     <td>{element.round_name}</td>
                     <td>{element.code}</td>
@@ -145,8 +175,13 @@ class Dashboard extends React.Component {
                         </td>
                     }
 
-                </tr>
-                );
+                </tr>;
+                if (element.submission_id == null) {
+                    tableElem.push(datRow);
+                } else {
+                    submittedTableElem.push(datRow);
+                }
+
                 index += 1;
             }
             if (this.state.allTableElements.length == 0) {
@@ -156,16 +191,102 @@ class Dashboard extends React.Component {
                 })
             }
 
+            if (this.state.allSubmittedTableElements.length == 0) {
+                this.setState({
+                    allSubmittedTableElements: submittedTableElem,
+                    currSubmittedElementsTableEl: submittedTableElem
+                })
+            }
+
         }
 
-        let pageContent = <div id='user_table' className='row'>
+
+        let viewControlButton = <div className="row">
             <div className="col-sm-12 mt-3">
-                <h3 className="float-left">RTRI PT Samples</h3>
+                <h3 className="float-left">RTRI PT Samples {this.state.listingName}</h3>
 
             </div>
 
-            <div className='col-sm-12 col-md-12'>
+            <div className="col-sm-12">
                 <hr />
+            </div>
+
+            <div className="form-check form-check-inline pl-2 mt-2">
+                <input
+                    onClick={() => {
+                        this.setState({
+                            listingName: 'Pending tests',
+                            listing: 'pending',
+                        })
+                    }}
+                    defaultChecked={this.state.listing == 'pending'} className="form-check-input"
+                    type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" />
+                <label className="form-check-label" htmlFor="inlineRadio1">View pending submissions</label>
+            </div>
+            <div className="form-check form-check-inline  mt-2">
+                <input
+                    onClick={() => {
+                        this.setState({
+                            listingName: 'Submitted tests',
+                            listing: 'submitted'
+                        })
+                    }}
+                    defaultChecked={this.state.listing == 'submitted'}
+                    className="form-check-input" type="radio"
+                    name="inlineRadioOptions" id="inlineRadio2" value="option2" />
+                <label className="form-check-label" htmlFor="inlineRadio2">View submitted results</label>
+            </div>
+        </div>
+
+        let submittedPageContent = <div id='user_table' className='row'>
+
+            <div className='col-sm-12 col-md-12'>
+
+                <div className="form-group mb-2">
+                    <input type="text"
+                        onChange={(event) => {
+                            let currSubmittedElementsTableEl = this.state.allSubmittedTableElements.filter(elemnt =>
+                                elemnt['props']['children'][1]['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
+                                elemnt['props']['children'][2]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase())
+                            );
+                            this.updatedSubmittedSearchItem(currSubmittedElementsTableEl);
+                        }}
+                        className="form-control float-right w-25 mb-1" placeholder="search shipment"></input>
+                </div>
+
+                <table className="table table-striped table-sm  table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Round</th>
+                            <th scope="col">Code</th>
+                            <th scope="col">End Date</th>
+                            <th scope="col">Action</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {this.state.currSubmittedElementsTableEl.slice(this.state.startSubmittedTableData, this.state.endeSubmittedTableData)}
+                    </tbody>
+
+                </table>
+                <br />
+                <DashTable
+                    activePage={this.state.activeSubmittedPage}
+                    totalItemsCount={this.state.currSubmittedElementsTableEl.length}
+                    onChange={this.handleSubmittedPageChange}
+                />
+            </div>
+
+        </div>;
+
+        //submission_id
+        let unSubmittedContent = <div id='user_submitted_content_table' className='row'>
+
+
+            <div className='col-sm-12 col-md-12'>
+
+
                 <div className="form-group mb-2">
                     <input type="text"
                         onChange={(event) => {
@@ -201,8 +322,8 @@ class Dashboard extends React.Component {
                     onChange={this.handlePageChange}
                 />
                 {/* <Pagination
-                    itemClass="page-item"
-                    linkClass="page-link"
+                    itemclassName="page-item"
+                    linkclassName="page-link"
                     activePage={this.state.activePage}
                     itemsCountPerPage={10}
                     totalItemsCount={this.state.currElementsTableEl.length}
@@ -210,10 +331,16 @@ class Dashboard extends React.Component {
                     onChange={this.handlePageChange}
                 /> */}
             </div>
+
         </div>;
 
-        if (this.state.page == 'edit') {
-            pageContent = <SubmitResults
+        if (this.state.page == 'edit' && this.state.listing == 'pending') {
+            unSubmittedContent = <SubmitResults
+                selectedElementHasSubmmisions={this.state.selectedElementHasSubmmisions}
+                shipment={this.state.selectedElement}
+                toggleView={this.toggleView} />
+        } else if (this.state.page == 'edit' && this.state.listing == 'submitted') {
+            submittedPageContent = <SubmitResults
                 selectedElementHasSubmmisions={this.state.selectedElementHasSubmmisions}
                 shipment={this.state.selectedElement}
                 toggleView={this.toggleView} />
@@ -221,7 +348,9 @@ class Dashboard extends React.Component {
 
         return (
             <React.Fragment>
-                {pageContent}
+                {this.state.page == 'list' ? viewControlButton : ''}
+                {this.state.listing == 'pending' ? unSubmittedContent : ''}
+                {this.state.listing == 'submitted' ? submittedPageContent : ''}
             </React.Fragment>
         );
     }
