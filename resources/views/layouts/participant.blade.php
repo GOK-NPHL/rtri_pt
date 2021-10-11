@@ -192,8 +192,8 @@ use Illuminate\Support\Facades\Gate;
         <footer class="main-footer">
             <strong>Copyright &copy; 2014- <script>
                     document.write(new Date().getFullYear());
-                </script> <a href="https://nphl.go.ke/">NPHL KNEQAS - RTRI PT/QC</a>.</strong>
-            All rights reserved. | <a href="http://helpdesk.nphl.go.ke/">RTRI PT/QC HELP DESK</a>
+                </script> <a href="https://nphl.go.ke/">NPHL KNEQAS - RTRI PT</a>.</strong>
+            All rights reserved. | <a href="http://helpdesk.nphl.go.ke/">RTRI PT HELP DESK</a>
             <div class="float-right d-none d-sm-inline-block">
                 <b>Version</b> 1.0.0
             </div>

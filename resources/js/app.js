@@ -28,6 +28,7 @@ require('./user/pt/readiness/AddReadiness');
 require('./user/pt/readiness/EditReadiness');
 require('./user/pt/readiness/ListReadiness');
 require('./user/pt/participant/Dashboard');
+require('./user/pt/participant/Readiness');
 require('./user/pt/participant/Demographics');
 
 require('./user/general/Dashboard');

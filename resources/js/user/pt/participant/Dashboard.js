@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import Pagination from "react-js-pagination";
 import { FetchUserSamples, FetchReadnessSurvey } from '../../../components/utils/Helpers';
 import DashTable from './DashTable';
+import ReadinessList from './ReadinessList';
 import SubmitResults from './SubmitResults';
 
 
@@ -29,8 +30,9 @@ class Dashboard extends React.Component {
             activeSubmittedPage: 1,
             //
             page: 'list',
-            listingName: 'Pending tests',
-            listing: 'pending'
+            listingName: ' Samples Submitted tests',
+            listing: 'submitted',
+            readiness: []
         }
         this.handlePageChange = this.handlePageChange.bind(this);
         this.toggleView = this.toggleView.bind(this);
@@ -41,8 +43,12 @@ class Dashboard extends React.Component {
 
         (async () => {
             let response = await FetchUserSamples();
+            let readiness = await FetchReadnessSurvey();
+            console.log("readiness")
+            console.log(readiness)
             this.setState({
-                data: response
+                data: response,
+                readiness: readiness
             })
         })();
 
@@ -101,10 +107,11 @@ class Dashboard extends React.Component {
                 let response = await FetchUserSamples();
                 this.setState({
                     allTableElements: [],
-                    allTableElements: [],
                     allSubmittedTableElements: [],
+                    allReadinessTableElements: [],
                     currElementsTableEl: [],
                     currSubmittedElementsTableEl: [],
+                    currReadinessElementsTableEl: [],
                     data: response,
                 })
             })();
@@ -124,6 +131,7 @@ class Dashboard extends React.Component {
         let tableElem = [];
         let submittedTableElem = [];
 
+        // results submissions table elements
         if (Object.keys(this.state.data).length != 0 && this.state.page == 'list') {
             let unsubmittedIndex = 1;
             let submittedIndex = 1;
@@ -214,7 +222,7 @@ class Dashboard extends React.Component {
 
         let viewControlButton = <div className="row">
             <div className="col-sm-12 mt-3">
-                <h3 className="float-left">RTRI PT Samples {this.state.listingName}</h3>
+                <h3 className="float-left">RTRI PT  {this.state.listingName}</h3>
 
             </div>
 
@@ -222,37 +230,11 @@ class Dashboard extends React.Component {
                 <hr />
             </div>
 
-            {/* Readiness */}
-            <div className="form-check form-check-inline pl-2 mt-2">
-                <input
-                    onClick={() => {
-                        this.setState({
-                            listingName: 'Pending tests',
-                            listing: 'pending',
-                        })
-                    }}
-                    defaultChecked={this.state.listing == 'pending'} className="form-check-input"
-                    type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" />
-                <label className="form-check-label" htmlFor="inlineRadio1">View readiness</label>
-            </div>
-
-            <div className="form-check form-check-inline pl-2 mt-2">
-                <input
-                    onClick={() => {
-                        this.setState({
-                            listingName: 'Pending tests',
-                            listing: 'pending',
-                        })
-                    }}
-                    defaultChecked={this.state.listing == 'pending'} className="form-check-input"
-                    type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" />
-                <label className="form-check-label" htmlFor="inlineRadio1">View pending submissions</label>
-            </div>
             <div className="form-check form-check-inline  mt-2">
                 <input
                     onClick={() => {
                         this.setState({
-                            listingName: 'Submitted tests',
+                            listingName: 'Samples Submitted tests',
                             listing: 'submitted'
                         })
                     }}
@@ -261,6 +243,34 @@ class Dashboard extends React.Component {
                     name="inlineRadioOptions" id="inlineRadio2" value="option2" />
                 <label className="form-check-label" htmlFor="inlineRadio2">View submitted results</label>
             </div>
+
+            <div className="form-check form-check-inline pl-2 mt-2">
+                <input
+                    onClick={() => {
+                        this.setState({
+                            listingName: 'Samples Pending tests',
+                            listing: 'pending',
+                        })
+                    }}
+                    defaultChecked={this.state.listing == 'pending'} className="form-check-input"
+                    type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" />
+                <label className="form-check-label" htmlFor="inlineRadio1">View pending submissions</label>
+            </div>
+
+            {/* Readiness */}
+            <div className="form-check form-check-inline pl-2 mt-2">
+                <input
+                    onClick={() => {
+                        this.setState({
+                            listingName: 'Readiness Survey List',
+                            listing: 'readiness',
+                        })
+                    }}
+                    defaultChecked={this.state.listing == 'readiness'} className="form-check-input"
+                    type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" />
+                <label className="form-check-label" htmlFor="inlineRadio1">View readiness</label>
+            </div>
+
         </div>
 
         let submittedPageContent = <div id='user_table' className='row'>
@@ -388,7 +398,9 @@ class Dashboard extends React.Component {
 
         return (
             <React.Fragment>
+
                 {this.state.page == 'list' ? viewControlButton : ''}
+                {this.state.listing == 'readiness' ? <ReadinessList page={this.state.page} data={this.state.readiness} /> : ''}
                 {this.state.listing == 'pending' ? unSubmittedContent : ''}
                 {this.state.listing == 'submitted' ? submittedPageContent : ''}
             </React.Fragment>

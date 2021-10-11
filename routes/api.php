@@ -6,6 +6,7 @@ use App\Http\Controllers\PT\PTReadinessController;
 use App\Http\Controllers\PT\PTShipmentController;
 use App\Http\Controllers\QC\QCAdminUsersController;
 use App\Http\Controllers\Service\CommonsController;
+use App\Http\Controllers\Service\ReadinessController;
 use App\Http\Controllers\Service\Submission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -64,4 +65,4 @@ Route::get('/get_counties', [CommonsController::class, 'getCounties']);
 Route::get('/get_participant_demographics', [ParticipantController::class, 'getParticipantDemographics']);
 Route::post('/own_bio_update', [ParticipantController::class, 'editOwnPersonalBio'])->name('own_bio_update')->middleware('auth');
 
-// Route::get('/get_user_samples', [PTShipmentController::class, 'get_readiness_survey'])->middleware('auth')
+Route::get('/get_readiness_survey', [ReadinessController::class, 'getReadinessSurvey'])->middleware('auth');

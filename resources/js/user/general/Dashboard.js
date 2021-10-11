@@ -19,7 +19,7 @@ class Dashboard extends React.Component {
 
         return (
             <React.Fragment>
-                <div>PT and QC access not allowed</div>
+                <div>PT access not allowed</div>
             </React.Fragment>
         );
     }

@@ -3,47 +3,40 @@
 namespace App\Http\Controllers\Service;
 
 use App\Http\Controllers\Controller;
+use App\Readiness;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReadinessController extends Controller
 {
 
     public function getReadinessSurvey(Request $request)
     {
-
+        $user = Auth::user();
         try {
 
-            $readinessesWithLabId = PtShipement::select(
-                "pt_shipements.id",
-                "pt_shipements.round_name",
-                "pt_shipements.code as shipment_code",
-                "pt_shipements.updated_at as last_update",
-                "pt_shipements.pass_mark",
-                DB::raw('count(*) as participant_count')
-            )->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'pt_shipements.readiness_id')
-                ->groupBy(
-                    "pt_shipements.id",
-                    'pt_shipements.round_name',
-                    'pt_shipements.readiness_id',
-                    "pt_shipements.updated_at",
-                    "pt_shipements.pass_mark",
-                    "pt_shipements.code",
-                );
+            $readinesses = Readiness::select(
+                "readinesses.id",
+                "readinesses.start_date",
+                "readinesses.end_date",
+                "readinesses.name",
+                "readinesses.admin_id",
+                "readiness_questions.question",
+                "readiness_questions.answer_options",
+                "readiness_questions.answer_type",
+                "readiness_questions.qustion_position",
+                "readiness_questions.qustion_type",
 
-            $readinessesWithNullLabId = PtShipement::select(
-                "pt_shipements.id",
-                "pt_shipements.round_name",
-                "pt_shipements.code as shipment_code",
-                "pt_shipements.updated_at as last_update",
-                "pt_shipements.pass_mark",
-                DB::raw('count(*) as participant_count')
-            )->join('laboratory_pt_shipement', 'laboratory_pt_shipement.pt_shipement_id', '=', 'pt_shipements.id')
-                ->groupBy('laboratory_pt_shipement.pt_shipement_id');
+            )->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'readinesses.id')
+                ->join('laboratories', 'laboratory_readiness.laboratory_id', '=', 'laboratories.id')
+                ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
+                ->join('readiness_questions', 'readiness_questions.readiness_id', '=', 'readinesses.id')
+                ->where('users.id', $user->id)
+                ->orderBy('readinesses.created_at', 'Desc')
+                ->get();
 
-
-            $finalQuery = $readinessesWithLabId->union($readinessesWithNullLabId)->orderBy('last_update', 'desc')->get();
-
-            return $finalQuery;
+            return $readinesses;
         } catch (Exception $ex) {
             return response()->json(['Message' => 'Could fetch readiness list: ' . $ex->getMessage()], 500);
         }
