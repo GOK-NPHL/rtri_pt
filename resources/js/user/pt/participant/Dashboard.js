@@ -142,37 +142,34 @@ class Dashboard extends React.Component {
                         <td>
 
                             {
-                                Date.parse(element.end_date) > new Date() ?
-                                    element.submission_id ?
 
-                                        <button
-                                            onClick={() => {
-                                                this.setState({
-                                                    selectedElement: element,
-                                                    selectedElementHasSubmmisions: true,
-                                                    page: 'edit'
-                                                });
-                                            }}
-                                            type="button"
-                                            className="btn btn-success">
-                                            <i className="far fa-edit"></i> Edit
-                                        </button>
-                                        :
-                                        <button
-                                            onClick={() => {
-                                                this.setState({
-                                                    selectedElement: element,
-                                                    selectedElementHasSubmmisions: false,
-                                                    page: 'edit'
-                                                });
-                                            }}
-                                            type="button"
-                                            className="btn btn-success">
-                                            <i className="fas fa-paper-plane"></i> Submit
-                                        </button> :
-                                    <span>
-                                        Submission closed
-                                    </span>
+                                element.submission_id ?
+
+                                    <button
+                                        onClick={() => {
+                                            this.setState({
+                                                selectedElement: element,
+                                                selectedElementHasSubmmisions: true,
+                                                page: 'edit'
+                                            });
+                                        }}
+                                        type="button"
+                                        className="btn btn-success">
+                                        <i className="far fa-edit"></i> {Date.parse(element.end_date) > new Date() ? 'Edit' : 'View only'}
+                                    </button>
+                                    :
+                                    <button
+                                        onClick={() => {
+                                            this.setState({
+                                                selectedElement: element,
+                                                selectedElementHasSubmmisions: false,
+                                                page: 'edit'
+                                            });
+                                        }}
+                                        type="button"
+                                        className="btn btn-success">
+                                        <i className="fas fa-paper-plane"></i>  {Date.parse(element.end_date) > new Date() ? 'Submit' : 'View only'}
+                                    </button>
 
                             }
                             {/* <a
@@ -223,6 +220,20 @@ class Dashboard extends React.Component {
 
             <div className="col-sm-12">
                 <hr />
+            </div>
+
+            {/* Readiness */}
+            <div className="form-check form-check-inline pl-2 mt-2">
+                <input
+                    onClick={() => {
+                        this.setState({
+                            listingName: 'Pending tests',
+                            listing: 'pending',
+                        })
+                    }}
+                    defaultChecked={this.state.listing == 'pending'} className="form-check-input"
+                    type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" />
+                <label className="form-check-label" htmlFor="inlineRadio1">View readiness</label>
             </div>
 
             <div className="form-check form-check-inline pl-2 mt-2">

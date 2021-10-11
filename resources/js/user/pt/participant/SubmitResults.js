@@ -37,7 +37,8 @@ class SubmitResults extends React.Component {
             pt_shipements_id: '',
             samples: {},
             submissionId: '',
-            test_instructions: ''
+            test_instructions: '',
+            endDate: Date.parse('1970-01-01')
         }
 
         this.onNameOfTestHandler = this.onNameOfTestHandler.bind(this);
@@ -103,7 +104,6 @@ class SubmitResults extends React.Component {
                 });
             }
 
-
             if (this.props.selectedElementHasSubmmisions) {
 
                 this.setState({
@@ -129,7 +129,8 @@ class SubmitResults extends React.Component {
                     pt_shipements_id: this.props.shipment.pt_shipements_id,
                     submissionId: edittableSubmission['data']['id'],
                     test_instructions: edittableSubmission['data']['test_instructions'],
-                    samples: samples
+                    samples: samples,
+                    endDate: this.props.shipment.end_date
                 });
 
             } else {
@@ -140,7 +141,8 @@ class SubmitResults extends React.Component {
                     userId: userDemographics[0].user_id,
                     edittableSubmission: edittableSubmission,
                     test_instructions: this.props.shipment.test_instructions,
-                    samples: samples
+                    samples: samples,
+                    endDate: this.props.shipment.end_date
                 });
 
             }
@@ -850,10 +852,13 @@ class SubmitResults extends React.Component {
                     </div>
                     <div className="d-flex w-100 justify-content-center">
 
-                        <button type="button " onClick={() => this.submitForm()} className="btn btn-info float-left mx-2">Submit</button>
+                        {Date.parse(this.state.endDate) > new Date() ?
+                            <button type="button " onClick={() => this.submitForm()} className="btn btn-info float-left mx-2">Submit</button>
+                            : ''
+                        }
                         <button type="button" onClick={() => {
                             this.props.toggleView('list');
-                        }} className="btn btn-danger float-left mx-2">Cancel</button>
+                        }} className="btn btn-danger float-left mx-2">Exit</button>
                     </div>
                 </div>
 
