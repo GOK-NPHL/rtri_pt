@@ -48,4 +48,13 @@ class QCParticipantController extends Controller
             return view('user.general.dashboard');
         }
     }
+
+    public function getReadinessForm()
+    {
+        if (Gate::allows('view_pt_component')) {
+            return view('user.pt.participant.readiness');
+        } else {
+            return view('user.general.dashboard');
+        }
+    }
 }

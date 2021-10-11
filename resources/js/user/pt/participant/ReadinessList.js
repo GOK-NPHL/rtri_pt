@@ -67,37 +67,39 @@ class ReadinessList extends React.Component {
 
                                 element.aswered_id ?
 
-                                    <button
+                                    <a
                                         onClick={() => {
                                             this.setState({
                                                 selectedElement: element,
                                                 selectedElementHasSubmmisions: true,
                                             });
                                         }}
-                                        type="button"
+                                        href="get-readiness-form"
+                                        // type="button"
                                         className="btn btn-success">
                                         {
                                             Date.parse(element.end_date) > new Date() ? <i className="far fa-edit"></i>
                                                 : <i className="fas fa-eye"></i>
                                         }
                                         {Date.parse(element.end_date) > new Date() ? ' Edit' : ' View only'}
-                                    </button>
+                                    </a>
                                     :
-                                    <button
+                                    <a
                                         onClick={() => {
                                             this.setState({
                                                 selectedElement: element,
                                                 selectedElementHasSubmmisions: false,
                                             });
                                         }}
-                                        type="button"
+                                        href="get-readiness-form"
+                                        // type="button"
                                         className="btn btn-success">
                                         {
                                             Date.parse(element.end_date) > new Date() ? <i className="fas fa-paper-plane"></i>
                                                 : <i className="fas fa-eye"></i>
                                         }
                                         {Date.parse(element.end_date) > new Date() ? ' Submit' : ' View only'}
-                                    </button>
+                                    </a>
 
                             }
 

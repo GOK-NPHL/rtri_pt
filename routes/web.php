@@ -65,3 +65,6 @@ Route::get('edit-shipment/{shipmentId}', [PTAdminController::class, 'editShipmen
 Route::get('list-readiness', [PTAdminController::class, 'listReadiness'])->name('list-readiness');
 Route::get('edit-readiness/{readinessId}', [PTAdminController::class, 'editReadiness'])->name('edit-readiness');
 Route::get('add-readiness', [PTAdminController::class, 'addReadiness'])->name('add-readiness');
+
+Route::get('get-readiness-form', [QCParticipantController::class, 'getReadinessForm'])->name('get-readiness-form');
+
