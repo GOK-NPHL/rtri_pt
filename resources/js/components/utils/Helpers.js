@@ -760,6 +760,18 @@ export async function FetchReadiness() {
     }
 }
 
+export async function FetchShipmentReadiness() {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_shipment_readiness`);
+        const responseData = response.data;
+        return responseData;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+}
+
 export async function FetchShipmentById(id) {
 
     try {

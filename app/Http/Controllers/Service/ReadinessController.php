@@ -31,6 +31,9 @@ class ReadinessController extends Controller
             )->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'readinesses.id')
                 ->join('laboratories', 'laboratory_readiness.laboratory_id', '=', 'laboratories.id')
                 ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
+
+                ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
+
                 ->join('readiness_questions', 'readiness_questions.readiness_id', '=', 'readinesses.id')
                 ->where('users.id', $user->id)
                 ->orderBy('readinesses.created_at', 'Desc')

@@ -94,7 +94,6 @@ class PTReadinessController extends Controller
 
                     try {
                         DB::table('readiness_questions')->where('id', $questionItem['id'])->delete();
-
                     } catch (Exception $ex) {
                         Log::error($ex);
                     }
@@ -141,6 +140,32 @@ class PTReadinessController extends Controller
             return response()->json(['Message' => 'Could fetch readiness list: ' . $ex->getMessage()], 500);
         }
     }
+
+    public function getShipmentReadiness(Request $request)
+    {
+        try {
+            // SELECT readiness_id FROM rtript.pt_shipements where readiness_id is not null
+            $readinesses = Readiness::select(
+                "readinesses.id",
+                "readinesses.name",
+                "readinesses.updated_at as last_update",
+                "admins.name as created_by",
+            )->join('admins', 'admins.id', '=', 'readinesses.admin_id')
+                ->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'readinesses.id')
+                ->whereNotIn(
+                    'readinesses.id',
+                    DB::table('pt_shipements')->select('readiness_id')->whereNotNull('readiness_id')->get()->pluck('readiness_id')->toArray()
+                )
+                ->groupBy('laboratory_readiness.readiness_id')
+                ->orderBy('last_update', 'DESC')
+                ->get();
+
+            return $readinesses;
+        } catch (Exception $ex) {
+            return response()->json(['Message' => 'Could fetch readiness list: ' . $ex->getMessage()], 500);
+        }
+    }
+
 
     public function getReadinessById(Request $request)
     {

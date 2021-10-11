@@ -1,5 +1,5 @@
 import React from 'react';
-import { FetchParticipantList, SaveShipment, FetchReadiness, FetchShipmentById, UpdateShipment } from '../../../components/utils/Helpers';
+import { FetchParticipantList, SaveShipment, FetchShipmentReadiness as FetchReadiness, FetchShipmentById, UpdateShipment } from '../../../components/utils/Helpers';
 import { v4 as uuidv4 } from 'uuid';
 import DualListBox from 'react-dual-listbox';
 import './PtShipment.css';
