@@ -63,3 +63,5 @@ Route::get('/get_counties', [CommonsController::class, 'getCounties']);
 
 Route::get('/get_participant_demographics', [ParticipantController::class, 'getParticipantDemographics']);
 Route::post('/own_bio_update', [ParticipantController::class, 'editOwnPersonalBio'])->name('own_bio_update')->middleware('auth');
+
+// Route::get('/get_user_samples', [PTShipmentController::class, 'get_readiness_survey'])->middleware('auth')

@@ -26,50 +26,50 @@ class QCAdminController extends Controller
      */
     public function adminHome()
     {
-        return view('user.qc.admin.dashboard');
+        return view('user.system.admin.dashboard');
     }
 
     public function addUser()
     {
-        return view('user.qc.admin.add_user');
+        return view('user.system.admin.add_user');
     }
 
     public function editUser()
     {
-        return view('user.qc.admin.edit_user');
+        return view('user.system.admin.edit_user');
     }
 
     public function addLab()
     {
-        return view('user.qc.admin.add_lab');
+        return view('user.system.admin.add_lab');
     }
 
     public function editLab()
     {
-        return view('user.qc.admin.edit_lab');
+        return view('user.system.admin.edit_lab');
     }
 
     public function addPersonel()
     {
-        return view('user.qc.admin.add_personel');
+        return view('user.system.admin.add_personel');
     }
     public function editPersonel()
     {
-        return view('user.qc.admin.edit_personel');
+        return view('user.system.admin.edit_personel');
     }
 
     public function listUser()
     {
-        return view('user.qc.admin.list_user');
+        return view('user.system.admin.list_user');
     }
 
     public function listLab()
     {
-        return view('user.qc.admin.list_lab');
+        return view('user.system.admin.list_lab');
     }
 
     public function listPersonel()
     {
-        return view('user.qc.admin.list_personel');
+        return view('user.system.admin.list_personel');
     }
 }

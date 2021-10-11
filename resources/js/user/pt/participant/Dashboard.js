@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Pagination from "react-js-pagination";
-import { FetchUserSamples } from '../../../components/utils/Helpers';
+import { FetchUserSamples, FetchReadnessSurvey } from '../../../components/utils/Helpers';
 import DashTable from './DashTable';
 import SubmitResults from './SubmitResults';
 

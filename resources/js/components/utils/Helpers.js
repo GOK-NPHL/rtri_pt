@@ -439,6 +439,19 @@ export async function FetchUserSamples() {
 
 }
 
+export async function FetchReadnessSurvey() {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_readiness_survey`);
+        const responseData = response.data;
+        return responseData;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+
+}
+
 export async function FetchCurrentParticipantDemographics() {
 
     try {

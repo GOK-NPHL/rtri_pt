@@ -1,5 +1,4 @@
 import React from 'react';
-import StatsLabel from '../../../components/utils/stats/StatsLabel';
 import { SaveSubmission, UpdateSubmission, FetchSubmission, FetchCurrentParticipantDemographics } from '../../../components/utils/Helpers';
 import './Results.css';
 import { v4 as uuidv4 } from 'uuid';
