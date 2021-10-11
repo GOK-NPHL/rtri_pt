@@ -69,10 +69,7 @@ class ReadinessList extends React.Component {
 
                                     <a
                                         onClick={() => {
-                                            this.setState({
-                                                selectedElement: element,
-                                                selectedElementHasSubmmisions: true,
-                                            });
+                                            window.location.assign('get-readiness-form/' + element.id)
                                         }}
                                         href="get-readiness-form"
                                         // type="button"
@@ -86,12 +83,8 @@ class ReadinessList extends React.Component {
                                     :
                                     <a
                                         onClick={() => {
-                                            this.setState({
-                                                selectedElement: element,
-                                                selectedElementHasSubmmisions: false,
-                                            });
+                                            window.location.assign('get-readiness-form/' + element.id)
                                         }}
-                                        href="get-readiness-form"
                                         // type="button"
                                         className="btn btn-success">
                                         {

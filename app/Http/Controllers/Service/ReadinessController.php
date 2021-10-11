@@ -29,7 +29,7 @@ class ReadinessController extends Controller
                 // "readiness_questions.answer_type",
                 // "readiness_questions.qustion_position",
                 // "readiness_questions.qustion_type",
-                
+
             )->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'readinesses.id')
                 ->join('laboratories', 'laboratory_readiness.laboratory_id', '=', 'laboratories.id')
                 ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
@@ -43,5 +43,10 @@ class ReadinessController extends Controller
         } catch (Exception $ex) {
             return response()->json(['Message' => 'Could fetch readiness list: ' . $ex->getMessage()], 500);
         }
+    }
+
+    public function getReadinessSurveyById(Request $request)
+    {
+        
     }
 }
