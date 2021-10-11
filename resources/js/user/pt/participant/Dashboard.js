@@ -163,7 +163,11 @@ class Dashboard extends React.Component {
                                         }}
                                         type="button"
                                         className="btn btn-success">
-                                        <i className="far fa-edit"></i> {Date.parse(element.end_date) > new Date() ? 'Edit' : 'View only'}
+                                        {
+                                            Date.parse(element.end_date) > new Date() ? <i className="far fa-edit"></i>
+                                                : <i className="fas fa-eye"></i>
+                                        }
+                                        {Date.parse(element.end_date) > new Date() ? ' Edit' : ' View only'}
                                     </button>
                                     :
                                     <button
@@ -176,7 +180,12 @@ class Dashboard extends React.Component {
                                         }}
                                         type="button"
                                         className="btn btn-success">
-                                        <i className="fas fa-paper-plane"></i>  {Date.parse(element.end_date) > new Date() ? 'Submit' : 'View only'}
+
+                                        {
+                                            Date.parse(element.end_date) > new Date() ? <i className="fas fa-paper-plane"></i>
+                                                : <i className="fas fa-eye"></i>
+                                        }
+                                        {Date.parse(element.end_date) > new Date() ? ' Submit' : ' View only'}
                                     </button>
 
                             }
