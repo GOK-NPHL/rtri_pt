@@ -7,6 +7,7 @@ use App\Readiness;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ReadinessController extends Controller
 {
@@ -27,10 +28,13 @@ class ReadinessController extends Controller
                 // "readiness_questions.answer_type",
                 // "readiness_questions.qustion_position",
                 // "readiness_questions.qustion_type",
+                
+                
 
             )->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'readinesses.id')
                 ->join('laboratories', 'laboratory_readiness.laboratory_id', '=', 'laboratories.id')
                 ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
+                ->leftJoin('readiness_answers', 'readinesses.id', '=', 'readiness_answers.readiness_id')
                 // ->join('readiness_questions', 'readiness_questions.readiness_id', '=', 'readinesses.id')
                 ->where('users.id', $user->id)
                 ->orderBy('readinesses.created_at', 'Desc')

@@ -11,7 +11,9 @@ class Readiness extends Model
         "start_date",
         "end_date",
         "name",
-        "admin_id"
+        "admin_id",
+        "readiness_id",
+        "answer"
     ];
 
     public function laboratories()

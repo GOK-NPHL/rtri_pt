@@ -16,9 +16,11 @@ class CreateReadinessAnswersTable extends Migration
         Schema::create('readiness_answers', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->integer("question_id")->nullable();
-            $table->integer("laboratory_id")->nullable();
-            $table->integer("user_id")->nullable();
+            $table->integer("readiness_id");
+            $table->integer("question_id");
+            $table->integer("laboratory_id");
+            $table->integer("user_id");
+            $table->string("answer");
         });
     }
 
