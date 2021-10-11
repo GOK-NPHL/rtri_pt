@@ -63,21 +63,24 @@ class ReadinessList extends React.Component {
 
                         <td>
 
-                            {/* {
+                            {
 
-                                element.submission_id ?
+                                element.aswered_id ?
 
                                     <button
                                         onClick={() => {
                                             this.setState({
                                                 selectedElement: element,
                                                 selectedElementHasSubmmisions: true,
-                                                page: 'edit'
                                             });
                                         }}
                                         type="button"
                                         className="btn btn-success">
-                                        <i className="far fa-edit"></i> {Date.parse(element.end_date) > new Date() ? 'Edit' : 'View only'}
+                                        {
+                                            Date.parse(element.end_date) > new Date() ? <i className="far fa-edit"></i>
+                                                : <i className="fas fa-eye"></i>
+                                        }
+                                        {Date.parse(element.end_date) > new Date() ? ' Edit' : ' View only'}
                                     </button>
                                     :
                                     <button
@@ -85,15 +88,18 @@ class ReadinessList extends React.Component {
                                             this.setState({
                                                 selectedElement: element,
                                                 selectedElementHasSubmmisions: false,
-                                                page: 'edit'
                                             });
                                         }}
                                         type="button"
                                         className="btn btn-success">
-                                        <i className="fas fa-paper-plane"></i>  {Date.parse(element.end_date) > new Date() ? 'Submit' : 'View only'}
+                                        {
+                                            Date.parse(element.end_date) > new Date() ? <i className="fas fa-paper-plane"></i>
+                                                : <i className="fas fa-eye"></i>
+                                        }
+                                        {Date.parse(element.end_date) > new Date() ? ' Submit' : ' View only'}
                                     </button>
 
-                            } */}
+                            }
 
                             {/* <a
                                 onClick={() => {
@@ -155,7 +161,7 @@ class ReadinessList extends React.Component {
                             this.state.currElementsTableEl.slice(this.state.startTableData, this.state.endeTableData) :
                             <tr>
                                 <td colSpan={5}>
-                                    No Survey Available
+                                    No Readiness Found
                                 </td>
                             </tr>
                         }
