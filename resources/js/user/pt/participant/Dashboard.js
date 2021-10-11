@@ -276,8 +276,8 @@ class Dashboard extends React.Component {
                         })
                     }}
                     defaultChecked={this.state.listing == 'readiness'} className="form-check-input"
-                    type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" />
-                <label className="form-check-label" htmlFor="inlineRadio1">View readiness</label>
+                    type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3" />
+                <label className="form-check-label" htmlFor="inlineRadio3">View readiness</label>
             </div>
 
         </div>
