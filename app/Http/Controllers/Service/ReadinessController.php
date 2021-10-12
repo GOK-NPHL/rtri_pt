@@ -39,6 +39,7 @@ class ReadinessController extends Controller
                 ->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'readinesses.id')
                 ->join('laboratories', 'laboratory_readiness.laboratory_id', '=', 'laboratories.id')
                 ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
+                ->join('pt_shipements', 'readinesses.id', '=', 'pt_shipements.readiness_id')
                 ->leftJoin('readiness_answers', 'readinesses.id', '=', 'readiness_answers.readiness_id')
                 // ->join('readiness_questions', 'readiness_questions.readiness_id', '=', 'readinesses.id')
                 ->where('users.id', $user->id)
@@ -48,6 +49,7 @@ class ReadinessController extends Controller
                     "readinesses.start_date",
                     "readinesses.end_date",
                     "readinesses.name",
+                    "pt_shipements.round_name",
                     "readinesses.admin_id",
                     "readiness_answers.readiness_id as aswered_id",
                     "readinesses.created_at"

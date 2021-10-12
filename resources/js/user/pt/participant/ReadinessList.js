@@ -55,6 +55,7 @@ class ReadinessList extends React.Component {
 
                 let datRow = <tr key={index++}>
                     <th scope="row">{index}</th>
+                    <td>{element.round_name}</td>
                     <td>{element.name}</td>
                     <td>{element.start_date}</td>
                     <td>{element.end_date}</td>
@@ -71,7 +72,6 @@ class ReadinessList extends React.Component {
                                         onClick={() => {
                                             window.location.assign('get-readiness-form/' + element.id)
                                         }}
-                                        href="get-readiness-form"
                                         // type="button"
                                         className="btn btn-success">
                                         {
@@ -144,7 +144,8 @@ class ReadinessList extends React.Component {
                     <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Name</th>
+                            <th scope="col">Round</th>
+                            <th scope="col">Readiness Name</th>
                             <th scope="col">Start Date</th>
                             <th scope="col">End Date</th>
                             <th scope="col">Action</th>
@@ -155,7 +156,7 @@ class ReadinessList extends React.Component {
                         {this.state.currElementsTableEl.length > 0 ?
                             this.state.currElementsTableEl.slice(this.state.startTableData, this.state.endeTableData) :
                             <tr>
-                                <td colSpan={5}>
+                                <td colSpan={6}>
                                     No Readiness Found
                                 </td>
                             </tr>
