@@ -97,11 +97,23 @@ class Readiness extends React.Component {
         let ansqwers = {
             readiness_id: this.state.id,
             lab_id: this.state.lab_id,
-            questionsAnswerMap: questionsAnswerMap,
-        }
-        SaveSuveyAnswers(ansqwers);
+            questionsAnswerMap: this.state.questionsAnswerMap,
+        };
+
+        (async () => {
+
+            let response = await SaveSuveyAnswers(ansqwers);
+            console.log("response")
+            console.log(response)
+            this.setState({
+                message: response.data.Message
+            });
+            $('#readinessFormModal').modal('toggle');
+        })();
 
     }
+
+
 
     render() {
 

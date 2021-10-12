@@ -83,16 +83,16 @@ class ReadinessController extends Controller
     public function saveSurveyAnswers(Request $request)
     {
         try {
-            //$request->survey['name']
+            //$request->survey['questionsAnswerMap']
             $user = Auth::user();
 
-            foreach ($request->readiness['readiness_questions']  as $key => $value) {
+            foreach ($request->survey['questionsAnswerMap']  as $key => $value) {
                 $readinessAswers = ReadinessAnswer::create([
                     'question_id' => $key,
                     'answer' => $value,
-                    'laboratory_id' => $request->readiness['lab_id'],
+                    'laboratory_id' => $request->survey['lab_id'],
                     'user_id' => $user->id,
-                    'readiness_id' =>  $request->readiness['readiness_id']
+                    'readiness_id' =>  $request->survey['readiness_id']
                 ]);
                 $readinessAswers->save();
             }
