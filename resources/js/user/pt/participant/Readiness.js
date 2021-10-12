@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { FetchReadnessSurveyById } from '../../../components/utils/Helpers';
 import { matchPath } from "react-router";
 import { v4 as uuidv4 } from 'uuid';
+import ReadinessQuestions from './ReadinessQuestions';
 
 
 class Readiness extends React.Component {
@@ -15,90 +16,12 @@ class Readiness extends React.Component {
             name: '',
             startDate: '',
             endDate: '',
-            readinessQuestions: [],
             readinessItems: [],
-            questionsAnswerMap: {}
+            questionsAnswerMap: {},
         }
 
-        this.addReadinessQuestion = this.addReadinessQuestion.bind(this);
         this.questionAnswerHandler = this.questionAnswerHandler.bind(this);
-
-    }
-
-    questionAnswerHandler(event) {
-        let questionsAnswerMap = this.state.questionsAnswerMap;
-        questionsAnswerMap[event.target.id] = event.target.value;
-        this.setState({
-            questionsAnswerMap: questionsAnswerMap
-        })
-    }
-
-    addReadinessQuestion(readiness) {
-
-        let rdItems = this.state.readinessItems;
-        rdItems.push(readiness);
-        let itemIndex = rdItems.length - 1;
-        readiness['delete_status'] = 0;
-        if (readiness['qustion_type'] == 'question') {
-
-            if (readiness['answer_type'] == 'list') {
-                let id = uuidv4();
-                let qstOptins = readiness['answer_options'].split(',');
-                let qstElement =
-                    <div key={id} className="form-group">
-
-                        <label className="float-left" htmlFor={readiness['question_id']}>{readiness['question']}</label>
-                        <select
-                            onChange={(event) => this.questionAnswerHandler(event)}
-                            className="custom-select" id={readiness['question_id']}>
-                            {qstOptins.map((option) => {
-                                return <option key={uuidv4()} value={option}>{option}</option>
-                            })}
-                        </select>
-                    </div>
-                let questions = this.state.readinessQuestions;
-                questions.push(qstElement);
-                this.setState({
-                    readinessQuestions: questions,
-                    readinessItems: rdItems
-                })
-            } else if (readiness['answer_type'] == 'number') {
-                let id = uuidv4();
-                let qstElement =
-                    <div key={id} className="form-group">
-
-                        <label className="float-left" htmlFor={readiness['question_id']}>{readiness['question']}</label>
-                        <input
-                            onChange={(event) => this.questionAnswerHandler(event)}
-                            type="number" className="form-control"
-                            id={readiness['question_id']} aria-describedby="qst_answer" placeholder="Enter your answer" />
-                    </div>
-                let questions = this.state.readinessQuestions;
-                questions.push(qstElement);
-                this.setState({
-                    readinessQuestions: questions,
-                    readinessItems: rdItems
-                })
-            }
-
-        } else if (readiness['qustion_type'] == 'comment') {
-            let id = uuidv4();
-            let qstElement =
-                <div className="form-group">
-
-                    <label className="float-left" htmlFor={readiness['question_id']}>{readiness['question']}</label>
-                    <textarea className="form-control"
-                        onChange={(event) => this.questionAnswerHandler(event)}
-                        id={readiness['question_id']} aria-describedby="qst_answer" placeholder="Enter your comment" />
-                </div>
-            let questions = this.state.readinessQuestions;
-            questions.push(qstElement);
-            this.setState({
-                readinessQuestions: questions,
-                readinessItems: rdItems
-            })
-        }
-
+        this.saveAnswers = this.saveAnswers.bind(this);
     }
 
     componentDidMount() {
@@ -122,22 +45,26 @@ class Readiness extends React.Component {
                 let startDate = null; "2021-09-29"
                 let endDate = null;
                 let name = null;
+
                 let questionsAnswerMap = {};
+
                 readinessItems.map((questionItem) => {
-                    this.addReadinessQuestion(questionItem)
-                    questionsAnswer[questionItem.question_id] = '';
-                    readinessId = questionItem.id;
-                    startDate = questionItem.start_date;
-                    endDate = questionItem.end_date;
-                    name = questionItem.name;
-                    // addReadinessQuestion(questionItem);
+
+                    questionsAnswerMap[questionItem.question_id] = '';
                 });
+
+                readinessId = readinessItems[0].id;
+                startDate = readinessItems[0].start_date;
+                endDate = readinessItems[0].end_date;
+                name = readinessItems[0].name;
+
                 this.setState({
                     id: readinessId,
                     name: name,
                     startDate: startDate,
                     endDate: endDate,
-                    questionsAnswerMap: questionsAnswerMap
+                    questionsAnswerMap: questionsAnswerMap,
+                    readinessItems: readinessItems,
                 });
             }
 
@@ -145,10 +72,31 @@ class Readiness extends React.Component {
 
     }
 
+    questionAnswerHandler(event) {
+        let questionsAnswerMap = this.state.questionsAnswerMap;
+        questionsAnswerMap[event.target.id] = event.target.value;
+        this.setState({
+            questionsAnswerMap: questionsAnswerMap,
+        })
+    }
+
+    saveAnswers() {
+
+        for (const [key, element] of Object.entries(this.state.questionsAnswerMap)) {
+
+            if (element == '' || element == null) {
+                this.setState({
+                    message: "Please answer all questions"
+                })
+                return;
+            }
+        }
+    }
+
     render() {
+
         return (
             <React.Fragment>
-
 
                 <div className="card" style={{ "backgroundColor": "#ecf0f1" }}>
                     <div className="card-body">
@@ -195,17 +143,12 @@ class Readiness extends React.Component {
                                 </div>
                                 <div className="col-sm-10 mb-3">
 
-                                    <div className="card">
-                                        <div className="card-body">
-                                            {
-                                                this.state.readinessQuestions.map((rdnsQuestion) => {
+                                    <ReadinessQuestions
+                                        questionsAnswerMap={this.state.questionsAnswerMap}
+                                        readinessItems={this.state.readinessItems}
+                                        questionAnswerHandler={this.questionAnswerHandler}
 
-                                                    return <span key={uuidv4()}>{rdnsQuestion}</span>
-                                                })
-                                            }
-
-                                        </div>
-                                    </div>
+                                    />
 
                                 </div>
 
@@ -213,7 +156,7 @@ class Readiness extends React.Component {
 
                             <div className="form-group row">
                                 <div className="col-sm-10 mt-3">
-                                    <a onClick={() => this.saveReadiness()} type="" className="d-inline m-2 btn btn-info m">
+                                    <a onClick={() => this.saveAnswers()} type="" className="d-inline m-2 btn btn-info m">
                                         Save
                                     </a>
                                     <a
@@ -229,11 +172,6 @@ class Readiness extends React.Component {
                         </div>
                     </div>
                 </div>
-
-
-
-
-
 
                 < div className="modal fade" id="readinessFormModal" tabIndex="-1" role="dialog" aria-labelledby="readinessModalTitle" aria-hidden="true" >
                     <div className="modal-dialog modal-dialog-centered" role="document">
@@ -258,10 +196,8 @@ class Readiness extends React.Component {
             </React.Fragment>
         );
 
-
     }
 }
-
 
 export default Readiness;
 
