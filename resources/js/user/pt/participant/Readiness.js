@@ -19,6 +19,7 @@ class Readiness extends React.Component {
             endDate: '',
             readinessItems: [],
             questionsAnswerMap: {},
+            showSaveButton: true
         }
 
         this.questionAnswerHandler = this.questionAnswerHandler.bind(this);
@@ -103,10 +104,14 @@ class Readiness extends React.Component {
         (async () => {
 
             let response = await SaveSuveyAnswers(ansqwers);
-            console.log("response")
+            let showSaveButton = false;
             console.log(response)
+            if (response.status == 500) {
+                showSaveButton = true;
+            }
             this.setState({
-                message: response.data.Message
+                message: response.data.Message,
+                showSaveButton: showSaveButton
             });
             $('#readinessFormModal').modal('toggle');
         })();
@@ -178,9 +183,11 @@ class Readiness extends React.Component {
 
                             <div className="form-group row">
                                 <div className="col-sm-10 mt-3">
-                                    <a onClick={() => this.saveAnswers()} type="" className="d-inline m-2 btn btn-info m">
-                                        Save
-                                    </a>
+                                    {this.state.showSaveButton ?
+                                        <a onClick={() => this.saveAnswers()} type="" className="d-inline m-2 btn btn-info m">
+                                            Save
+                                        </a> : ''
+                                    }
                                     <a
                                         onClick={
                                             () => {
