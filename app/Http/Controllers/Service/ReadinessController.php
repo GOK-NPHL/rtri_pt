@@ -117,7 +117,7 @@ class ReadinessController extends Controller
                 );
             }
 
-            return response()->json(['Message' => 'Created successfully'], 200);
+            return response()->json(['Message' => 'Saved successfully'], 200);
         } catch (Exception $ex) {
             return response()->json(['Message' => 'Could not save the checklist ' . $ex->getMessage()], 500);
         }
