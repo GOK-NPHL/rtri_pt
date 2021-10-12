@@ -450,6 +450,12 @@ class SubmitResults extends React.Component {
                         <h1>RTRI PT Submission form</h1>
                         <hr />
                     </div>
+                    <div className="col-sm-12 float-left">
+                        {new Date() > Date.parse(this.state.endDate) ?
+                            <h3 style={{ "color": "red" }} className="col-sm-12">Past Due date. Submission diabled</h3>
+                            :
+                            ''}
+                    </div>
 
                     <div className="col-sm-12 pl-4 pr-4">
                         {/* lab basic info */}

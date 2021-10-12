@@ -16,7 +16,7 @@ class Readiness extends React.Component {
             lab_id: '',
             name: '',
             startDate: '',
-            endDate: '',
+            endDate: '1970-01-01',
             readinessItems: [],
             questionsAnswerMap: {},
             showSaveButton: true
@@ -66,6 +66,7 @@ class Readiness extends React.Component {
                     lab_id: readinessItems[0].lab_id,
                     startDate: startDate,
                     endDate: endDate,
+                    showSaveButton: Date.parse(endDate) > new Date(),
                     questionsAnswerMap: questionsAnswerMap,
                     readinessItems: readinessItems,
                 });
@@ -132,6 +133,13 @@ class Readiness extends React.Component {
                         </h5><br />
                         <hr />
                         <div style={{ "margin": "0 auto", "width": "80%" }} className="text-center">
+
+                            <div className="form-group row">
+                                {new Date() > Date.parse(this.state.endDate) ?
+                                    <label style={{"color": "red"}} className="col-sm-12">Past Due date. Submission diabled</label>
+                                    :
+                                    ''}
+                            </div>
 
                             <div className="form-group row">
                                 <label htmlFor="u_name" className="col-sm-2 col-form-label">Name/Title</label>
