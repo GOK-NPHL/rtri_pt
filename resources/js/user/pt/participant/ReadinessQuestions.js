@@ -75,7 +75,7 @@ class ReadinessQuestions extends React.Component {
 
                     <label className="float-left" htmlFor={readiness['question_id']}>{readiness['question']}</label>
                     <textarea className="form-control"
-                        onChange={(event) => {
+                        onFocusOut={(event) => {
                             let key = readiness['question_id'];
                             this.props.questionAnswerHandler(event)
                         }}
