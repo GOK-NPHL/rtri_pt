@@ -17,7 +17,7 @@ class Readiness extends React.Component {
             name: '',
             startDate: '',
             endDate: '1970-01-01',
-            readinessItems: [],
+            readinessItems: { 'questions': [], 'answers': [] },
             questionsAnswerMap: {},
             showSaveButton: true
         }
@@ -50,20 +50,28 @@ class Readiness extends React.Component {
 
                 let questionsAnswerMap = {};
 
-                readinessItems.map((questionItem) => {
+                let qstns = readinessItems.questions;
+                qstns.map((questionItem) => {
+                    let answer = '';
 
-                    questionsAnswerMap[questionItem.question_id] = '';
+                    readinessItems.answers.map((answr) => {
+                        if (questionItem.question_id == answr['question_id']) {
+                            answer = answr['answer'];
+                        }
+                    });
+
+                    questionsAnswerMap[questionItem.question_id] = answer;
                 });
 
-                readinessId = readinessItems[0].id;
-                startDate = readinessItems[0].start_date;
-                endDate = readinessItems[0].end_date;
-                name = readinessItems[0].name;
+                readinessId = qstns[0].id;
+                startDate = qstns[0].start_date;
+                endDate = qstns[0].end_date;
+                name = qstns[0].name;
 
                 this.setState({
                     id: readinessId,
                     name: name,
-                    lab_id: readinessItems[0].lab_id,
+                    lab_id: qstns[0].lab_id,
                     startDate: startDate,
                     endDate: endDate,
                     showSaveButton: Date.parse(endDate) > new Date(),
@@ -122,6 +130,7 @@ class Readiness extends React.Component {
 
 
     render() {
+        console.log(this.state.readinessItems);
 
         return (
             <React.Fragment>
@@ -136,7 +145,7 @@ class Readiness extends React.Component {
 
                             <div className="form-group row">
                                 {new Date() > Date.parse(this.state.endDate) ?
-                                    <label style={{"color": "red"}} className="col-sm-12">Past Due date. Submission diabled</label>
+                                    <label style={{ "color": "red" }} className="col-sm-12">Past Due date. Submission diabled</label>
                                     :
                                     ''}
                             </div>
@@ -180,7 +189,7 @@ class Readiness extends React.Component {
 
                                     <ReadinessQuestions
                                         questionsAnswerMap={this.state.questionsAnswerMap}
-                                        readinessItems={this.state.readinessItems}
+                                        readinessItems={this.state.readinessItems.questions}
                                         questionAnswerHandler={this.questionAnswerHandler}
 
                                     />
@@ -192,9 +201,16 @@ class Readiness extends React.Component {
                             <div className="form-group row">
                                 <div className="col-sm-10 mt-3">
                                     {this.state.showSaveButton ?
-                                        <a onClick={() => this.saveAnswers()} type="" className="d-inline m-2 btn btn-info m">
-                                            Save
-                                        </a> : ''
+
+                                        this.state.readinessItems.answers.length > 0 ?
+                                            <a onClick={() => this.saveAnswers()} type="" className="d-inline m-2 btn btn-info m">
+                                                Update
+                                            </a> :
+                                            <a onClick={() => this.saveAnswers()} type="" className="d-inline m-2 btn btn-info m">
+                                                Save
+                                            </a>
+                                        :
+                                        ''
                                     }
                                     <a
                                         onClick={

@@ -23,55 +23,6 @@ class ReadinessQuestions extends React.Component {
 
     }
 
-    componentDidMount() {
-
-        let pathname = window.location.pathname;
-        let pathObject = matchPath(pathname, {
-            path: `/get-readiness-form/:readinessId`,
-        });
-
-        (async () => {
-
-            let readinessItems = await FetchReadnessSurveyById(pathObject.params.readinessId);
-            if (readinessItems.status == 500) {
-                this.setState({
-                    message: readinessItems.data.Message,
-                });
-                $('#readinessFormModal').modal('toggle');
-            } else {
-                let readinessId = null;
-
-                let startDate = null; "2021-09-29"
-                let endDate = null;
-                let name = null;
-
-                let questionsAnswerMap = {};
-
-                readinessItems.map((questionItem) => {
-
-                    questionsAnswerMap[questionItem.question_id] = '';
-                });
-
-                readinessId = readinessItems[0].id;
-                startDate = readinessItems[0].start_date;
-                endDate = readinessItems[0].end_date;
-                name = readinessItems[0].name;
-
-                this.setState({
-                    id: readinessId,
-                    name: name,
-                    startDate: startDate,
-                    endDate: endDate,
-                    questionsAnswerMap: questionsAnswerMap,
-                    readinessItems: readinessItems,
-                });
-            }
-
-        })();
-
-    }
-
-
     addReadinessQuestion(readiness) {
 
         if (readiness['qustion_type'] == 'question') {

@@ -88,7 +88,18 @@ class ReadinessController extends Controller
                 ->where('users.id', $user->id)
                 ->get();
 
-            return $readinesses;
+            $readinessesAswers = ReadinessAnswer::select(
+                "readiness_answers.id",
+                "readiness_answers.question_id",
+                "readiness_answers.answer"
+            )->join('laboratories', 'readiness_answers.laboratory_id', '=', 'laboratories.id')
+                ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
+                ->where('readiness_answers.readiness_id', $request->id)
+                ->where('users.id', $user->id)
+                ->get();
+
+            return ['questions' => $readinesses, 'answers' => $readinessesAswers];
+
         } catch (Exception $ex) {
             return response()->json(['Message' => 'Could fetch readiness list: ' . $ex->getMessage()], 500);
         }
