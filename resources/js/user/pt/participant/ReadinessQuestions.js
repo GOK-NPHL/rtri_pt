@@ -87,6 +87,7 @@ class ReadinessQuestions extends React.Component {
                             value={this.props.questionsAnswerMap[readiness['question_id']]}
                             onChange={(event) => this.props.questionAnswerHandler(event)}
                             className="custom-select" id={readiness['question_id']}>
+                            <option hidden>--Select option--</option>
                             {qstOptins.map((option) => {
                                 return <option key={uuidv4()} value={option}>{option}</option>
                             })}

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { FetchReadnessSurveyById } from '../../../components/utils/Helpers';
+import { FetchReadnessSurveyById, SaveSuveyAnswers } from '../../../components/utils/Helpers';
 import { matchPath } from "react-router";
 import { v4 as uuidv4 } from 'uuid';
 import ReadinessQuestions from './ReadinessQuestions';
@@ -13,6 +13,7 @@ class Readiness extends React.Component {
         this.state = {
             message: '',
             id: '',
+            lab_id: '',
             name: '',
             startDate: '',
             endDate: '',
@@ -61,6 +62,7 @@ class Readiness extends React.Component {
                 this.setState({
                     id: readinessId,
                     name: name,
+                    lab_id: readinessItems[0].lab_id,
                     startDate: startDate,
                     endDate: endDate,
                     questionsAnswerMap: questionsAnswerMap,
@@ -91,6 +93,14 @@ class Readiness extends React.Component {
                 return;
             }
         }
+
+        let ansqwers = {
+            readiness_id: this.state.id,
+            lab_id: this.state.lab_id,
+            questionsAnswerMap: questionsAnswerMap,
+        }
+        SaveSuveyAnswers(ansqwers);
+
     }
 
     render() {

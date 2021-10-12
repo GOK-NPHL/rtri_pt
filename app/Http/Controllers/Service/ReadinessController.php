@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Service;
 
 use App\Http\Controllers\Controller;
 use App\Readiness;
+use App\ReadinessAnswer;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -57,6 +58,7 @@ class ReadinessController extends Controller
                 "readinesses.end_date",
                 "readinesses.name",
                 "readinesses.admin_id",
+                "laboratories.id as lab_id",
                 "readiness_questions.id as question_id",
                 "readiness_questions.question",
                 "readiness_questions.answer_options",
@@ -75,6 +77,29 @@ class ReadinessController extends Controller
             return $readinesses;
         } catch (Exception $ex) {
             return response()->json(['Message' => 'Could fetch readiness list: ' . $ex->getMessage()], 500);
+        }
+    }
+
+    public function saveSurveyAnswers(Request $request)
+    {
+        try {
+            //$request->survey['name']
+            $user = Auth::user();
+
+            foreach ($request->readiness['readiness_questions']  as $key => $value) {
+                $readinessAswers = ReadinessAnswer::create([
+                    'question_id' => $key,
+                    'answer' => $value,
+                    'laboratory_id' => $request->readiness['lab_id'],
+                    'user_id' => $user->id,
+                    'readiness_id' =>  $request->readiness['readiness_id']
+                ]);
+                $readinessAswers->save();
+            }
+
+            return response()->json(['Message' => 'Created successfully'], 200);
+        } catch (Exception $ex) {
+            return response()->json(['Message' => 'Could not save the checklist ' . $ex->getMessage()], 500);
         }
     }
 }

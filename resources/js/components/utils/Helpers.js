@@ -454,3 +454,20 @@ export async function FetchShipments() {
         return err.response
     }
 }
+
+export async function SaveSuveyAnswers(survey) {
+    try {
+        const response = await axios({
+            method: 'post',
+            url: `${settings.serverBaseApi}/save_survey_answers`,
+            data: {
+                survey: survey,
+            }
+        });
+        return response;
+    } catch (err) {
+        // Handle Error Here
+        console.log(err);
+        return err.response
+    }
+}

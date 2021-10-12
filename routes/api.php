@@ -70,3 +70,4 @@ Route::post('/own_bio_update', [ParticipantController::class, 'editOwnPersonalBi
 Route::get('/get_readiness_survey', [ReadinessController::class, 'getReadinessSurvey'])->middleware('auth');
 Route::get('/get_readiness_survey_by_id/{id}', [ReadinessController::class, 'getReadinessSurveyById'])->middleware('auth');
 
+Route::post('/save_survey_answers', [ReadinessController::class, 'saveSurveyAnswers']);

@@ -10,6 +10,7 @@ class ReadinessAnswer extends Model
         "question_id",
         "answer",
         "laboratory_id",
-        "user_id"
+        "user_id",
+        "readiness_id"
     ];
 }
