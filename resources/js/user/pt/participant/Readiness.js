@@ -114,7 +114,6 @@ class Readiness extends React.Component {
 
             let response = await SaveSuveyAnswers(ansqwers);
             let showSaveButton = false;
-            console.log(response)
             if (response.status == 500) {
                 showSaveButton = true;
             }
@@ -130,7 +129,6 @@ class Readiness extends React.Component {
 
 
     render() {
-        console.log(this.state.readinessItems);
 
         return (
             <React.Fragment>

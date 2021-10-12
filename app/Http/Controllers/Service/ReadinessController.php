@@ -99,7 +99,6 @@ class ReadinessController extends Controller
                 ->get();
 
             return ['questions' => $readinesses, 'answers' => $readinessesAswers];
-
         } catch (Exception $ex) {
             return response()->json(['Message' => 'Could fetch readiness list: ' . $ex->getMessage()], 500);
         }
@@ -112,14 +111,33 @@ class ReadinessController extends Controller
             $user = Auth::user();
 
             foreach ($request->survey['questionsAnswerMap']  as $key => $value) {
-                $readinessAswers = ReadinessAnswer::create([
-                    'question_id' => $key,
-                    'answer' => $value,
-                    'laboratory_id' => $request->survey['lab_id'],
-                    'user_id' => $user->id,
-                    'readiness_id' =>  $request->survey['readiness_id']
-                ]);
-                $readinessAswers->save();
+
+                // $readinessAswers = ReadinessAnswer::create([
+                //     'question_id' => $key,
+                //     'answer' => $value,
+                //     'laboratory_id' => $request->survey['lab_id'],
+                //     'user_id' => $user->id,
+                //     'readiness_id' =>  $request->survey['readiness_id']
+                // ]);
+                // $readinessAswers->save();
+
+                $readinessAswers = ReadinessAnswer::updateOrCreate(
+
+                    [
+                        'question_id' => $key,
+                        'laboratory_id' => $request->survey['lab_id'],
+                        'readiness_id' =>  $request->survey['readiness_id']
+
+                    ],
+                    [
+                        'question_id' => $key,
+                        'answer' => $value,
+                        'laboratory_id' => $request->survey['lab_id'],
+                        'user_id' => $user->id,
+                        'readiness_id' =>  $request->survey['readiness_id']
+                    ]
+
+                );
             }
 
             return response()->json(['Message' => 'Created successfully'], 200);
