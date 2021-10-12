@@ -17,10 +17,20 @@ class Readiness extends React.Component {
             endDate: '',
             readinessQuestions: [],
             readinessItems: [],
+            questionsAnswerMap: {}
         }
 
         this.addReadinessQuestion = this.addReadinessQuestion.bind(this);
+        this.questionAnswerHandler = this.questionAnswerHandler.bind(this);
 
+    }
+
+    questionAnswerHandler(event) {
+        let questionsAnswerMap = this.state.questionsAnswerMap;
+        questionsAnswerMap[event.target.id] = event.target.value;
+        this.setState({
+            questionsAnswerMap: questionsAnswerMap
+        })
     }
 
     addReadinessQuestion(readiness) {
@@ -37,9 +47,10 @@ class Readiness extends React.Component {
                 let qstElement =
                     <div key={id} className="form-group">
 
-                        <label className="float-left" htmlFor={id + "qst_answer"}>{readiness['question']}</label>
+                        <label className="float-left" htmlFor={readiness['question_id']}>{readiness['question']}</label>
                         <select
-                            className="custom-select" id={id + "qst_answer"}>
+                            onChange={(event) => this.questionAnswerHandler(event)}
+                            className="custom-select" id={readiness['question_id']}>
                             {qstOptins.map((option) => {
                                 return <option key={uuidv4()} value={option}>{option}</option>
                             })}
@@ -56,8 +67,11 @@ class Readiness extends React.Component {
                 let qstElement =
                     <div key={id} className="form-group">
 
-                        <label className="float-left" htmlFor={id + "qst_answer"}>{readiness['question']}</label>
-                        <input type="number" className="form-control" id={id + "qst_answer"} aria-describedby="qst_answer" placeholder="Enter your answer" />
+                        <label className="float-left" htmlFor={readiness['question_id']}>{readiness['question']}</label>
+                        <input
+                            onChange={(event) => this.questionAnswerHandler(event)}
+                            type="number" className="form-control"
+                            id={readiness['question_id']} aria-describedby="qst_answer" placeholder="Enter your answer" />
                     </div>
                 let questions = this.state.readinessQuestions;
                 questions.push(qstElement);
@@ -72,8 +86,10 @@ class Readiness extends React.Component {
             let qstElement =
                 <div className="form-group">
 
-                    <label className="float-left" htmlFor={id + "qst_answer"}>{readiness['question']}</label>
-                    <textarea className="form-control" id={id + "qst_answer"} aria-describedby="qst_answer" placeholder="Enter your comment" />
+                    <label className="float-left" htmlFor={readiness['question_id']}>{readiness['question']}</label>
+                    <textarea className="form-control"
+                        onChange={(event) => this.questionAnswerHandler(event)}
+                        id={readiness['question_id']} aria-describedby="qst_answer" placeholder="Enter your comment" />
                 </div>
             let questions = this.state.readinessQuestions;
             questions.push(qstElement);
@@ -106,9 +122,10 @@ class Readiness extends React.Component {
                 let startDate = null; "2021-09-29"
                 let endDate = null;
                 let name = null;
-
+                let questionsAnswerMap = {};
                 readinessItems.map((questionItem) => {
                     this.addReadinessQuestion(questionItem)
+                    questionsAnswer[questionItem.question_id] = '';
                     readinessId = questionItem.id;
                     startDate = questionItem.start_date;
                     endDate = questionItem.end_date;
@@ -119,8 +136,8 @@ class Readiness extends React.Component {
                     id: readinessId,
                     name: name,
                     startDate: startDate,
-                    endDate: endDate
-
+                    endDate: endDate,
+                    questionsAnswerMap: questionsAnswerMap
                 });
             }
 

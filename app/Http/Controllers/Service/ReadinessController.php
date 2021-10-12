@@ -57,26 +57,7 @@ class ReadinessController extends Controller
                 "readinesses.end_date",
                 "readinesses.name",
                 "readinesses.admin_id",
-                "readiness_questions.question",
-                "readiness_questions.answer_options",
-                "readiness_questions.answer_type",
-                "readiness_questions.qustion_position",
-                "readiness_questions.qustion_type",
-
-            )->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'readinesses.id')
-                ->join('readiness_questions', 'readiness_questions.readiness_id', '=', 'readinesses.id')
-                ->join('laboratories', 'laboratory_readiness.laboratory_id', '=', 'laboratories.id')
-                ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
-                ->where('readinesses.id', $request->id)
-                ->where('users.id', $user->id)->toSql();
-
-
-            $readinesses = Readiness::select(
-                "readinesses.id",
-                "readinesses.start_date",
-                "readinesses.end_date",
-                "readinesses.name",
-                "readinesses.admin_id",
+                "readiness_questions.id as question_id",
                 "readiness_questions.question",
                 "readiness_questions.answer_options",
                 "readiness_questions.answer_type",
