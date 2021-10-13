@@ -91,37 +91,34 @@ class ReadinessResponse extends React.Component {
                     <th scope="row">{index + 1}</th>
                     <td>{element.name}</td>
                     <td>{element.lab_name}</td>
-                    <td>{
-                    element.created_at
-                    }</td>
+                    <td>{element.created_at}</td>
                     <td>{element.updated_at}</td>
-                    <td>{element.fname} {element.sname}</td>
+                    <td>{element.fname == null && element.sname == null ?
+                        <span>Not Responded</span> :
+                        <span>{element.fname} {element.sname}</span>
+                    }
+
+                    </td>
 
                     {
                         //lab_id   id
                         <td>
 
-                            <a
-                                onClick={
-                                    () => {
-                                        window.location.assign('edit-readiness/' + element.id)
-                                    }
-                                }
-                                data-toggle="tooltip" data-placement="top" title="Edit readiness"
-                                style={{ 'marginRight': '5px' }}
-                                className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm">
-                                <i className="fas fa-user-edit"></i>
-                            </a>
-                            <a
-                                onClick={() => {
-                                    this.setState({
-                                        selectedElement: element
-                                    });
-                                }}
-                                data-toggle="tooltip" data-placement="top" title="View readiness responses"
-                                className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-                                <i className="fas fa-file-import"></i>
-                            </a>
+                            {
+                                element.readiness_id == null ? '' :
+                                    <>
+                                        <a
+                                            onClick={() => {
+                                                this.setState({
+                                                    selectedElement: element
+                                                });
+                                            }}
+                                            data-toggle="tooltip" data-placement="top" title="View readiness responses"
+                                            className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                            <i className="fas fa-eye"></i>
+                                        </a>
+                                    </>
+                            }
 
                         </td>
                     }
@@ -137,7 +134,6 @@ class ReadinessResponse extends React.Component {
             }
 
         }
-
 
         let pageContent = <div id='user_table' className='row'>
             <div className="col-sm-12 mb-3 mt-3">
@@ -162,7 +158,7 @@ class ReadinessResponse extends React.Component {
                             );
                             this.updatedSearchItem(currElementsTableEl);
                         }}
-                        className="form-control" placeholder="search personel"></input>
+                        className="form-control" placeholder="search reponse"></input>
                 </div>
 
                 <table className="table table-striped table-sm  table-hover">

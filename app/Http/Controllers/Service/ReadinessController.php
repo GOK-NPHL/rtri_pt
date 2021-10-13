@@ -128,27 +128,28 @@ class ReadinessController extends Controller
         $user = Auth::user();
         try {
 
-            $readinesses = Readiness::select(
-                "readinesses.id",
-                "readinesses.start_date",
-                "readinesses.end_date",
-                "readinesses.name",
-                "laboratories.id as lab_id",
-                "users.name as fname",
-                "users.second_name as sname",
-                "laboratories.phone_number",
-                "laboratories.lab_name",
-                "laboratories.email",
-                "readiness_answers.id as answer_id",
-                DB::raw('DATE_FORMAT(readiness_answers.created_at,"%Y-%m-%d") as created_at'),
-                DB::raw('DATE_FORMAT(readiness_answers.updated_at,"%Y-%m-%d") as updated_at')
-            )->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'readinesses.id')
+            $readinesses = DB::table("readinesses")->distinct()
+                ->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'readinesses.id')
                 ->join('readiness_questions', 'readiness_questions.readiness_id', '=', 'readinesses.id')
                 ->join('laboratories', 'laboratory_readiness.laboratory_id', '=', 'laboratories.id')
                 ->leftJoin('readiness_answers', 'readiness_answers.laboratory_id', '=', 'laboratories.id')
                 ->leftJoin('users', 'readiness_answers.user_id', '=', 'users.id')
                 ->where('readinesses.id', $request->id)
-                ->get();
+                ->get([
+                    "readinesses.id",
+                    "readinesses.start_date",
+                    "readinesses.end_date",
+                    "readinesses.name",
+                    "laboratories.id as lab_id",
+                    "users.name as fname",
+                    "users.second_name as sname",
+                    "laboratories.phone_number",
+                    "laboratories.lab_name",
+                    "laboratories.email",
+                    "readiness_answers.id as readiness_id as answer_id",
+                    "readiness_answers.created_at",
+                    "readiness_answers.updated_at"
+                ]);
 
             return $readinesses;
         } catch (Exception $ex) {
