@@ -5,6 +5,7 @@ namespace App\Http\Controllers\QC;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 
 class QCParticipantController extends Controller
 {
@@ -51,6 +52,11 @@ class QCParticipantController extends Controller
 
     public function getReadinessForm()
     {
-        return view('user.pt.participant.readiness');
+
+        if (str_contains(url()->current(), "get-readiness-form")) {
+            return view('user.pt.participant.readiness');
+        } else {
+            return view('user.system.admin.readiness');
+        }
     }
 }

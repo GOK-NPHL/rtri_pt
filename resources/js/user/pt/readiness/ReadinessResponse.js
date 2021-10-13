@@ -110,7 +110,7 @@ class ReadinessResponse extends React.Component {
 
                                         <a
                                             onClick={() => {
-                                                window.location.assign('/get-readiness-form/' + element.id)
+                                                window.location.assign('/get-admin-readiness-form/' + element.id + '/' + element.lab_id)
                                             }}
                                             data-toggle="tooltip" data-placement="top" title="View readiness responses"
                                             className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">

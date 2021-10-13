@@ -50,7 +50,18 @@ class ReadinessController extends Controller
     public function getReadinessSurveyById(Request $request)
     {
         $user = Auth::user();
+
+        $parameter = 'users.id';
+        $condition = $user->id;
+
         try {
+            try {
+                if ($request->labId) {
+                    $parameter = 'laboratories.id';
+                    $condition = $request->labId;
+                }
+            } catch (Exception $ex) {
+            }
 
             $readinesses = Readiness::select(
                 "readinesses.id",
@@ -71,7 +82,7 @@ class ReadinessController extends Controller
                 ->join('laboratories', 'laboratory_readiness.laboratory_id', '=', 'laboratories.id')
                 ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
                 ->where('readinesses.id', $request->id)
-                ->where('users.id', $user->id)
+                ->where($parameter, $condition)
                 ->get();
 
             $readinessesAswers = ReadinessAnswer::select(
@@ -81,7 +92,7 @@ class ReadinessController extends Controller
             )->join('laboratories', 'readiness_answers.laboratory_id', '=', 'laboratories.id')
                 ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
                 ->where('readiness_answers.readiness_id', $request->id)
-                ->where('users.id', $user->id)
+                ->where($parameter, $condition)
                 ->get();
 
             return ['questions' => $readinesses, 'answers' => $readinessesAswers];

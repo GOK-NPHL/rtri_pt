@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { FetchReadnessSurveyById, SaveSuveyAnswers } from '../../../components/utils/Helpers';
+import { FetchReadnessSurveyById, FetchReadnessSurveyByIdAndLab, SaveSuveyAnswers } from '../../../components/utils/Helpers';
 import { matchPath } from "react-router";
 import { v4 as uuidv4 } from 'uuid';
 import ReadinessQuestions from './ReadinessQuestions';
@@ -29,13 +29,29 @@ class Readiness extends React.Component {
     componentDidMount() {
 
         let pathname = window.location.pathname;
+        let isUser = true;
+        //check which url is accessing this component, user of admin?
         let pathObject = matchPath(pathname, {
             path: `/get-readiness-form/:readinessId`,
+
         });
 
-        (async () => {
+        if (!pathObject) {
+            isUser = false;
+            pathObject = matchPath(pathname, {
+                path: `/get-admin-readiness-form/:readinessId/:labId`,
 
-            let readinessItems = await FetchReadnessSurveyById(pathObject.params.readinessId);
+            });
+        }
+
+        (async () => {
+            let readinessItems = null;
+            if (isUser) {
+                readinessItems = await FetchReadnessSurveyById(pathObject.params.readinessId);
+            } else {
+                readinessItems = await FetchReadnessSurveyByIdAndLab(pathObject.params.readinessId, pathObject.params.labId);
+            }
+
             if (readinessItems.status == 500) {
                 this.setState({
                     message: readinessItems.data.Message,

@@ -69,6 +69,8 @@ Route::post('/own_bio_update', [ParticipantController::class, 'editOwnPersonalBi
 
 Route::get('/get_readiness_survey', [ReadinessController::class, 'getReadinessSurvey'])->middleware('auth');
 Route::get('/get_readiness_survey_by_id/{id}', [ReadinessController::class, 'getReadinessSurveyById'])->middleware('auth');
+Route::get('/get_readiness_survey_by_id_and_labid/{id}/{labId}', [ReadinessController::class, 'getReadinessSurveyById'])->middleware('auth:admin');
+
 Route::get('/get_readiness_response/{id}', [ReadinessController::class, 'getReadinessResponse'])->middleware('auth:admin');
 
 Route::post('/save_survey_answers', [ReadinessController::class, 'saveSurveyAnswers']);

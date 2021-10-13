@@ -77,6 +77,19 @@ export async function FetchReadnessSurveyById(readinessId) {
 
 }
 
+export async function FetchReadnessSurveyByIdAndLab(readinessId, labId) {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_readiness_survey_by_id_and_labid/` + readinessId + '/' + labId);
+        const responseData = response.data;
+        return responseData;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+
+}
+
 export async function FetchCurrentParticipantDemographics() {
 
     try {
@@ -471,7 +484,7 @@ export async function SaveSuveyAnswers(survey) {
         return err.response
     }
 
-    
+
 }
 
 export async function FetchReadinessResponses(id) {
