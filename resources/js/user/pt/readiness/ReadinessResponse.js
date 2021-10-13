@@ -107,11 +107,10 @@ class ReadinessResponse extends React.Component {
                             {
                                 element.readiness_id == null ? '' :
                                     <>
+
                                         <a
                                             onClick={() => {
-                                                this.setState({
-                                                    selectedElement: element
-                                                });
+                                                window.location.assign('/get-readiness-form/' + element.id)
                                             }}
                                             data-toggle="tooltip" data-placement="top" title="View readiness responses"
                                             className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">

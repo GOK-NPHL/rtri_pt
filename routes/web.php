@@ -36,10 +36,10 @@ Route::post('participant-login', [CustomAuthController::class, 'doLogin'])->name
 Route::get('registration', [CustomAuthController::class, 'registration'])->name('register-user');
 Route::post('custom-registration', [CustomAuthController::class, 'customRegistration'])->name('register.custom');
 Route::get('logout', [CustomAuthController::class, 'signOut'])->name('logout');
-Route::get('participant-pt-demographics', [QCParticipantController::class, 'participantDemographicsPage'])->name('participant-pt-demographics');
+Route::get('participant-pt-demographics', [QCParticipantController::class, 'participantDemographicsPage'])->name('participant-pt-demographics')->middleware('auth');
 
-Route::get('participant-home', [QCParticipantController::class, 'participantHome'])->name('participant-home');
-Route::get('participant-pt-home', [QCParticipantController::class, 'participantPTHome'])->name('participant-pt-home');
+Route::get('participant-home', [QCParticipantController::class, 'participantHome'])->name('participant-home')->middleware('auth');
+Route::get('participant-pt-home', [QCParticipantController::class, 'participantPTHome'])->name('participant-pt-home')->middleware('auth');;
 
 Route::get('admin-logout', [AdminAuthController::class, 'signOut'])->name('admin-logout');
 Route::post('admin-login', [AdminAuthController::class, 'doLogin'])->name('admin-login');

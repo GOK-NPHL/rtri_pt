@@ -15,7 +15,7 @@ class QCParticipantController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        // $this->middleware('auth');
     }
 
     /**
@@ -51,10 +51,6 @@ class QCParticipantController extends Controller
 
     public function getReadinessForm()
     {
-        if (Gate::allows('view_pt_component')) {
-            return view('user.pt.participant.readiness');
-        } else {
-            return view('user.general.dashboard');
-        }
+        return view('user.pt.participant.readiness');
     }
 }
