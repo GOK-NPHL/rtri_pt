@@ -249,7 +249,7 @@ class Readiness extends React.Component {
                                                 window.location.assign(route)
                                             }
                                         }
-                                        className={this.state.isUser ? "d-inline m-2 btn btn-danger" : "d-inline m-2 btn btn-info"}
+                                        className={this.state.isUser ? "d-inline m-2 btn btn-danger" : "d-inline m-2 btn btn-secondary"}
 
                                     >Exit</a>
                                 </div>
