@@ -35,6 +35,7 @@ class ReadinessQuestions extends React.Component {
 
                         <label className="float-left" htmlFor={readiness['question_id']}>{readiness['question']}</label>
                         <select
+                            disabled={!this.props.isUser}
                             value={this.props.questionsAnswerMap[readiness['question_id']]}
                             onChange={(event) => this.props.questionAnswerHandler(event)}
                             className="custom-select" id={readiness['question_id']}>
@@ -53,6 +54,7 @@ class ReadinessQuestions extends React.Component {
 
                         <label className="float-left" htmlFor={readiness['question_id']}>{readiness['question']}</label>
                         <input
+                            readOnly={!this.props.isUser}
                             value={this.props.questionsAnswerMap[readiness['question_id']]}
                             onChange={
                                 (event) => {
@@ -74,7 +76,9 @@ class ReadinessQuestions extends React.Component {
                 <div key={uuidv4()} className="form-group">
 
                     <label className="float-left" htmlFor={readiness['question_id']}>{readiness['question']}</label>
-                    <textarea className="form-control"
+                    <textarea
+                        readOnly={!this.props.isUser}
+                        className="form-control"
                         onFocusOut={(event) => {
                             let key = readiness['question_id'];
                             this.props.questionAnswerHandler(event)
