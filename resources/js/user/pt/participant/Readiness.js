@@ -19,7 +19,7 @@ class Readiness extends React.Component {
             endDate: '1970-01-01',
             readinessItems: { 'questions': [], 'answers': [] },
             questionsAnswerMap: {},
-            showSaveButton: true,
+            showSaveButton: false,
             isUser: null
         }
 
@@ -231,13 +231,27 @@ class Readiness extends React.Component {
                                         :
                                         ''
                                     }
+                                    {!this.state.isUser ?
+
+                                        <a type="" className="d-inline m-2 btn btn-primary m">
+                                            Approve
+                                        </a>
+                                        :
+                                        ''
+                                    }
                                     <a
                                         onClick={
                                             () => {
-                                                window.location.assign('/participant-pt-home')
+                                                let route = '/participant-pt-home';
+                                                if (!this.state.isUser) {
+                                                    route = '/get-readiness-response/' + this.state.id;
+                                                }
+                                                window.location.assign(route)
                                             }
                                         }
-                                        className="d-inline m-2 btn btn-danger">Exit</a>
+                                        className={this.state.isUser ? "d-inline m-2 btn btn-danger" : "d-inline m-2 btn btn-info"}
+
+                                    >Exit</a>
                                 </div>
                             </div>
 
