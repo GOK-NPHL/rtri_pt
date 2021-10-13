@@ -83,19 +83,21 @@ class ListReadiness extends React.Component {
                                         window.location.assign('edit-readiness/' + element.id)
                                     }
                                 }
+                                data-toggle="tooltip" data-placement="top" title="Edit readiness"
                                 style={{ 'marginRight': '5px' }}
                                 className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm">
                                 <i className="fas fa-user-edit"></i>
                             </a>
-                            {/* <a
+                            <a 
                                 onClick={() => {
                                     this.setState({
                                         selectedElement: element
                                     });
-                                    $('#deleteConfirmModal').modal('toggle');
-                                }} className="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
-                                <i className="fas fa-user-times"></i>
-                            </a> */}
+                                }}
+                                data-toggle="tooltip" data-placement="top" title="View readiness responses"
+                                className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                                <i className="fas fa-file-import"></i>
+                            </a>
 
                         </td>
                     }
