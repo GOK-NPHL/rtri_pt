@@ -42,4 +42,9 @@ class PTAdminController extends Controller
     {
         return view('user.pt.readiness.edit_readiness');
     }
+
+    public function getReadinessResponse()
+    {
+        return view('user.pt.readiness.readiness_responses');
+    }
 }

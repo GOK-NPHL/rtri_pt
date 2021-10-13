@@ -470,4 +470,18 @@ export async function SaveSuveyAnswers(survey) {
         console.log(err);
         return err.response
     }
+
+    
+}
+
+export async function FetchReadinessResponses(id) {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_readiness_response/` + id);
+        const responseData = response.data;
+        return responseData;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
 }
