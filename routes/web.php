@@ -5,6 +5,7 @@ use App\Http\Controllers\CustomAuthController;
 use App\Http\Controllers\PT\PTAdminController;
 use App\Http\Controllers\QC\QCAdminController;
 use App\Http\Controllers\QC\QCParticipantController;
+use App\Http\Controllers\Service\ReadinessController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -67,3 +68,4 @@ Route::get('edit-readiness/{readinessId}', [PTAdminController::class, 'editReadi
 Route::get('add-readiness', [PTAdminController::class, 'addReadiness'])->name('add-readiness');
 
 Route::get('get-readiness-form/{readinessId}', [QCParticipantController::class, 'getReadinessForm'])->name('get-readiness-form');
+Route::get('get-readiness-response/{readinessId}', [PTAdminController::class, 'getReadinessResponse'])->name('get-readiness-response');
