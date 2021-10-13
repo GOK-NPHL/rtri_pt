@@ -90,11 +90,15 @@ class ReadinessResponse extends React.Component {
                 tableElem.push(<tr key={index}>
                     <th scope="row">{index + 1}</th>
                     <td>{element.name}</td>
-                    <td>{element.participant_count}</td>
-                    <td>{element.last_update}</td>
-                    <td>{element.created_by}</td>
-                    {
+                    <td>{element.lab_name}</td>
+                    <td>{
+                    element.created_at
+                    }</td>
+                    <td>{element.updated_at}</td>
+                    <td>{element.fname} {element.sname}</td>
 
+                    {
+                        //lab_id   id
                         <td>
 
                             <a

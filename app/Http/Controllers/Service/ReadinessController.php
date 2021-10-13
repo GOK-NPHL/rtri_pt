@@ -139,7 +139,9 @@ class ReadinessController extends Controller
                 "laboratories.phone_number",
                 "laboratories.lab_name",
                 "laboratories.email",
-                "readiness_answers.id as answer_id"
+                "readiness_answers.id as answer_id",
+                DB::raw('DATE_FORMAT(readiness_answers.created_at,"%Y-%m-%d") as created_at'),
+                DB::raw('DATE_FORMAT(readiness_answers.updated_at,"%Y-%m-%d") as updated_at')
             )->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'readinesses.id')
                 ->join('readiness_questions', 'readiness_questions.readiness_id', '=', 'readinesses.id')
                 ->join('laboratories', 'laboratory_readiness.laboratory_id', '=', 'laboratories.id')
