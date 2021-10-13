@@ -53,7 +53,7 @@ class ReadinessList extends React.Component {
 
             for (const [key, element] of Object.entries(this.props.data)) {
 
-                let datRow = <tr key={index++}>
+                let datRow = <tr key={index}>
                     <th scope="row">{index}</th>
                     <td>{element.round_name}</td>
                     <td>{element.name}</td>
@@ -110,9 +110,8 @@ class ReadinessList extends React.Component {
                     }
 
                 </tr>;
-
+                index++;
                 tableElem.push(datRow);
-                index += 1;
             }
             if (this.state.allTableElements.length == 0 && tableElem.length != 0) {
                 this.setState({
