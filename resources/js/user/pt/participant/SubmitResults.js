@@ -443,11 +443,19 @@ class SubmitResults extends React.Component {
             <>
                 <div className="row">
 
-
-
-
                     <div className="col-sm-12 float-left">
-                        <h1>RTRI PT Submission form</h1>
+                        <h1>
+                            RTRI PT Submission form
+                            {
+                                Date.parse(this.state.endDate) > new Date() ?
+                                    this.props.shipment.readiness_approval_id == null ?
+                                        <span style={{ "color": "red" }}> Waiting for readiness approval</span>
+                                        :
+                                        ''
+                                    :
+                                    ''
+                            }
+                        </h1>
                         <hr />
                     </div>
                     <div className="col-sm-12 float-left">
@@ -857,7 +865,7 @@ class SubmitResults extends React.Component {
                     </div>
                     <div className="d-flex w-100 justify-content-center">
 
-                        {Date.parse(this.state.endDate) > new Date() ?
+                        {Date.parse(this.state.endDate) > new Date() && this.props.shipment.readiness_approval_id != null ?
                             <button type="button " onClick={() => this.submitForm()} className="btn btn-info float-left mx-2">Submit</button>
                             : ''
                         }

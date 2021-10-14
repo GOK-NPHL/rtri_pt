@@ -144,7 +144,20 @@ class Dashboard extends React.Component {
                     <td>{element.round_name}</td>
                     <td>{element.code}</td>
                     <td>{element.end_date}</td>
+                    {
+                        element.submission_id == null ? <td>
+                            {Date.parse(element.end_date) > new Date() ?
+                                element.is_readiness_answered == null ? 'Readiness needs filling' :
+                                    element.readiness_approval_id == null ?
+                                        'Pendind readiness approval'
+                                        :
+                                        'Submit result'
+                                :
+                                ' Past due date'}
 
+                        </td> :
+                            ''
+                    }
                     {
 
                         <td>
@@ -198,7 +211,11 @@ class Dashboard extends React.Component {
                                                 : <i className="fas fa-eye"></i>
                                         }
                                         {Date.parse(element.end_date) > new Date() ?
-                                            element.is_readiness_answered == null ? ' Fill readiness' : ' Submit'
+                                            element.is_readiness_answered == null ?
+                                                ' Fill readiness'
+                                                :
+                                                element.readiness_approval_id == null ? ' View only' : ' Submit'
+
                                             :
                                             ' View only'}
                                     </button>
@@ -372,6 +389,7 @@ class Dashboard extends React.Component {
                             <th scope="col">Round</th>
                             <th scope="col">Code</th>
                             <th scope="col">End Date</th>
+                            <th scope="col">Status</th>
                             <th scope="col">Action</th>
 
                         </tr>

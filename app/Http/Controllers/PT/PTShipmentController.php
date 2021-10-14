@@ -236,8 +236,10 @@ class PTShipmentController extends Controller
                 "pt_samples.id as sample_id",
                 "pt_samples.name as sample_name",
                 "ptsubmissions.id as submission_id",
-                DB::raw("1 as is_answered"),
-                DB::raw("null as readiness_id")
+                DB::raw("1 as is_readiness_answered"),
+                DB::raw("null as readiness_id"),
+                DB::raw("1 as readiness_approval_id")
+
             )
                 ->leftJoin('ptsubmissions', 'pt_shipements.id', '=', 'ptsubmissions.pt_shipements_id')
                 ->join('laboratory_pt_shipement', 'laboratory_pt_shipement.pt_shipement_id', '=', 'pt_shipements.id')
@@ -258,12 +260,14 @@ class PTShipmentController extends Controller
                 "pt_samples.name as sample_name",
                 "ptsubmissions.id as submission_id",
                 "readiness_answers.id as is_readiness_answered", //check if readiness for this shipment id filled
-                "pt_shipements.readiness_id as readiness_id"
+                "pt_shipements.readiness_id as readiness_id",
+                "readiness_approvals.id as readiness_approval_id"
 
             )
                 ->leftJoin('ptsubmissions', 'pt_shipements.id', '=', 'ptsubmissions.pt_shipements_id')
                 ->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'pt_shipements.readiness_id')
                 ->leftJoin('readiness_answers',  'laboratory_readiness.readiness_id', '=',  'readiness_answers.readiness_id')
+                ->leftJoin('readiness_approvals', 'readiness_answers.laboratory_id', '=',  'readiness_approvals.lab_id')
                 ->join('pt_samples', 'pt_samples.ptshipment_id', '=', 'pt_shipements.id')
                 ->join('laboratories', 'laboratory_readiness.laboratory_id', '=', 'laboratories.id')
                 ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
@@ -304,6 +308,7 @@ class PTShipmentController extends Controller
                         $payload[$lab->id]['submission_id'] = $lab->submission_id;
                         $payload[$lab->id]['is_readiness_answered'] = $lab->is_readiness_answered;
                         $payload[$lab->id]['readiness_id'] = $lab->readiness_id;
+                        $payload[$lab->id]['readiness_approval_id'] = $lab->readiness_approval_id;
                     }
                 }
             }
