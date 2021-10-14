@@ -402,7 +402,7 @@ class Dashboard extends React.Component {
                             this.state.currElementsTableEl.length > 0 ?
                                 this.state.currElementsTableEl.slice(this.state.startTableData, this.state.endeTableData) :
                                 <tr>
-                                    <td colSpan={5}>
+                                    <td colSpan={6}>
                                         No pending samples to fill
                                     </td>
                                 </tr>
