@@ -5,6 +5,7 @@ namespace App\Http\Controllers\PT;
 use App\Http\Controllers\Controller;
 use App\Laboratory;
 use App\Readiness;
+use App\ReadinessApproval;
 use App\ReadinessQuestion;
 use Exception;
 use Illuminate\Http\Request;
@@ -210,6 +211,36 @@ class PTReadinessController extends Controller
             return $envelop;
         } catch (Exception $ex) {
             return response()->json(['Message' => 'Could fetch readiness: ' . $ex->getMessage()], 500);
+        }
+    }
+
+    public function approveReadinessAnswer(Request $request)
+    {
+        try {
+
+            $user = Auth::user();
+
+
+            $readinessAswers = ReadinessApproval::updateOrCreate(
+
+
+                [
+                    'lab_id' => $request->lab_id,
+                    'readiness_id' =>  $request->readiness_id
+
+                ],
+                [
+                    'lab_id' => $request->lab_id,
+                    'readiness_id' =>  $request->readiness_id,
+                    'admin_id' => $user->id,
+                    'approved' => 1
+                ]
+
+            );
+
+            return response()->json(['Message' => 'Saved successfully'], 200);
+        } catch (Exception $ex) {
+            return response()->json(['Message' => 'Could not save the request:  ' . $ex->getMessage()], 500);
         }
     }
 }

@@ -121,7 +121,7 @@ class ReadinessController extends Controller
                     [
                         'question_id' => $key,
                         'answer' => $value,
-                        'laboratory_id' => $request->survey['lab_id'],
+                        'lab_id' => $request->survey['lab_id'],
                         'user_id' => $user->id,
                         'readiness_id' =>  $request->survey['readiness_id']
                     ]
@@ -169,46 +169,4 @@ class ReadinessController extends Controller
         }
     }
 
-    public function getReadinessResponse2(Request $request)
-    {
-        $user = Auth::user();
-        try {
-
-            $readinesses = Readiness::select(
-                "readinesses.id",
-                "readinesses.start_date",
-                "readinesses.end_date",
-                "readinesses.name",
-                "readinesses.admin_id",
-                "laboratories.id as lab_id",
-                "readiness_questions.id as question_id",
-                "readiness_questions.question",
-                "readiness_questions.answer_options",
-                "readiness_questions.answer_type",
-                "readiness_questions.qustion_position",
-                "readiness_questions.qustion_type",
-
-            )->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'readinesses.id')
-                ->join('readiness_questions', 'readiness_questions.readiness_id', '=', 'readinesses.id')
-                ->join('laboratories', 'laboratory_readiness.laboratory_id', '=', 'laboratories.id')
-                ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
-                ->where('readinesses.id', $request->id)
-                ->where('users.id', $user->id)
-                ->get();
-
-            $readinessesAswers = ReadinessAnswer::select(
-                "readiness_answers.id",
-                "readiness_answers.question_id",
-                "readiness_answers.answer"
-            )->join('laboratories', 'readiness_answers.laboratory_id', '=', 'laboratories.id')
-                ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
-                ->where('readiness_answers.readiness_id', $request->id)
-                ->where('users.id', $user->id)
-                ->get();
-
-            return ['questions' => $readinesses, 'answers' => $readinessesAswers];
-        } catch (Exception $ex) {
-            return response()->json(['Message' => 'Could fetch readiness list: ' . $ex->getMessage()], 500);
-        }
-    }
 }

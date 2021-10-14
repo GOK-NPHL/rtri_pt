@@ -484,8 +484,26 @@ export async function SaveSuveyAnswers(survey) {
         return err.response
     }
 
+}
+
+export async function ApproveReadinessAnswer(readinessId, labId) {
+    try {
+        const response = await axios({
+            method: 'post',
+            url: `${settings.serverBaseApi}/approve_readiness_answer`,
+            data: {
+                readiness_id: readinessId,
+                lab_id: labId
+            }
+        });
+        return response;
+    } catch (err) {
+        console.log(err);
+        return err.response
+    }
 
 }
+
 
 export async function FetchReadinessResponses(id) {
 

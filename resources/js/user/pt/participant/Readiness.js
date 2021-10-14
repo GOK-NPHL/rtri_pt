@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { FetchReadnessSurveyById, FetchReadnessSurveyByIdAndLab, SaveSuveyAnswers } from '../../../components/utils/Helpers';
+import { FetchReadnessSurveyById, FetchReadnessSurveyByIdAndLab, SaveSuveyAnswers,ApproveReadinessAnswer } from '../../../components/utils/Helpers';
 import { matchPath } from "react-router";
 import { v4 as uuidv4 } from 'uuid';
 import ReadinessQuestions from './ReadinessQuestions';
@@ -25,6 +25,8 @@ class Readiness extends React.Component {
 
         this.questionAnswerHandler = this.questionAnswerHandler.bind(this);
         this.saveAnswers = this.saveAnswers.bind(this);
+        this.approveReadinessResponse = this.approveReadinessResponse.bind(this);
+
     }
 
     componentDidMount() {
@@ -94,7 +96,7 @@ class Readiness extends React.Component {
                     showSaveButton: Date.parse(endDate) > new Date(),
                     questionsAnswerMap: questionsAnswerMap,
                     readinessItems: readinessItems,
-                    isUser: isUser
+                    isUser: isUser,
                 });
             }
 
@@ -144,7 +146,15 @@ class Readiness extends React.Component {
 
     }
 
-
+    approveReadinessResponse() {
+        (async () => {
+            let response = await ApproveReadinessAnswer(this.state.id, this.state.lab_id);
+            this.setState({
+                message: response.data.Message,
+            });
+            $('#readinessFormModal').modal('toggle');
+        })();
+    }
 
     render() {
 
@@ -233,7 +243,9 @@ class Readiness extends React.Component {
                                     }
                                     {!this.state.isUser ?
 
-                                        <a type="" className="d-inline m-2 btn btn-primary m">
+                                        <a
+                                            onClick={() => this.approveReadinessResponse()}
+                                            type="" className="d-inline m-2 btn btn-primary m">
                                             Approve
                                         </a>
                                         :
