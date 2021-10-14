@@ -93,11 +93,17 @@ class ReadinessResponse extends React.Component {
                     <td>{element.lab_name}</td>
                     <td>{element.created_at}</td>
                     <td>{element.updated_at}</td>
-                    <td>{element.fname == null && element.sname == null ?
-                        <span>Not Responded</span> :
-                        <span>{element.fname} {element.sname}</span>
-                    }
-
+                    <td>
+                        {element.fname == null && element.sname == null ?
+                            <span>Not Responded</span> :
+                            <span>{element.fname} {element.sname}</span>
+                        }
+                    </td>
+                    <td>
+                        {element.approved_id == null ?
+                            <span>Pending Approval</span> :
+                            <span>Approved</span>
+                        }
                     </td>
 
                     {
@@ -169,6 +175,7 @@ class ReadinessResponse extends React.Component {
                             <th scope="col">Date responded</th>
                             <th scope="col">Date updated</th>
                             <th scope="col">Responded by</th>
+                            <th scope="col">Approval status</th>
                             <th scope="col">Action</th>
                         </tr>
                     </thead>

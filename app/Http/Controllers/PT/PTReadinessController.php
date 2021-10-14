@@ -220,9 +220,7 @@ class PTReadinessController extends Controller
 
             $user = Auth::user();
 
-
             $readinessAswers = ReadinessApproval::updateOrCreate(
-
 
                 [
                     'lab_id' => $request->lab_id,
@@ -238,9 +236,9 @@ class PTReadinessController extends Controller
 
             );
 
-            return response()->json(['Message' => 'Saved successfully'], 200);
+            return response()->json(['Message' => 'Approval success'], 200);
         } catch (Exception $ex) {
-            return response()->json(['Message' => 'Could not save the request:  ' . $ex->getMessage()], 500);
+            return response()->json(['Message' => 'Could not Approval success request:  ' . $ex->getMessage()], 500);
         }
     }
 }

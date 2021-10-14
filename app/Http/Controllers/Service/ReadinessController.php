@@ -146,6 +146,7 @@ class ReadinessController extends Controller
                 ->join('laboratories', 'laboratory_readiness.laboratory_id', '=', 'laboratories.id')
                 ->leftJoin('readiness_answers', 'readiness_answers.laboratory_id', '=', 'laboratories.id')
                 ->leftJoin('users', 'readiness_answers.user_id', '=', 'users.id')
+                ->leftJoin('readiness_approvals', 'readiness_answers.laboratory_id', '=', 'readiness_approvals.lab_id')
                 ->where('readinesses.id', $request->id)
                 ->get([
                     "readinesses.id",
@@ -160,7 +161,8 @@ class ReadinessController extends Controller
                     "laboratories.email",
                     "readiness_answers.id as readiness_id as answer_id",
                     "readiness_answers.created_at",
-                    "readiness_answers.updated_at"
+                    "readiness_answers.updated_at",
+                    "readiness_approvals.id as approved_id"
                 ]);
 
             return $readinesses;
@@ -168,5 +170,4 @@ class ReadinessController extends Controller
             return response()->json(['Message' => 'Could fetch readiness list: ' . $ex->getMessage()], 500);
         }
     }
-
 }
