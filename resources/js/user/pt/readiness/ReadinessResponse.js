@@ -100,10 +100,15 @@ class ReadinessResponse extends React.Component {
                         }
                     </td>
                     <td>
-                        {element.approved_id == null ?
-                            <span>Pending Approval</span> :
-                            <span>Approved</span>
+                        {element.fname == null && element.sname == null ?
+                            <span>Readiness Not Responded</span>
+                            :
+                            element.approved_id == null ?
+                                <span>Pending Approval</span>
+                                :
+                                <span>Approved</span>
                         }
+
                     </td>
 
                     {

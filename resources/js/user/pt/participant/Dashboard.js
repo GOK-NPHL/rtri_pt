@@ -145,15 +145,18 @@ class Dashboard extends React.Component {
                     <td>{element.code}</td>
                     <td>{element.end_date}</td>
                     {
-                        element.submission_id == null ? <td>
-                            {Date.parse(element.end_date) > new Date() ?
-                                element.is_readiness_answered == null ? 'Readiness needs filling' :
-                                    element.readiness_approval_id == null ?
-                                        'Pendind readiness approval'
-                                        :
-                                        'Submit result'
-                                :
-                                ' Past due date'}
+                        element.submission_id == null ? <td >
+                            <span style={{ "background-color": "green", "padding": "3px", "border-radius": "2px", "color": "white" }}>
+                                {Date.parse(element.end_date) > new Date() ?
+                                    element.is_readiness_answered == null ? 'Readiness needs filling' :
+                                        element.readiness_approval_id == null ?
+                                            'Pending readiness approval'
+                                            :
+                                            'Submit result'
+                                    :
+                                    ' Past due date'}
+                            </span>
+
 
                         </td> :
                             ''

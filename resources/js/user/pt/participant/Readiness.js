@@ -93,7 +93,7 @@ class Readiness extends React.Component {
                     lab_id: qstns[0].lab_id,
                     startDate: startDate,
                     endDate: endDate,
-                    showSaveButton: Date.parse(endDate) > new Date(),
+                    showSaveButton: Date.parse(endDate) > new Date() && isUser,
                     questionsAnswerMap: questionsAnswerMap,
                     readinessItems: readinessItems,
                     isUser: isUser,
