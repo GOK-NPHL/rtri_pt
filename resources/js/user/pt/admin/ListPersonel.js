@@ -88,8 +88,8 @@ class ListPersonel extends React.Component {
                                     }
                                 }
                                 style={{ 'marginRight': '5px' }}
-                                className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm">
-                                <i className="fas fa-user-edit"></i>
+                                className="d-none d-sm-inline-block btn btn-xs btn-info shadow-sm text-white">
+                                <i className="fas fa-user-edit"></i> Edit
                             </a>
                             {/* <a
                                 onClick={() => {
@@ -126,11 +126,17 @@ class ListPersonel extends React.Component {
                 <div className="form-group mb-2">
                     <input type="text"
                         onChange={(event) => {
+                            let searchTerm = event.target.value.trim().toLowerCase() || '';
                             console.log(this.state.allTableElements);
+                            
+                            
                             let currElementsTableEl = this.state.allTableElements.filter(elemnt =>
-                                elemnt['props']['children'][1]['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
-                                elemnt['props']['children'][2]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
-                                elemnt['props']['children'][3]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase())
+                                {
+                                    return elemnt['props']['children'][1]['props']['children'].toString().toLowerCase().trim().includes(searchTerm) ||
+                                    elemnt['props']['children'][2]['props']['children'].join(' ').toLowerCase().trim().includes(searchTerm) ||
+                                    elemnt['props']['children'][3]['props']['children'].toLowerCase().trim().includes(searchTerm) ||
+                                    elemnt['props']['children'][4]['props']['children'].toLowerCase().trim().includes(searchTerm)
+                            }
                             );
                             this.updatedSearchItem(currElementsTableEl);
                         }}

@@ -85,16 +85,16 @@ class ListReadiness extends React.Component {
                                 }
                                 data-toggle="tooltip" data-placement="top" title="Edit readiness"
                                 style={{ 'marginRight': '5px' }}
-                                className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm">
-                                <i className="fas fa-user-edit"></i>
+                                className="d-none d-sm-inline-block btn btn-xs btn-info shadow-sm text-white m-1">
+                                <i className="fas fa-edit"></i> Edit Checklist
                             </a>
                             <a
                                 onClick={() => {
                                     window.location.assign('get-readiness-response/' + element.id)
                                 }}
                                 data-toggle="tooltip" data-placement="top" title="View readiness responses"
-                                className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-                                <i className="fas fa-file-import"></i>
+                                className="d-none d-sm-inline-block btn btn-xs btn-primary shadow-sm text-white m-1">
+                                <i className="fas fa-file-alt"></i> View Responses
                             </a>
 
                         </td>
