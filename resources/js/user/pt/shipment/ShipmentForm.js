@@ -357,7 +357,10 @@ class ShipmentForm extends React.Component {
             checklists.push(<option key={checklist.id} value={checklist.id}>{checklist.name}</option>);
         });
 
-        let labSelect = <div>No checklist defined</div>;
+        let labSelect = <div>No checklist defined. Readiness: {this.state.readinessId}</div>;
+        if (this.state.pageState == 'edit' && this.state.readinessId && this.state.readinessId != '' && this.state.readinessId != null) {
+            labSelect = <div> {this.state.readinessId},, {JSON.stringify(this.state.readinessChecklists) || '~'} </div>
+        }
         if (this.state.readinessChecklists.length != 0) {
             labSelect = <select
                 id="u_readinessId"

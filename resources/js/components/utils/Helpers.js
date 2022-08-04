@@ -51,6 +51,19 @@ export async function FetchUserSamples() {
 
 }
 
+export async function FetchSampleResponseResultById(id) {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_sample_response_result/` + id);
+        const responseData = response.data;
+        return responseData;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+
+}
+
 export async function FetchReadnessSurvey() {
 
     try {
@@ -90,10 +103,10 @@ export async function FetchReadnessSurveyByIdAndLab(readinessId, labId) {
 
 }
 
-export async function FetchCurrentParticipantDemographics() {
+export async function FetchCurrentParticipantDemographics(id) {
 
     try {
-        const response = await axios.get(`${settings.serverBaseApi}/get_participant_demographics`);
+        const response = await axios.get(`${settings.serverBaseApi}/get_participant_demographics/` + id);
         const responseData = response.data;
         return responseData;
     } catch (err) {
@@ -306,6 +319,7 @@ export async function FetchLabPersonelById(id) {
     }
 }
 
+
 export async function SaveLabPersonel(personel) {
     try {
         const response = await axios({
@@ -322,6 +336,7 @@ export async function SaveLabPersonel(personel) {
         return err.response
     }
 }
+
 
 export async function UpdateLabPersonel(personel) {
     try {
@@ -456,10 +471,10 @@ export async function UpdateShipment(shipement) {
     }
 }
 
-export async function FetchShipments() {
+export async function FetchShipments(userId, filterEmpty) {
 
     try {
-        const response = await axios.get(`${settings.serverBaseApi}/get_shipments`);
+        const response = await axios.get(`${settings.serverBaseApi}/get_shipments/` + userId + '/' + filterEmpty);
         const responseData = response.data;
         return responseData;
     } catch (err) {
@@ -504,7 +519,6 @@ export async function ApproveReadinessAnswer(readinessId, labId) {
 
 }
 
-
 export async function FetchReadinessResponses(id) {
 
     try {
@@ -513,6 +527,177 @@ export async function FetchReadinessResponses(id) {
         return responseData;
     } catch (err) {
         // Handle Error Here
+        return err.response
+    }
+}
+
+export async function FetchShipmentResponses(id) {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_shipment_responses/` + id);
+        const responseData = response.data;
+        return responseData;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+}
+
+export async function FetchShipmentResponsesReport(id, isPart) {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_shipment_response_report/` + id + '/' + isPart);
+        const responseData = response.data;
+        return responseData;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+}
+
+export async function FetchuserId(id) {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_user_id/`);
+        const responseData = response.data;
+        return responseData;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+}
+
+export async function FetchuserParams(id) {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_user_params/`);
+        const responseData = response.data;
+        return responseData;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+}
+
+export async function FetchAdminParams(id) {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_admin_params/`);
+        const responseData = response.data;
+        return responseData;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+}
+
+
+export function exportToExcel(bundle, filename) {
+    console.log('Exporting to Excel');
+    if (!filename || filename == '' || filename == null || filename == undefined) {
+        filename = 'data';
+    }
+    // let bundle = this.state.data
+    if (bundle.length > 0) {
+        let csv = '';
+        filename = filename + '-' + new Date().toLocaleDateString().split('/').join('_') + '.csv'
+        let keys = Object.keys(bundle[0])//.map(key => key.split('_').join(' '));
+        csv += keys.join(',') + '\r\n';
+        bundle.forEach(item => {
+            csv += keys.map(key => item[key]).join(',') + '\r\n';
+        });
+        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        if (navigator.msSaveBlob) { // IE 10+
+            navigator.msSaveBlob(blob, filename);
+        } else {
+            if (document && document.createElement) {
+                let link = document.createElement("a");
+                if (link.download !== undefined) { // feature detection
+                    // Browsers that support HTML5 download attribute
+                    var url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", filename);
+                } else {
+                    link.setAttribute("href", 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
+                }
+                link.style.visibility = 'hidden';
+                // link.textContent = 'Download '+filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+            } else {
+                if (window && window.open) {
+                    window.open('data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
+                }
+            }
+        }
+        console.log('Exported to Excel');
+    } else {
+        console.log('No data to export');
+        alert('No data to export');
+    }
+}
+
+
+export async function FetchAllFiles() {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/resources/files_all`);
+        const flList = response.data;
+        return flList;
+    } catch (err) {
+        return err.response
+    }
+}
+
+export async function FetchPublicFiles() {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/resources/files_public`);
+        const pbFlst = response.data;
+        return pbFlst;
+    } catch (err) {
+        return err.response
+    }
+}
+export async function FetchPrivateFiles() {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/resources/files_private`);
+        const prvFlst = response.data;
+        return prvFlst;
+    } catch (err) {
+        return err.response
+    }
+}
+
+export async function SaveFile(payload, isPub = false) {
+    let response;
+    try {
+        const formData = new FormData();
+        formData.append('file', payload);
+        formData.append('isPublic', isPub);
+        response = await axios.post(`${settings.serverBaseApi}/resources/files`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return response;
+    } catch (err) {
+        return err.response
+    }
+}
+
+export async function DeleteFile(fileId) {
+    let response;
+    try {
+        response = await axios({
+            method: 'delete',
+            url: `${settings.serverBaseApi}/resources/files/${fileId}`,
+        });
+        return response;
+    } catch (err) {
         return err.response
     }
 }

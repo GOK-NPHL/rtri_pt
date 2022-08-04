@@ -23,7 +23,11 @@ require('./user/pt/admin/ListLab');
 require('./user/pt/admin/ListPersonel');
 require('./user/pt/admin/ListUser');
 
+require('./user/pt/admin/ListFiles');
+
 require('./user/pt/shipment/PtShipment');
+require('./user/pt/shipment/ListShipmentResponse');
+require('./user/pt/shipment/ShipmentResponseForm');
 require('./user/pt/readiness/AddReadiness');
 require('./user/pt/readiness/EditReadiness');
 require('./user/pt/readiness/ListReadiness');
@@ -31,6 +35,11 @@ require('./user/pt/readiness/ReadinessResponse');
 require('./user/pt/participant/Dashboard');
 require('./user/pt/participant/Readiness');
 require('./user/pt/participant/Demographics');
+
+require('./user/pt/reports/ListShipmentReport');
+require('./user/pt/reports/ListShipmentResponseReport');
+require('./user/pt/reports/PTPerformanceReport');
+
 
 require('./user/general/Dashboard');
 //Intrface code

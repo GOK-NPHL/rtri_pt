@@ -93,6 +93,22 @@ class AdminAuthController extends Controller
         }
     }
 
+    public function getAdminParticulars(Request $request)
+    {
+
+        try {
+            $user = request()->user();
+            
+            $response = [
+                'user' => $user,
+            ];
+            return response()->json($response);
+
+        } catch (Exception $ex) {
+            return response()->json(['Message' => 'Error getting user details: ' . $ex->getMessage()], 500);
+        }
+    }
+
     public function signOut()
     {
         Auth::guard('admin')->logout();

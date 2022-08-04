@@ -70,3 +70,22 @@ Route::get('add-readiness', [PTAdminController::class, 'addReadiness'])->name('a
 Route::get('get-readiness-form/{readinessId}', [QCParticipantController::class, 'getReadinessForm'])->name('get-readiness-form');
 Route::get('get-admin-readiness-form/{readinessId}/{labId}', [QCParticipantController::class, 'getReadinessForm'])->name('get-admin-readiness-form');
 Route::get('get-readiness-response/{readinessId}', [PTAdminController::class, 'getReadinessResponse'])->name('get-readiness-response');
+
+/////
+Route::get('get-shipment-responses/{shipmentId}', [PTAdminController::class, 'getShipmentResponse'])->name('get-shipment-response');
+Route::get('get-shipment-response-form/{resultSubmissionId}', [PTAdminController::class, 'getShipmentResponseForm']);
+
+Route::get('pt-shipment-report-list', [PTAdminController::class, 'getShipmentReportList'])->name('pt-shipment-report-list');
+Route::get('get-shipment-report-responses/{shipmentId}', [PTAdminController::class, 'getShipmentReportResponse'])->name('get-shipment-report-response');
+
+Route::get('get-shipment-response-performance/{resultSubmissionId}', [PTAdminController::class, 'getShipmentResponsePerformance']);
+
+Route::get('get-participant-shipment-response-performance/{resultSubmissionId}', [QCParticipantController::class, 'getParticipantShipmentResponsePerformance']);
+
+//Files
+Route::get('/home/resources',  [CustomAuthController::class, 'publicResources'])->name('publicResources');
+Route::get('resources', function () {
+    return redirect('/resources/files');
+})->name('resourcesIndex');
+Route::get('resources/files',['as'=>'resources.files', 'uses'=>'ResourceFilesController@index']);
+//////

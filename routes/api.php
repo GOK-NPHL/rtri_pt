@@ -66,6 +66,7 @@ Route::get('/get_user_samples', [PTShipmentController::class, 'getUserSamples'])
 Route::get('/get_counties', [CommonsController::class, 'getCounties']);
 
 Route::get('/get_participant_demographics', [ParticipantController::class, 'getParticipantDemographics']);
+Route::get('/get_participant_demographics/{id}', [ParticipantController::class, 'getParticipantDemographics']);
 Route::post('/own_bio_update', [ParticipantController::class, 'editOwnPersonalBio'])->name('own_bio_update')->middleware('auth');
 
 Route::get('/get_readiness_survey', [ReadinessController::class, 'getReadinessSurvey'])->middleware('auth');
@@ -75,3 +76,21 @@ Route::get('/get_readiness_survey_by_id_and_labid/{id}/{labId}', [ReadinessContr
 Route::get('/get_readiness_response/{id}', [ReadinessController::class, 'getReadinessResponse'])->middleware('auth:admin');
 
 Route::post('/save_survey_answers', [ReadinessController::class, 'saveSurveyAnswers']);
+
+/////
+Route::get('/get_shipment_responses/{id}', [PTShipmentController::class, 'getShipmentResponsesById'])->middleware('auth:admin');
+
+Route::get('/get_sample_response_result/{id}', [PTShipmentController::class, 'getUserSampleResponseResult'])->middleware('auth:admin');
+
+Route::get('/get_shipment_response_report/{id}/{is_part}', [PTShipmentController::class, 'getShipmentResponseReport']);
+
+Route::get('/get_user_id', [CommonsController::class, 'getUserId']);
+Route::get('/get_user_params', [CommonsController::class, 'getUserParticulars']);
+Route::get('/get_admin_params', [AdminAuthController::class, 'getAdminParticulars']);
+
+Route::get('resources/files_all',['as'=>'resources.files', 'uses'=>'ResourceFilesController@getAllFiles']);
+Route::get('resources/files_public',['as'=>'resources.files_public', 'uses'=>'ResourceFilesController@getPublicFiles']);
+Route::get('resources/files_private',['as'=>'resources.files_private', 'uses'=>'ResourceFilesController@getPrivateFiles']);
+Route::delete('resources/files/{id}',['as'=>'resources.delete', 'uses'=>'ResourceFilesController@destroy']);
+Route::get('resources/files/download/{id}',['as'=>'resources.download', 'uses'=>'ResourceFilesController@download']);
+Route::post('resources/files',['as'=>'resources.store', 'uses'=>'ResourceFilesController@store']);

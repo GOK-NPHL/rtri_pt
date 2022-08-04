@@ -172,10 +172,24 @@ class ParticipantController extends Controller
     public function getParticipantDemographics(Request $request)
     {
         try {
-            $user = Auth::user();
+
+            $userId = null;
+            try {
+
+                if ($request->id != 'null' && $request->id != 'undefined') {
+                    $userId = $request->id;
+                    
+                } else {
+                    $user = Auth::user();
+                    $userId = $user->id;
+                }
+            } catch (Exception $ex) {
+            };
+
             $usersDemo = User::select(
                 'users.id as user_id',
                 'users.name',
+                'users.email as user_email',
                 'laboratories.id as lab_id',
                 'users.second_name',
                 'users.phone_number as user_phone_number',
@@ -185,11 +199,11 @@ class ParticipantController extends Controller
                 'laboratories.email',
 
             )->join('laboratories', 'laboratories.id', '=', 'users.laboratory_id')
-                ->where('users.id', '=', $user->id)
+                ->where('users.id', '=', $userId)
                 ->get();
             return $usersDemo;
         } catch (Exception $ex) {
-            return response()->json(['Message' => 'Could fetch users: ' . $ex->getMessage()], 500);
+            return response()->json(['Message' => 'Could not fetch users: ' . $ex->getMessage()], 500);
         }
     }
 

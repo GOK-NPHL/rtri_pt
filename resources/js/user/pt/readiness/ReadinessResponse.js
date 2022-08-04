@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { v4 as uuidv4 } from 'uuid';
 import Pagination from "react-js-pagination";
-import { FetchReadiness, FetchReadinessResponses } from '../../../components/utils/Helpers';
+import { FetchReadiness, FetchReadinessResponses, exportToExcel } from '../../../components/utils/Helpers';
 import { matchPath } from "react-router";
 
 
@@ -12,6 +12,7 @@ class ReadinessResponse extends React.Component {
         super(props);
         this.state = {
             data: [],
+            data_f: [],
             message: '',
             currElementsTableEl: [],
             allTableElements: [],
@@ -45,7 +46,8 @@ class ReadinessResponse extends React.Component {
                 } else {
 
                     this.setState({
-                        data: response
+                        data: response,
+                        data_f: response,
                     });
 
                 }
@@ -55,7 +57,6 @@ class ReadinessResponse extends React.Component {
     }
 
     handlePageChange(pageNumber) {
-        console.log(`active page is ${pageNumber}`);
         let pgNumber = pageNumber * 10 + 1;
         this.setState({
             startTableData: pgNumber - 11,
@@ -63,6 +64,7 @@ class ReadinessResponse extends React.Component {
             activePage: pageNumber
         });
     }
+
 
     updatedSearchItem(currElementsTableEl) {
         this.setState({
@@ -84,29 +86,33 @@ class ReadinessResponse extends React.Component {
 
         let tableElem = [];
 
-        if (this.state.data.length > 0) {
+        if (this.state.data_f.length > 0) {
 
-            this.state.data.map((element, index) => {
-                tableElem.push(<tr key={index}>
+            this.state.data_f.map((element, index) => {
+                tableElem.push(<tr key={index} style={{ fontSize: '16px' }}>
                     <th scope="row">{index + 1}</th>
-                    <td>{element.name}</td>
-                    <td>{element.lab_name}</td>
-                    <td>{element.created_at}</td>
-                    <td>{element.updated_at}</td>
                     <td>
-                        {element.fname == null && element.sname == null ?
-                            <span>Not Responded</span> :
-                            <span>{element.fname} {element.sname}</span>
+                        <p style={{ marginLeft: '3px', marginRight: '3px' }}>{element.name}</p>
+                    </td>
+                    <td>
+                        {element.lab_name}
+                    </td>
+                    <td>{element.created_at ? new Date(element.created_at).toLocaleString('en-GB') : '-'}</td>
+                    <td>{element.updated_at ? new Date(element.updated_at).toLocaleString('en-GB') : '-'}</td>
+                    <td>
+                        {element.fname == null && element.sname == null && element.email == null ?
+                            <span className='badge badge-danger' style={{ fontWeight: 500, backgroundColor: '#fc4545' }}>Not Responded</span> :
+                            <span style={{ textTransform: 'capitalize' }}>{element.fname} {element.sname} {element.email}</span>
                         }
                     </td>
                     <td>
                         {element.fname == null && element.sname == null ?
-                            <span>Readiness Not Responded</span>
+                            <span>N/A</span>
                             :
                             element.approved_id == null ?
-                                <span>Pending Approval</span>
+                                <span className='badge badge-warning' style={{ fontWeight: 500 }}>Pending Approval</span>
                                 :
-                                <span>Approved</span>
+                                <span className='badge badge-success' style={{ fontWeight: 500 }}>Approved</span>
                         }
 
                     </td>
@@ -116,7 +122,7 @@ class ReadinessResponse extends React.Component {
                         <td>
 
                             {
-                                element.readiness_id == null ? '' :
+                                element.readiness_id == null ? <span style={{ marginLeft: '6px', marginRight: '16px' }}>&nbsp;&nbsp;&nbsp;&nbsp;</span> :
                                     <>
 
                                         <a
@@ -124,8 +130,8 @@ class ReadinessResponse extends React.Component {
                                                 window.location.assign('/get-admin-readiness-form/' + element.id + '/' + element.lab_id)
                                             }}
                                             data-toggle="tooltip" data-placement="top" title="View readiness responses"
-                                            className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-                                            <i className="fas fa-eye"></i>
+                                            className="btn btn-sm btn-primary shadow-sm text-white" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <i className="fas fa-file mr-2"></i> View
                                         </a>
                                     </>
                             }
@@ -146,32 +152,58 @@ class ReadinessResponse extends React.Component {
         }
 
         let pageContent = <div id='user_table' className='row'>
-            <div className="col-sm-12 mb-3 mt-3">
-                <h3 className="float-left">Readiness response list</h3>
-                <button style={{ "color": "white" }} type="button"
-                    className="btn btn-success float-right"
-                    onClick={() => {
-                        window.location.assign('/list-readiness')
+            <div className="col-md-12 row">
+                <div className='col-md-8'>
+                    <h3 className="float-left">Readiness response list</h3>
+                </div>
+                <div className='col-md-4' style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                    <button type="button" className="btn btn-success btn-sm mx-1" onClick={() => {
+                        if (this.state.data && this.state.data.length > 0) {
+                            let final_data = this.state.data.map(element => {
+                                return {
+                                    'checklist name': element.name,
+                                    'participant name': element.lab_name,
+                                    'date responded': element.created_at,
+                                    'date responded': element.updated_at,
+                                    'responded by': `${element.fname || ''} ${element.sname || ''}`,
+                                    'approved': element.approved_id == null ? 'Not Approved' : 'Approved',
+                                }
+                            })
+                            exportToExcel(final_data, 'Readiness response list');
+                        } else {
+                            console.error('No data to export');
+                            alert('No data to export')
+                        }
                     }}>
-                    back
-                </button>
+                        <i className='fa fa-download'></i>&nbsp;
+                        Excel/CSV
+                    </button>
+                    <div>
+                        <button type="button"
+                            className="btn btn-secondary btn-outline btn-xs float-right"
+                            onClick={() => {
+                                window.location.assign('/list-readiness')
+                            }}>
+                            ← Back
+                        </button>
+                    </div>
+                </div>
             </div>
             <div className='col-sm-12 col-md-12'>
                 <div className="form-group mb-2">
                     <input type="text"
                         onChange={(event) => {
-                            console.log(this.state.allTableElements);
-                            let currElementsTableEl = this.state.allTableElements.filter(elemnt =>
-                                elemnt['props']['children'][1]['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
-                                elemnt['props']['children'][2]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
-                                elemnt['props']['children'][3]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase())
-                            );
+                            // console.log(this.state.allTableElements);
+                            let currElementsTableEl = this.state.allTableElements.filter(elemnt => {
+                                return elemnt['props']['children'][1]['props']['children']['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
+                                    elemnt['props']['children'][2]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase())
+                            });
                             this.updatedSearchItem(currElementsTableEl);
                         }}
-                        className="form-control" placeholder="search reponse"></input>
+                        className="form-control" placeholder="search reponse" />
                 </div>
 
-                <table className="table table-striped table-sm  table-hover">
+                <table className="table table-striped table-sm table-hoverz">
                     <thead>
                         <tr>
                             <th scope="col">#</th>

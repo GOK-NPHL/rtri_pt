@@ -52,6 +52,7 @@ class PTReadinessController extends Controller
                     $readinessQuestion->answer_type = $questionItem['answer_type'];
                     $readinessQuestion->qustion_position = $questionItem['qustion_position'];
                     $readinessQuestion->qustion_type = $questionItem['qustion_type'];
+                    $readinessQuestion->is_required = $questionItem['is_required'];
 
                     // $readiness->readinessQuestion()->associate($readinessQuestion);
                     $readinessQuestion->readiness()->associate($readiness);
@@ -104,6 +105,7 @@ class PTReadinessController extends Controller
                     $readinessQuestion->answer_type = $questionItem['answer_type'];
                     $readinessQuestion->qustion_position = $questionItem['qustion_position'];
                     $readinessQuestion->qustion_type = $questionItem['qustion_type'];
+                    $readinessQuestion->is_required = $questionItem['is_required'];
 
                     $readinessQuestion->readiness()->associate($checklist);
 
@@ -145,7 +147,7 @@ class PTReadinessController extends Controller
     public function getShipmentReadiness(Request $request)
     {
         try {
-            // SELECT readiness_id FROM rtript.pt_shipements where readiness_id is not null
+            // SELECT readiness_id FROM oncologypt.pt_shipements where readiness_id is not null
             $readinesses = Readiness::select(
                 "readinesses.id",
                 "readinesses.name",
@@ -173,7 +175,7 @@ class PTReadinessController extends Controller
         try {
 
             $readinessQuestions = DB::table('readiness_questions')
-                ->select('readiness_questions.id', 'question', 'answer_options', 'answer_type', 'qustion_position', 'qustion_type')
+                ->select('readiness_questions.id', 'question', 'answer_options', 'answer_type', 'qustion_position', 'qustion_type', 'is_required')
                 ->join('readinesses', 'readiness_questions.readiness_id', '=', 'readinesses.id')
                 ->where('readinesses.id', $request->id)
                 ->get();

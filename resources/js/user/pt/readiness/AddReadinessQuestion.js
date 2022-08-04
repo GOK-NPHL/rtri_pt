@@ -9,6 +9,7 @@ class AddReadinessQuestion extends React.Component {
             answerOptions: '',
             answerType: 'list',
             qustionPosition: 1,
+            is_required: 0,
             qustionType: 'question',
             showErrorMessage: false,
             errorMessage: '',
@@ -18,6 +19,7 @@ class AddReadinessQuestion extends React.Component {
         this.qustionAnswerOptionsHandler = this.qustionAnswerOptionsHandler.bind(this);
         this.qustionAnswerTypeHandler = this.qustionAnswerTypeHandler.bind(this);
         this.qustionTypeHandler = this.qustionTypeHandler.bind(this);
+        this.qnRequiredHandler = this.qnRequiredHandler.bind(this);
         this.qustionPositionHandler = this.qustionPositionHandler.bind(this);
         this.addReadinessQuestion = this.addReadinessQuestion.bind(this);
         this.questionHandler = this.questionHandler.bind(this);
@@ -50,6 +52,21 @@ class AddReadinessQuestion extends React.Component {
         }
 
     }
+    qnRequiredHandler(qnreq) {
+        this.setState({
+            is_required: qnreq || 0,
+        });
+        // if (qnreq == 'no') {
+        //     this.setState({
+        //         is_required: false,
+        //     });
+        // } else {
+        //     this.setState({
+        //         is_required: true,
+        //     });
+        // }
+
+    }
 
     qustionPositionHandler(qustionPosition) {
         this.setState({ qustionPosition: qustionPosition });
@@ -78,6 +95,7 @@ class AddReadinessQuestion extends React.Component {
             readiness['answer_type'] = this.state.answerType;
             readiness['qustion_position'] = this.state.qustionPosition;
             readiness['qustion_type'] = this.state.qustionType;
+            readiness['is_required'] = this.state.is_required || false;
             this.setState({
                 answerOptions: '',
                 answerType: 'list',
@@ -85,7 +103,8 @@ class AddReadinessQuestion extends React.Component {
                 qustionType: 'question',
                 showErrorMessage: false,
                 errorMessage: '',
-                question: ''
+                question: '',
+                is_required: false
             });
             $('#addQuestionModal').modal('toggle');
             this.props.addReadinessQuestion(readiness);
@@ -119,7 +138,7 @@ class AddReadinessQuestion extends React.Component {
                                 className="form-control" id="qst_question" aria-describedby="emailHelp" placeholder="Readiness question" />
                         </div>
 
-                        <div className="form-group">
+                        {/* <div className="form-group">
                             <label htmlFor="qst_position">Position *</label>
                             <input onChange={(event) => this.qustionPositionHandler(event.target.value)} type="number"
                                 min={+this.state.qustionPosition + +1} //convert to unary ie number
@@ -127,7 +146,7 @@ class AddReadinessQuestion extends React.Component {
                                 className="form-control"
                                 id="qst_position"
                                 placeholder="Password" />
-                        </div>
+                        </div> */}
 
                         <div className="form-group">
                             <label htmlFor="qst_type">Question type *</label>
@@ -135,6 +154,14 @@ class AddReadinessQuestion extends React.Component {
                                 value={this.state.qustionType} className="custom-select" id="qst_type">
                                 <option value="question">Question</option>
                                 <option value="comment">Comment</option>
+                            </select>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="is_required">Is it required? *</label>
+                            <select onChange={(event) => this.qnRequiredHandler(event.target.value)}
+                                value={this.state.is_required} className="custom-select" id="is_required">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
                             </select>
                         </div>
 

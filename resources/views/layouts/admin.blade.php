@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Gate;
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="MoH Rapid Test Continous Quality Improvement ODK data Analytics Platform.">
+    <meta name="description" content="MOH DLS NPHL - Laboratory EQA - HIV Recency Proficiency Testing.">
     <meta name="author" content="NPHL ICT" <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -74,36 +74,51 @@ use Illuminate\Support\Facades\Gate;
 
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Configure
+                                    Managers &amp; Personnel
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{route('list-admin-user')}}">PT/QC Managers</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="{{route('list-lab')}}">PT/QC Laboratories</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="{{route('list-personel')}}">PT/QC Lab Personel</a>
-
-                                    <!--    <a class="dropdown-item" href="#">Something else here</a> -->
+                                    <a class="dropdown-item" href="{{route('list-admin-user')}}">PT System Managers</a>
+                                    <a class="dropdown-item" href="{{route('list-personel')}}">PT Lab Personel</a>
                                 </div>
                             </li>
-
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Manage
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Laboratories
                                 </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown2">
+                                    <a class="dropdown-item" href="{{route('list-lab')}}">PT Laboratories</a>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown3" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Checklists &amp; Shipments
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown3">
                                     <a class="dropdown-item" href="{{route('list-readiness')}}">Readiness Checklists</a>
                                     <a class="dropdown-item" href="{{route('pt-shipment')}}">PT Shipment</a>
                                 </div>
                             </li>
+                            {{--  <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Configure
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="{{route('list-admin-user')}}">PT System Managers</a>
+                                    <a class="dropdown-item" href="{{route('list-lab')}}">PT Laboratories</a>
+                                    <a class="dropdown-item" href="{{route('list-personel')}}">PT Lab Personel</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="{{route('list-readiness')}}">Readiness Checklists</a>
+                                    <a class="dropdown-item" href="{{route('pt-shipment')}}">PT Shipment</a>
+                                </div>
+                            </li>  --}}
 
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Reports
+                                    Reports &amp; Resources
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="#">PT Indicator Reports</a>
-
+                                    <a class="dropdown-item" href="{{route('pt-shipment-report-list')}}">PT Response Reports</a>
+                                    <a class="dropdown-item" href="{{route('resourcesIndex')}}">Files / Resources</a>
                                 </div>
                             </li>
 
@@ -115,7 +130,8 @@ use Illuminate\Support\Facades\Gate;
                                     Account
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{route('edit-admin-user',['userId'=>'bad6b8cf97131fceab'])}}">Profile</a>
+                                    <a class="dropdown-item" style="text-transform:capitalize;" href="{{route('edit-admin-user',['userId'=>'bad6b8cf97131fceab'])}}">{{Auth()->user()->name ?? "Account"}}</a>
+                                    <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="{{route('admin-logout')}}">Logout</a>
                                 </div>
                             </li>

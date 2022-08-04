@@ -78,23 +78,23 @@ class ListReadiness extends React.Component {
                         <td>
 
                             <a
+                                onClick={() => {
+                                    window.location.assign('get-readiness-response/' + element.id)
+                                }}
+                                style={{ 'marginRight': '5px' }}
+                                data-toggle="tooltip" data-placement="top" title="View readiness responses"
+                                className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm text-white">
+                                <i className="fas fa-file"></i> View
+                            </a>
+                            <a
                                 onClick={
                                     () => {
                                         window.location.assign('edit-readiness/' + element.id)
                                     }
                                 }
                                 data-toggle="tooltip" data-placement="top" title="Edit readiness"
-                                style={{ 'marginRight': '5px' }}
-                                className="d-none d-sm-inline-block btn btn-xs btn-info shadow-sm text-white m-1">
-                                <i className="fas fa-edit"></i> Edit Checklist
-                            </a>
-                            <a
-                                onClick={() => {
-                                    window.location.assign('get-readiness-response/' + element.id)
-                                }}
-                                data-toggle="tooltip" data-placement="top" title="View readiness responses"
-                                className="d-none d-sm-inline-block btn btn-xs btn-primary shadow-sm text-white m-1">
-                                <i className="fas fa-file-alt"></i> View Responses
+                                className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm text-white">
+                                <i className="fas fa-edit"></i> Edit
                             </a>
 
                         </td>

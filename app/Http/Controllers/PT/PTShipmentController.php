@@ -319,4 +319,140 @@ class PTShipmentController extends Controller
             return response()->json(['Message' => 'Could fetch samples: ' . $ex->getMessage()], 500);
         }
     }
+    /////
+
+    public function getShipmentResponsesById(Request $request)
+    {
+        $user = Auth::user();
+        try {
+
+            $shipmentsResponses = DB::table("pt_shipements")->distinct()
+                ->join('ptsubmissions', 'ptsubmissions.pt_shipements_id', '=', 'pt_shipements.id')
+                ->join('laboratories', 'ptsubmissions.lab_id', '=', 'laboratories.id')
+                ->join('users', 'ptsubmissions.user_id', '=', 'users.id')
+                ->where('pt_shipements.id', $request->id)
+                ->get([
+                    "pt_shipements.id",
+                    "pt_shipements.start_date",
+                    "pt_shipements.code",
+                    "pt_shipements.end_date",
+                    "pt_shipements.round_name as name",
+                    "laboratories.id as lab_id",
+                    "users.name as fname",
+                    "users.second_name as sname",
+                    "laboratories.phone_number",
+                    "laboratories.lab_name",
+                    "laboratories.email",
+                    "ptsubmissions.id as ptsubmission_id",
+                    "ptsubmissions.created_at",
+                    "ptsubmissions.updated_at",
+                ]);
+
+            return $shipmentsResponses;
+        } catch (Exception $ex) {
+            return response()->json(['Message' => 'Could fetch ptsubmissions list: ' . $ex->getMessage()], 500);
+        }
+    }
+
+
+    public function getShipmentResponseReport($id,  $is_part)
+    {
+        $user = Auth::user();
+        try {
+
+            $shipmentsResponses = DB::table("pt_shipements")->distinct()
+                ->join('ptsubmissions', 'ptsubmissions.pt_shipements_id', '=', 'pt_shipements.id')
+                ->join('pt_submission_results', 'pt_submission_results.ptsubmission_id', '=', 'ptsubmissions.id')
+                ->join('laboratories', 'ptsubmissions.lab_id', '=', 'laboratories.id')
+                ->join('users', 'ptsubmissions.user_id', '=', 'users.id');
+
+            if ($is_part == 1) {
+                $shipmentsResponses = $shipmentsResponses->where('ptsubmissions.lab_id', $user->laboratory_id)
+                    ->where('ptsubmissions.pt_shipements_id', $id);
+            } else {
+                $shipmentsResponses = $shipmentsResponses->where('ptsubmissions.id', $id);
+            }
+
+            $shipmentsResponses = $shipmentsResponses->get([
+                "pt_shipements.id",
+                "pt_shipements.created_at as shipment_date",
+                "pt_shipements.code",
+                "pt_shipements.end_date",
+                "pt_shipements.round_name as name",
+                "laboratories.id as lab_id",
+                "users.name as fname",
+                "users.second_name as sname",
+                "laboratories.phone_number",
+                "laboratories.lab_name",
+                "laboratories.email",
+                "ptsubmissions.id as ptsubmission_id",
+                "ptsubmissions.created_at as _first_submission_date",
+                "ptsubmissions.updated_at  as update_submission_date",
+                "ptsubmissions.testing_date",
+                "ptsubmissions.kit_expiry_date",
+                "ptsubmissions.kit_date_received",
+                "ptsubmissions.pt_lot_no",
+            ]);
+
+
+            //  one
+            $hipmentsRefResult = DB::table("pt_shipements")->distinct()
+                ->join('pt_samples', 'pt_samples.ptshipment_id', '=', 'pt_shipements.id');
+
+            $hipmentsRefResult = $hipmentsRefResult->get([
+                "pt_samples.reference_result as ref_result",
+                "pt_samples.name as sample_name"
+            ]);
+
+
+            //  two
+            $shipmentsResponsesRlt = DB::table("pt_shipements")->distinct()
+                ->join('ptsubmissions', 'ptsubmissions.pt_shipements_id', '=', 'pt_shipements.id')
+                ->leftJoin('pt_submission_results', 'pt_submission_results.ptsubmission_id', '=', 'ptsubmissions.id')
+                ->join('pt_samples', 'pt_samples.id', '=', 'pt_submission_results.sample_id');
+            if ($is_part == 1) {
+                $shipmentsResponsesRlt = $shipmentsResponsesRlt->where('ptsubmissions.lab_id', $user->laboratory_id)
+                    ->where('ptsubmissions.pt_shipements_id', $id);
+            } else {
+                $shipmentsResponsesRlt = $shipmentsResponsesRlt->where('ptsubmissions.id', $id);
+            }
+
+            $shipmentsResponsesRlt = $shipmentsResponsesRlt->get([
+                "pt_submission_results.control_line as result_control_line",
+                "pt_submission_results.verification_line as result_verification_line",
+                "pt_submission_results.longterm_line as result_longterm_line",
+                "pt_submission_results.interpretation as result_interpretation",
+                "pt_samples.name as sample_name"
+            ]);
+
+
+            $dataPayload = [];
+            foreach ($hipmentsRefResult as $refRslt) {
+                foreach ($shipmentsResponsesRlt as $rslt) {
+                    if ($refRslt->sample_name == $rslt->sample_name) {
+                        $data = [];
+                        $data['result_control_line'] = $rslt->result_control_line;
+                        $data['result_verification_line'] = $rslt->result_verification_line;
+                        $data['result_longterm_line'] = $rslt->result_longterm_line;
+                        $data['result_interpretation'] = $rslt->result_interpretation;
+                        $data['sample_name'] = $refRslt->sample_name;
+                        $data['reference_result'] = $refRslt->reference_result;
+                        $dataPayload[] = $data;
+                    }
+                }
+            }
+
+            return [
+                'metadata' => $shipmentsResponses, "results" => $dataPayload
+            ];
+        } catch (Exception $ex) {
+            return response()->json(['Message' => 'Could fetch report data: ' . $ex->getMessage()], 500);
+        }
+    }
+
+
+    public function getUserSampleResponseResult(Request $request)
+    {
+        return $this->geSamples($request->id);
+    }
 }

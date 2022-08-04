@@ -21,7 +21,8 @@ class ReadinessForm extends React.Component {
             dualListptions: [],
             readinessQuestions: [],
             readinessItems: [],
-            pageState: 'add'
+            pageState: 'add',
+            submitting: false,
         }
 
         this.handleNameChange = this.handleNameChange.bind(this);
@@ -147,7 +148,9 @@ class ReadinessForm extends React.Component {
                 let id = uuidv4();
                 let qstOptins = readiness['answer_options'].split(',');
                 let qstElement =
-                    <div key={id} className="form-group">
+                    <div key={id} className="card">
+                    <div className="card-body">
+                    <div className="form-group text-left">
                         <a href="#" onClick={
                             (event) => {
                                 event.preventDefault();
@@ -165,20 +168,23 @@ class ReadinessForm extends React.Component {
                                 questions[itemIndex] = null;
 
                                 this.setState({
-
                                     readinessQuestions: questions,
                                     readinessItems: readinessItems
                                 })
                             }
                         }
-                            className="float-right" style={{ "color": "red" }}>Delete</a>
-                        <label className="float-left" htmlFor={id + "qst_answer"}>{readiness['question']}</label>
+                            className="float-right" style={{ padding: '2px', fontSize: '22px', lineHeight: 0, color: 'red', fontWeight: 'bold' }}>
+                            &times;
+                        </a>
+                        <label className="float-left text-left" style={{ fontSize: '18px' }} htmlFor={id + "qst_answer"}>{readiness['question']}  <span style={{ color: 'red' }}>{(readiness['is_required'] && parseInt(readiness['is_required']) == 1) ? "*" : ""}</span></label>
                         <select
                             className="custom-select" id={id + "qst_answer"}>
                             {qstOptins.map((option) => {
                                 return <option key={uuidv4()} value={option}>{option}</option>
                             })}
                         </select>
+                    </div>
+                    </div>
                     </div>
                 let questions = this.state.readinessQuestions;
                 questions.push(qstElement);
@@ -189,24 +195,35 @@ class ReadinessForm extends React.Component {
             } else if (readiness['answer_type'] == 'number') {
                 let id = uuidv4();
                 let qstElement =
-                    <div key={id} className="form-group">
-                        <a href="#" onClick={
-                            (event) => {
-                                event.preventDefault();
-                                let readinessItems = this.state.readinessItems;
-                                let questions = this.state.readinessQuestions;
-                                questions[itemIndex] = null;
+                    <div key={id} className="card">
+                        <div className="card-body">
+                            <div className="form-group">
+                                <a href="#" onClick={
+                                    (event) => {
+                                        event.preventDefault();
+                                        let readinessItems = this.state.readinessItems;
+                                        let questions = this.state.readinessQuestions;
+                                        questions[itemIndex] = null;
+                                        if (this.state.pageState == 'edit') { //for edit mark as one to be deleted from controller and database
+                                            let qItem = readinessItems[itemIndex];
+                                            qItem['delete_status'] = 1;
+                                            readinessItems[itemIndex] = qItem;
+                                        } else {
+                                            readinessItems[itemIndex] = null;
+                                        }
+                                        this.setState({
 
-                                this.setState({
-
-                                    readinessQuestions: questions,
-                                    readinessItems: readinessItems
-                                })
-                            }
-                        }
-                            className="float-right" style={{ "color": "red" }}>Delete</a>
-                        <label className="float-left" htmlFor={id + "qst_answer"}>{readiness['question']}</label>
-                        <input type="number" className="form-control" id={id + "qst_answer"} aria-describedby="qst_answer" placeholder="Enter your answer" />
+                                            readinessQuestions: questions,
+                                            readinessItems: readinessItems
+                                        })
+                                    }
+                                }
+                                    className="float-right" style={{ padding: '2px', fontSize: '22px', lineHeight: 0, color: 'red', fontWeight: 'bold' }}>
+                                    &times;</a>
+                                <label className="float-left" htmlFor={id + "qst_answer"}>{readiness['question']} <span style={{ color: 'red' }}>{(readiness['is_required'] && parseInt(readiness['is_required']) == 1) ? "*" : ""}</span></label>
+                                <input type="number" className="form-control" id={id + "qst_answer"} aria-describedby="qst_answer" placeholder="Enter your answer" />
+                            </div>
+                        </div>
                     </div>
                 let questions = this.state.readinessQuestions;
                 questions.push(qstElement);
@@ -258,7 +275,9 @@ class ReadinessForm extends React.Component {
     }
 
     saveReadiness() {
-
+        this.setState({
+            submitting: true
+        });
         if (
             this.state.name == '' ||
             this.state.start_date == '' ||
@@ -268,7 +287,8 @@ class ReadinessForm extends React.Component {
 
         ) {
             this.setState({
-                message: "Kindly fill all fileds marked * in the form"
+                message: "Kindly fill all fileds marked * in the form",
+                submitting: false
             })
             $('#addAdminUserModal').modal('toggle');
         } else {
@@ -287,6 +307,7 @@ class ReadinessForm extends React.Component {
                     response = await UpdateReadiness(readiness);
                     this.setState({
                         message: response.data.Message,
+                        submitting: false
                     });
                 } else {
                     response = await SaveReadiness(readiness);
@@ -298,11 +319,13 @@ class ReadinessForm extends React.Component {
                             name: '',
                             selected: [],
                             readinessQuestions: [],
-                            readinessItems: []
+                            readinessItems: [],
+                            submitting: false
                         });
                     } else {
                         this.setState({
                             message: response.data.Message,
+                            submitting: false
                         });
                     }
 
@@ -312,7 +335,9 @@ class ReadinessForm extends React.Component {
 
             })();
         }
-
+        this.setState({
+            submitting: false
+        });
     }
 
     render() {
@@ -387,19 +412,16 @@ class ReadinessForm extends React.Component {
                                 </div>
                                 <div className="col-sm-10 mb-3">
 
-                                    <div className="card">
-                                        <div className="card-body">
-                                            {this.state.readinessQuestions.map((rdnsQuestion) => {
-                                                return <span key={uuidv4()}>{rdnsQuestion}</span>
-                                            })}
+                                    {this.state.readinessQuestions.map((rdnsQuestion) => {
+                                        return (<React.Fragment key={uuidv4()}>
+                                                {rdnsQuestion}
+                                        </React.Fragment>)
+                                    })}
 
-                                            <button onClick={() => {
-                                                $('#addQuestionModal').modal('toggle');
-                                            }} type="button"
-                                                className="btn btn-info float-left">Add question</button>
-
-                                        </div>
-                                    </div>
+                                    <button onClick={() => {
+                                        $('#addQuestionModal').modal('toggle');
+                                    }} type="button"
+                                        className="btn btn-info float-left">Add question</button>
 
                                 </div>
 
@@ -407,9 +429,16 @@ class ReadinessForm extends React.Component {
 
                             <div className="form-group row">
                                 <div className="col-sm-10 mt-3">
-                                    <a onClick={() => this.saveReadiness()} type="" className="d-inline m-2 btn btn-info m">
-                                        {this.state.pageState == 'edit' ? 'Update Readiness' : 'Send Readiness'}
-                                    </a>
+                                    <button onClick={(ev) => {
+                                        ev.preventDefault();
+
+                                        this.setState({
+                                            submitting: true
+                                        });
+                                        this.saveReadiness();
+                                    }} type="" className="d-inline m-2 btn btn-info m" disabled={this.state.submitting}>
+                                        {this.state.pageState == 'edit' ? (this.state.submitting ? 'Updating...' : 'Update Readiness') : (this.state.submitting ? 'Sending...' : 'Send Readiness')}
+                                    </button>
                                     <a
                                         onClick={
                                             () => {
