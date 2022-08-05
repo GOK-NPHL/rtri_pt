@@ -147,7 +147,7 @@ class PTReadinessController extends Controller
     public function getShipmentReadiness(Request $request)
     {
         try {
-            // SELECT readiness_id FROM oncologypt.pt_shipements where readiness_id is not null
+            // SELECT readiness_id FROM rtript.pt_shipements where readiness_id is not null
             $readinesses = Readiness::select(
                 "readinesses.id",
                 "readinesses.name",

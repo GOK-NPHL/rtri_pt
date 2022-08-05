@@ -145,7 +145,7 @@ class PTPerformanceReport extends React.Component {
                 <div className='row' style={{ padding: '16px 4px' }}>
                     <div className='col-md-12 py-3'>
                         <ReactToPrint
-                            documentTitle={"Oncology HIV Recency PT Report"}
+                            documentTitle={"HIV Recency PT Report"}
                             trigger={() => <button className='btn btn-primary float-right'>Download report</button>}
                             content={() => this.componentRef}
                         />
@@ -163,7 +163,7 @@ class PTPerformanceReport extends React.Component {
                                     <p>MINISTRY OF HEALTH</p>
                                     <p>NATIONAL PUBLIC HEALTH LABORATORIES</p>
                                     <p>KENYA EXTERNAL QUALITY ASSESSMENT SCHEME (KNEQAS)</p>
-                                    <p>NATIONAL ONCOLOGY/BIOCHEMISTRY REFERENCE LABORATORY</p>
+                                    <p>NATIONAL HIV REFERENCE LABORATORY</p>
                                     <p style={{ "fontWeight": "normal" }}>P.O Box 20750 - 00202 NAIROBI Email: nphlpt@nphl.go.ke Help Desk: helpdesk.nphl.go.ke</p>
                                     <h4><b>HIV RECENCY PROFICIENCY TESTING SCHEME REPORT</b></h4>
                                 </td>
@@ -207,9 +207,9 @@ class PTPerformanceReport extends React.Component {
                                                 </td>
                                                 <td className='text-left tbBorder'>
                                                     <p style={{ margin: 0, padding: '2px 7px' }}>
-                                                        Charity<br />
+                                                        Charity Maina<br />
                                                         KNEQAS QA Manager<br />
-                                                        National Oncology Biochemistry Reference Laboratory<br />
+                                                        National HIV Reference Laboratory<br />
                                                         P.O. Box 20750-00200<br />
                                                         Nairobi, Kenya<br />
                                                         Contact: 0721397766
@@ -304,7 +304,7 @@ class PTPerformanceReport extends React.Component {
                             <tr style={{ "fontWeight": "bold" }} >
                                 <td style={paragraphStyle} colSpan={totalTableLength}>
                                     <p>KNEQAS QA: Charity Maina</p>
-                                    <p>ONCOLOGY SCOPE Coordinator: Francis Tawuo</p>
+                                    <p>HIV SCOPE Coordinator: Nancy Bowen</p>
                                 </td>
                             </tr>
                             <tr><td><p></p></td></tr>
