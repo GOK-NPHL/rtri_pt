@@ -400,7 +400,7 @@ class PTShipmentController extends Controller
                 ->join('pt_samples', 'pt_samples.ptshipment_id', '=', 'pt_shipements.id');
 
             $hipmentsRefResult = $hipmentsRefResult->get([
-                "pt_samples.reference_result as ref_result",
+                "pt_samples.reference_result as reference_result",
                 "pt_samples.name as sample_name"
             ]);
 
@@ -418,9 +418,6 @@ class PTShipmentController extends Controller
             }
 
             $shipmentsResponsesRlt = $shipmentsResponsesRlt->get([
-                "pt_submission_results.control_line as result_control_line",
-                "pt_submission_results.verification_line as result_verification_line",
-                "pt_submission_results.longterm_line as result_longterm_line",
                 "pt_submission_results.interpretation as result_interpretation",
                 "pt_samples.name as sample_name"
             ]);
@@ -431,9 +428,6 @@ class PTShipmentController extends Controller
                 foreach ($shipmentsResponsesRlt as $rslt) {
                     if ($refRslt->sample_name == $rslt->sample_name) {
                         $data = [];
-                        $data['result_control_line'] = $rslt->result_control_line;
-                        $data['result_verification_line'] = $rslt->result_verification_line;
-                        $data['result_longterm_line'] = $rslt->result_longterm_line;
                         $data['result_interpretation'] = $rslt->result_interpretation;
                         $data['sample_name'] = $refRslt->sample_name;
                         $data['reference_result'] = $refRslt->reference_result;

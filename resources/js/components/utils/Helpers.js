@@ -413,10 +413,13 @@ export async function FetchReadiness() {
     }
 }
 
-export async function FetchShipmentReadiness() {
-
+export async function FetchShipmentReadiness(getAll) {
+    let url = `${settings.serverBaseApi}/get_shipment_readiness`;
+    if(getAll && (getAll===true || getAll===1)){
+        url = `${settings.serverBaseApi}/get_shipment_readiness?get_all=1`;
+    }
     try {
-        const response = await axios.get(`${settings.serverBaseApi}/get_shipment_readiness`);
+        const response = await axios.get(url);
         const responseData = response.data;
         return responseData;
     } catch (err) {

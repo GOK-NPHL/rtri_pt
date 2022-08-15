@@ -61,7 +61,7 @@ class SubmitResults extends React.Component {
         this.otherCommentsHandler = this.otherCommentsHandler.bind(this);
         this.notTestedReasonHandler = this.notTestedReasonHandler.bind(this);
 
-        this.visualResultsHandler = this.visualResultsHandler.bind(this);
+        // this.visualResultsHandler = this.visualResultsHandler.bind(this);
         this.ptInterpretation = this.ptInterpretation.bind(this);
 
         this.onTesternameChangeHandler = this.onTesternameChangeHandler.bind(this);
@@ -82,14 +82,14 @@ class SubmitResults extends React.Component {
                 if (edittableSubmission['test_results'].length == 0) {
                     this.props.shipment.samples.map((sample) => {
                         samples[sample.sample_id] = {
-                            "visual": { c: 0, v: 0, lt: 0 },
+                            // "visual": { c: 0, v: 0, lt: 0 },
                             "interpretation": null
                         }
                     });
                 } else {
                     edittableSubmission['test_results'].map((sample) => {
                         samples[sample.sample_id] = {
-                            "visual": { c: sample.control_line, v: sample.verification_line, lt: sample.longterm_line },
+                            // "visual": { c: sample.control_line, v: sample.verification_line, lt: sample.longterm_line },
                             "interpretation": sample.interpretation
                         }
                     });
@@ -97,7 +97,7 @@ class SubmitResults extends React.Component {
             } else {
                 this.props.shipment.samples.map((sample) => {
                     samples[sample.sample_id] = {
-                        "visual": { c: 0, v: 0, lt: 0 },
+                        // "visual": { c: 0, v: 0, lt: 0 },
                         "interpretation": null
                     }
                 });
@@ -240,17 +240,17 @@ class SubmitResults extends React.Component {
 
     }
 
-    visualResultsHandler(event, sample_id) {
+    // visualResultsHandler(event, sample_id) {
 
-        let samples = this.state.samples;
-        let visualValue = event.target.value;
-        let status = event.target.checked ? 1 : 0;
+    //     let samples = this.state.samples;
+    //     let visualValue = event.target.value;
+    //     let status = event.target.checked ? 1 : 0;
 
-        let results = samples[sample_id]["visual"]; //{ c: 0, v: 0, lt: 0 };
-        results[visualValue] = status;
-        samples[sample_id]["visual"] = results;
+    //     let results = samples[sample_id]["visual"]; //{ c: 0, v: 0, lt: 0 };
+    //     results[visualValue] = status;
+    //     samples[sample_id]["visual"] = results;
 
-    }
+    // }
 
 
     onPtLotReceiceDateHandler(event) {
@@ -404,8 +404,8 @@ class SubmitResults extends React.Component {
     isChecked(sample) {
         try {
             return this.props.selectedElementHasSubmmisions
-                &&
-                this.state.samples[sample.sample_id]["visual"]['c'] == 1
+                // &&
+                // this.state.samples[sample.sample_id]["visual"]['c'] == 1
                 ? true : false
         } catch (err) {
             return false;
@@ -653,12 +653,16 @@ class SubmitResults extends React.Component {
                         <hr />
                     </div>
 
+                    <div className="col-sm-12  pl-4 pr-4" style={{marginTop: '2.1em'}}>
+                        <h5><b>Testing Instructions</b></h5>
+                    </div>
                     <div className="col-sm-12  pl-4 pr-4 mb-3">
-
-                        <label htmlFor="test_instructions" >Testing Instructions</label>
-                        <textarea readOnly
+                        <div style={{width: '100%', border: '1px solid #cdc5c5', backgroundColor: '#fffbea', padding: '15px 12px', borderRadius: '5px'}}>
+                            <pre style={{fontFamily: 'inherit', fontSize: '1em', whiteSpace: 'pre-wrap'}}>{this.state.test_instructions}</pre>
+                        </div>
+                        {/* <textarea readOnly
                             value={this.state.test_instructions}
-                            className="form-control" id="test_instructions" rows="3"></textarea>
+                            className="form-control" id="test_instructions" rows="3"></textarea> */}
                     </div>
 
                     <div className="col-sm-12 mb-4  pl-4 pr-4">
@@ -713,7 +717,7 @@ class SubmitResults extends React.Component {
                                     <thead>
                                         <tr>
                                             <th>PT Sample ID</th>
-                                            <th colSpan={3}>
+                                            {/* <th colSpan={3}>
                                                 <table>
                                                     <tbody>
                                                         <tr><td>Visual results</td></tr>
@@ -724,7 +728,7 @@ class SubmitResults extends React.Component {
                                                         </tr>
                                                     </tbody>
                                                 </table>
-                                            </th>
+                                            </th> */}
                                             <th>Interpretation *</th>
                                         </tr>
                                     </thead>
@@ -735,7 +739,7 @@ class SubmitResults extends React.Component {
 
                                             return <tr key={uuidv4()}>
                                                 <td>{sample.sample_name}</td>
-                                                <td ><input onChange={(event) => this.visualResultsHandler(event, sample.sample_id)}
+                                                {/* <td ><input onChange={(event) => this.visualResultsHandler(event, sample.sample_id)}
                                                     defaultChecked={
 
                                                         // samples[sample.sample_id] = {
@@ -775,7 +779,7 @@ class SubmitResults extends React.Component {
                                                             ? true : false
                                                     }
 
-                                                    value="lt" type="checkbox" /></td>
+                                                    value="lt" type="checkbox" /></td> */}
                                                 <td onChange={(event) => this.ptInterpretation(event, sample.sample_id)}>
                                                     <div className="form-check form-check-inline">
                                                         <input className="form-check-input" type="radio" value="lt"

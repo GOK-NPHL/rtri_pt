@@ -105,10 +105,6 @@ class PTPerformanceReport extends React.Component {
         }
         let totalTableLength = 8;
 
-        this.state.results.map((data) => {
-            console.log(data.result_control_line)
-        })
-
         let results = [];
         let isPassOverallScore = true;
         let passedScore = 0;
@@ -117,11 +113,6 @@ class PTPerformanceReport extends React.Component {
             let isPass = false;
             ///////// SCORING ///////////
             if (
-                // data.result_control_line == data.ref_control_line
-                // &&
-                // data.result_verification_line == data.ref_verification_line
-                // &&
-                // data.result_longterm_line == data.ref_longterm_line
                 data.result_interpretation == data.reference_result
             ) {
                 isPass = true;
@@ -130,11 +121,10 @@ class PTPerformanceReport extends React.Component {
                 isPassOverallScore = false;
             }
             ///////// SCORING ///////////
-            results.push(<tr className='tbBorder' key={uuidv4()}>
+            results.push(<tr className='tbBorder' key={uuidv4()} style={{textTransform: 'uppercase'}}>
                 <td style={tdtyle}>{data.sample_name}</td>
-                <td style={borderLeft}>{data.result_control_line ? data.result_control_line : 'No Result'}</td> <td>{data.ref_control_line}</td>
-                <td style={borderLeft}>{data.result_verification_line ? data.result_verification_line : 'No Result'}</td> <td>{data.ref_verification_line}</td>
-                <td style={borderLeft}>{data.result_longterm_line ? data.result_longterm_line : 'No Result'}</td> <td style={borderRight} >{data.ref_longterm_line}</td>
+                <td style={borderLeft}>{data.result_interpretation ? data.result_interpretation : 'No Result'}</td> 
+                <td>{data.reference_result}</td>
                 <td>{isPass ? 'ACCEPTABLE' : 'UNACCEPATBE'}</td>
             </tr>);
             totalSamples += 1;
@@ -183,7 +173,6 @@ class PTPerformanceReport extends React.Component {
                                     <div><strong>HIV Recency Expiry Date :</strong> &nbsp; {this.state.kitExpiration}</div>
                                 </td>
                                 <td style={tdtyle}>
-                                    {/* {this.state.personnelName.length>0 && <div><strong>Laboratory personnel testing:</strong> &nbsp; {this.state.personnelName}</div>} */}
                                     {true && <div style={{textTransform:'capitalize'}}><strong>Laboratory personnel testing:</strong> &nbsp; {this.state.userName}</div>}
                                     <div><strong>Phone No:</strong> &nbsp; {this.state.phoneNo}</div>
                                     <div><strong>Testing Date:</strong> &nbsp; {this.state.testingDate}</div>
@@ -227,16 +216,12 @@ class PTPerformanceReport extends React.Component {
                                         <tbody>
                                             <tr style={{ "fontWeight": "bold" }} className='tbBorder'>
                                                 <td style={tdtyle} >SAMPLE </td>
-                                                <td colSpan={2}>Control line </td>
-                                                <td colSpan={2}>Verification line </td>
-                                                <td colSpan={2}>Longterm line</td>
+                                                <td colSpan={2}> ANALYSIS </td>
                                                 <td >PERFORMANCE</td>
                                             </tr>
 
                                             <tr style={{ "fontWeight": "bold" }} className='tbBorder'>
                                                 <td></td>
-                                                <td style={borderLeft}>Results</td>  <td>Expected</td>
-                                                <td style={borderLeft}>Results</td>  <td>Expected</td>
                                                 <td style={borderLeft}>Results</td> <td style={borderRight}>Expected</td>
                                                 <td></td>
                                             </tr>

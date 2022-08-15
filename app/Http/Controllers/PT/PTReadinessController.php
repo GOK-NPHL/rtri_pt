@@ -147,21 +147,35 @@ class PTReadinessController extends Controller
     public function getShipmentReadiness(Request $request)
     {
         try {
+            $include_submitted = (isset($request->get_all) || $request->get_all == 1) ? true : false;
             // SELECT readiness_id FROM rtript.pt_shipements where readiness_id is not null
-            $readinesses = Readiness::select(
-                "readinesses.id",
-                "readinesses.name",
-                "readinesses.updated_at as last_update",
-                "admins.name as created_by",
-            )->join('admins', 'admins.id', '=', 'readinesses.admin_id')
-                ->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'readinesses.id')
-                ->whereNotIn(
-                    'readinesses.id',
-                    DB::table('pt_shipements')->select('readiness_id')->whereNotNull('readiness_id')->get()->pluck('readiness_id')->toArray()
-                )
-                ->groupBy('laboratory_readiness.readiness_id')
-                ->orderBy('last_update', 'DESC')
-                ->get();
+            if($include_submitted){
+                $readinesses = Readiness::select(
+                    "readinesses.id",
+                    "readinesses.name",
+                    "readinesses.updated_at as last_update",
+                    "admins.name as created_by",
+                )->join('admins', 'admins.id', '=', 'readinesses.admin_id')
+                    ->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'readinesses.id')
+                    ->groupBy('laboratory_readiness.readiness_id')
+                    ->orderBy('last_update', 'DESC')
+                    ->get();
+            }else{
+                $readinesses = Readiness::select(
+                    "readinesses.id",
+                    "readinesses.name",
+                    "readinesses.updated_at as last_update",
+                    "admins.name as created_by",
+                )->join('admins', 'admins.id', '=', 'readinesses.admin_id')
+                    ->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'readinesses.id')
+                    ->whereNotIn(
+                        'readinesses.id',
+                        DB::table('pt_shipements')->select('readiness_id')->whereNotNull('readiness_id')->get()->pluck('readiness_id')->toArray()
+                    )
+                    ->groupBy('laboratory_readiness.readiness_id')
+                    ->orderBy('last_update', 'DESC')
+                    ->get();
+            }
 
             return $readinesses;
         } catch (Exception $ex) {

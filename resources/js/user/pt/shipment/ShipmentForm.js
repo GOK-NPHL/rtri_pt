@@ -89,9 +89,10 @@ class ShipmentForm extends React.Component {
 
     componentDidMount() {
         (async () => {
-            let readinessChecklists = await FetchReadiness();
             let partsList = await FetchParticipantList();
             if (this.props.pageState == 'edit') {
+
+                let readinessChecklists = await FetchReadiness(1);
 
                 this.getShipementDataById(this.props.id);
                 this.setState({
@@ -100,6 +101,8 @@ class ShipmentForm extends React.Component {
                 });
 
             } else {
+
+                let readinessChecklists = await FetchReadiness();
                 this.setState({
                     dualListptions: partsList,
                     readinessChecklists: readinessChecklists,
@@ -357,9 +360,13 @@ class ShipmentForm extends React.Component {
             checklists.push(<option key={checklist.id} value={checklist.id}>{checklist.name}</option>);
         });
 
-        let labSelect = <div>No checklist defined. Readiness: {this.state.readinessId}</div>;
+        let labSelect = <div>No checklist defined
+            {/* . Readiness: {this.state.readinessId} */}
+        </div>;
         if (this.state.pageState == 'edit' && this.state.readinessId && this.state.readinessId != '' && this.state.readinessId != null) {
-            labSelect = <div> {this.state.readinessId},, {JSON.stringify(this.state.readinessChecklists) || '~'} </div>
+            console.log('this.state.readinessId: ', this.state.readinessId);
+            console.log('this.state.readinessChecklists: ', this.state.readinessChecklists);
+            labSelect = <div> {this.state.readinessId}{JSON.stringify(this.state.readinessChecklists) || '~'} </div>
         }
         if (this.state.readinessChecklists.length != 0) {
             labSelect = <select
