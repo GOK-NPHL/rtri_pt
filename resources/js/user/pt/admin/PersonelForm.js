@@ -84,8 +84,11 @@ class PersonelForm extends React.Component {
                         hasPtAccess: editData.has_pt_access == 1 ? true : false,
                         isActive: editData.is_active,
                         pageState: 'edit',
-
                     });
+
+                    setTimeout(() => {
+                        document.querySelector('#u_facility').value = editData.laboratory_id;
+                    }, 4000);
                 }
             })();
         }
@@ -247,6 +250,10 @@ class PersonelForm extends React.Component {
     componentDidUpdate() {
         try {
             $('#u_facility').selectpicker();
+            if(this.state.facility && this.state.facility != '' && this.state.facility != null){
+                $('#u_facility').val(this.state.facility);
+                $('#u_facility').selectpicker('refresh');
+            }
         } catch (err) {
 
         }
@@ -299,7 +306,7 @@ class PersonelForm extends React.Component {
 
                                     {/* add */}
                                     <div className="col-md-6 mb-3">
-                                        <label htmlFor="u_facility" >Laboratory  *</label>
+                                        <label htmlFor="u_facility" >Laboratory *</label>
 
                                         {labSelect}
                                     </div>
@@ -352,7 +359,9 @@ class PersonelForm extends React.Component {
                                             }}
                                             onChange={(event) => this.handlePasswordChange(event.target.value)}
                                             type="email" className="form-control" id="u_password" />
-                                            <small style={{ "color": "red" }} className="form-text">Leave blank to retain previous password.</small>
+                                            {this.state.pageState == 'edit' ?
+                                            <small style={{ "color": "red" }} className="form-text">Leave blank to retain previous password.</small> :
+                                            ''}
                                     </div>
                                 </div>
 
@@ -383,7 +392,7 @@ class PersonelForm extends React.Component {
                                             onChange={(event) => this.handleIsQcActiveChange(event.target.checked)}
                                             type="checkbox"
                                             id="u_qc_access" />
-                                        <label className="ml-3" htmlFor="u_qc_access" >Has QC Access</label>
+                                        <label className="ml-3" htmlFor="u_qc_access" >Has PT Access</label>
 
                                     </div>
 

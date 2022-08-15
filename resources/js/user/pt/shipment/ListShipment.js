@@ -29,7 +29,7 @@ class ListShipment extends React.Component {
 
     fetchListing() {
         (async () => {
-            let response = await FetchShipments();
+            let response = await FetchShipments(this.props.userId, this.props.filterEmpty);
             this.setState({
                 data: response
             });
@@ -38,9 +38,12 @@ class ListShipment extends React.Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.currentPage !== this.props.currentPage) {
-            this.fetchListing();
+            this.fetchListing(this.props.userId);
         }
 
+        if (prevProps.userId !== this.props.userId) {
+            this.fetchListing(this.props.userId);
+        }
     }
 
     handlePageChange(pageNumber) {
@@ -63,7 +66,6 @@ class ListShipment extends React.Component {
     }
 
     render() {
-        console.log("rendering")
         const imgStyle = {
             width: "100%"
         };
@@ -87,27 +89,44 @@ class ListShipment extends React.Component {
                     {
 
                         <td>
+                            {
+                                this.props.isParticipant ?
+                                    <a
+                                        onClick={() => {
+                                            window.location.assign('/get-participant-shipment-response-performance/' + element.id)
+                                        }}
+                                        data-toggle="tooltip" data-placement="top" title="View performance report"
+                                        style={{ 'marginRight': '5px' }}
+                                        className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm text-white">
+                                        <i className="fas fa-file-pdf"></i> Performance
+                                    </a>
+                                    :
+                                    <a
+                                        onClick={() => {
+                                            this.props.page != 'report' ?
+                                                window.location.assign('get-shipment-responses/' + element.id) :
+                                                window.location.assign('get-shipment-report-responses/' + element.id)
+                                        }}
+                                        style={{ 'marginRight': '5px' }}
+                                        data-toggle="tooltip" data-placement="top" title="View shipment responses"
+                                        className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm text-white">
+                                        <i className="fas fa-file"></i> View
+                                    </a>
+                            }
+                            {
+                                this.props.page != 'report' ?
+                                    <a href="#"
+                                        onClick={
+                                            () => {
+                                                console.log(element);
+                                                this.props.toggleView('edit', element.id);
+                                            }
+                                        }
+                                        className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm text-white">
+                                        <i className="fas fa-edit"></i> Edit
+                                    </a> : ''
+                            }
 
-                            <a href="#"
-                                onClick={
-                                    () => {
-                                        console.log(element);
-                                        this.props.toggleView('edit', element.id);
-                                    }
-                                }
-                                style={{ 'marginRight': '5px' }}
-                                className="d-none d-sm-inline-block btn btn-xs text-white btn-info shadow-sm">
-                                <i className="fas fa-edit"></i> Edit
-                            </a>
-                            {/* <a
-                                onClick={() => {
-                                    this.setState({
-                                        selectedElement: element
-                                    });
-                                    $('#deleteConfirmModal').modal('toggle');
-                                }} className="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
-                                <i className="fas fa-user-times"></i>
-                            </a> */}
 
                         </td>
                     }
@@ -138,7 +157,7 @@ class ListShipment extends React.Component {
                             );
                             this.updatedSearchItem(currElementsTableEl);
                         }}
-                        className="form-control" placeholder="search personel"></input>
+                        className="form-control" placeholder="search shipment"></input>
                 </div>
 
                 <table className="table table-striped table-sm  table-hover">

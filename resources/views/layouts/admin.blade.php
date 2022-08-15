@@ -45,7 +45,7 @@ use Illuminate\Support\Facades\Gate;
 
         .nav-link:hover,
         .bg-light>a:hover {
-            color: #1900ff !important;
+            color: #74b8e9 !important;
             ;
         }
 
