@@ -188,7 +188,7 @@ class PTPerformanceReport extends React.Component {
                                                 <td className='text-left tbBorder'>
                                                     <p style={{ margin: 0, padding: '2px 7px' }}>
                                                         Nancy Bowen<br />
-                                                        National HIV Reference Laboratory<br />
+                                                        Head, National HIV Reference Laboratory<br />
                                                         Department of Laboratory Services - NPHL<br />
                                                         P.O. Box 20750-00200<br />
                                                         Nairobi, Kenya<br />
