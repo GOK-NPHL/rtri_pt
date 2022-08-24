@@ -356,9 +356,11 @@ class ShipmentForm extends React.Component {
         }
 
         let checklists = [];
-        this.state.readinessChecklists.map((checklist) => {
-            checklists.push(<option key={checklist.id} value={checklist.id}>{checklist.name}</option>);
-        });
+        if (this.state.readinessChecklists.length > 0) {
+            this.state.readinessChecklists.map((checklist) => {
+                checklists.push(<option key={checklist.id} value={checklist.id}>{checklist.name}</option>);
+            });
+        }
 
         let labSelect = <div>No checklist defined
             {/* . Readiness: {this.state.readinessId} */}
