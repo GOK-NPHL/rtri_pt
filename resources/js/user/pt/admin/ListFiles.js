@@ -49,10 +49,10 @@ class ListUser extends React.Component {
     uploadFile(fl, isPub) {
         (async () => {
             let result = await SaveFile(fl, isPub);
-            console.log('uploadFile response:::: ', result);
+            // console.log('uploadFile response:::: ', result);
             if (result.data.status === 'success') {
                 this.setState({
-                    files: result.data.data,
+                    files: result.data.files,
                     is_admin: result.data.is_admin || false,
                     message: 'File uploaded successfully',
                     status: 200,
@@ -72,7 +72,7 @@ class ListUser extends React.Component {
     deleteFile(id) {
         (async () => {
             let result = await DeleteFile(id);
-            console.log('deleteFile response:::: ', result);
+            // console.log('deleteFile response:::: ', result);
             if (result.data.status === 'success') {
                 this.setState({
                     files: result.data.data,
@@ -158,26 +158,25 @@ class ListUser extends React.Component {
                                     <tr>
                                         <th>Name</th>
                                         <th>Size</th>
-                                        <th>Is public?</th>
-                                        {this.state.is_admin && this.state.is_admin === true && <th>Actions</th>}
+                                        {this.state.is_admin && this.state.is_admin && <><th>Is public?</th><th>Actions</th></>}
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {this.state.files && this.state.files.length > 0 ? this.state.files.map(fl => (
                                         <tr key={fl.id}>
-                                            <td style={{ border: '1px solid #ccd6e3' }}>
+                                            <td style={{ border: '1px solid #ccd6e3', textAlign: 'left' }}>
                                                 <a href={
                                                     window.location.origin + '/api/resources/files/download/' + fl['id']
                                                 } target="_blank" download={fl['name']}>{fl['name']}</a>
                                             </td>
                                             <td style={{ border: '1px solid #ccd6e3' }}>{Intl.NumberFormat('en-GB').format(fl['size'] / 1000000) + "MB"}</td>
-                                            <td style={{ border: '1px solid #ccd6e3' }}>{fl['is_public'] == "1" || fl['is_public'] === true ? <span title="Visible to the public" className="badge badge-success"><i className="fa fa-globe"></i> Yes</span> : <span title="Only visible to logged in users" className="badge badge-danger"><i className="fa fa-lock"></i> No</span>}</td>
-                                            {this.state.is_admin && this.state.is_admin === true && <td style={{ border: '1px solid #ccd6e3' }}>
+                                            {this.state.is_admin && this.state.is_admin === true && <><td style={{ border: '1px solid #ccd6e3' }}>{fl['is_public'] == "1" || fl['is_public'] === true ? <span title="Visible to the public" className="badge badge-success"><i className="fa fa-globe"></i> Yes</span> : <span title="Only visible to logged in users" className="badge badge-danger"><i className="fa fa-lock"></i> No</span>}</td>
+                                            <td style={{ border: '1px solid #ccd6e3' }}>
                                                 <button className="btn btn-danger btn-xs" style={{ padding: '3px 5px', fontSize: '0.7em' }} onClick={(ev) => {
                                                     ev.preventDefault();
                                                     window.confirm('Are you sure you want to delete this file?') && this.deleteFile(fl['id']);
                                                 }}>Delete</button>
-                                            </td>}
+                                            </td></>}
                                         </tr>
                                     )) : <tr>
                                         <th colSpan={4}>No files at this moment. Check later.</th>
@@ -194,8 +193,8 @@ class ListUser extends React.Component {
                             <form onSubmit={(ev) => {
                                 ev.preventDefault();
                                 ev.stopPropagation();
-                                console.log('this.state.fileForUpload::: ', this.state.fileForUpload);
-                                console.log('t::: ', typeof this.state.fileForUpload);
+                                // console.log('this.state.fileForUpload::: ', this.state.fileForUpload);
+                                // console.log('t::: ', typeof this.state.fileForUpload);
                                 if (this.state.fileForUpload && this.state.fileForUpload != null) {
                                     this.uploadFile(this.state.fileForUpload, this.state.fileForUploadPublic);
                                 } else {
@@ -211,7 +210,7 @@ class ListUser extends React.Component {
                                 <div className="modal-body">
                                     <div className="form-group">
                                         <label htmlFor="file_">Pick a file</label>
-                                        <input type="file" className="form-control" id="file_" name="file_" placeholder="Input field" onChange={(f) => {
+                                        <input type="file" className="form-control" id="file_" name="file_" placeholder="File" onChange={(f) => {
                                             this.setState({
                                                 fileForUpload: f.target.files[0]
                                             })
@@ -229,7 +228,7 @@ class ListUser extends React.Component {
                                         </label>
                                         &nbsp; &nbsp; &nbsp; &nbsp;
                                         <label>
-                                            <input type="radio" name="public" value="0" onChange={(ev) => {
+                                            <input type="radio" name="public" value="0" defaultChecked onChange={(ev) => {
                                                 this.setState({
                                                     fileForUploadPublic: ev.target.value
                                                 })

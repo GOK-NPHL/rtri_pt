@@ -101,6 +101,9 @@ class ShipmentResponses extends React.Component {
                     <td>{element.created_at}</td>
                     <td>{element.updated_at}</td>
                     <td> {<span>{element.fname} {element.sname}</span>} </td>
+                    <td>
+                        <a href={window.location.origin + '/api/resources/files/download/' + element.pt_submission_file_id} target="_blank" download={element.pt_submission_file_name}>{"File_"+element.pt_submission_file_id}</a>
+                    </td>
 
                     {
                         //lab_id   id
@@ -186,6 +189,7 @@ class ShipmentResponses extends React.Component {
                             <th scope="col">Date responded</th>
                             <th scope="col">Date updated</th>
                             <th scope="col">Responded by</th>
+                            <th scope="col">PT Files</th>
                             <th scope="col">Action</th>
                         </tr>
                     </thead>

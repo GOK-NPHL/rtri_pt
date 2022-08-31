@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Service;
 use App\Http\Controllers\Controller;
 use App\PtSubmissionResult;
 use App\ptsubmission as SubmissionModel;
+use App\ResourceFiles;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,45 +30,92 @@ class Submission extends Controller
     public function createSubmission(Request $request)
     {
         try {
-            $submission = $request->submission;
-            $submissionModel = new SubmissionModel([
-
-                "testing_date" => $submission["testingDate"],
-                "kit_date_received" => $submission["kitReceivedDate"],
-                "lot_date_received" => $submission["ptLotReceivedDate"],
-                "kit_expiry_date" => $submission["kitExpiryDate"],
-                "kit_lot_no" => $submission["kitLotNo"],
-                "name_of_test" => $submission["nameOfTest"],
-                "pt_lot_no" => $submission["ptLotNumber"],
-                "lab_id" => $submission["labId"],
-                "user_id" => $submission["userId"],
-                "sample_reconstituion_date" => $submission["ptReconstituionDate"],
-                "sample_type" => $submission["sampleType"],
-                "tester_name" => $submission["testerName"],
-                "test_justification" => $submission["testJustification"],
-                "pt_tested" => $submission["isPTTested"],
-                "not_test_reason" => $submission["ptNotTestedReason"],
-                "other_not_tested_reason" => $submission["ptNotTestedOtherReason"],
-                "pt_shipements_id" => $submission["ptShipementId"]
-
-            ]);
-
-            $submissionModel->save();
-            $submissionId = $submissionModel->id;
-
-
-            // if (count($submission["samples"]) > 0) {
-
-            foreach ($submission["samples"] as $key => $val) {
-
-                $ptLtResult = new PtSubmissionResult([
-                    "interpretation" => $val["interpretation"],
-                    "ptsubmission_id" => $submissionId,
-                    "sample_id" => $key
-                ]);
-                $ptLtResult->save();
+            $submission = json_decode($request->input('submission'), true);
+            if (!$submission) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Invalid submission',
+                ], 400);
             }
+            $file_id = null;
+            // save file and get id
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                $banned_files = ['exe', 'sh', 'bat', 'php', 'go', 'js', 'py', 'rb', 'pl', 'sh', 'c', 'cpp', 'java', 'cs', 'html', 'css', 'json', 'xml', 'sql', 'dmg', null, 'bin', 'jar', 'ts', 'cpp'];
+                $name = $file->getClientOriginalName();
+                // make name unique
+                $new_name = uniqid() . '_' . $name;
+                // strip, lowercase, and clean file name
+                $new_name = strtolower(str_replace([' ', '-'], '_', $new_name));
+                $extension = $file->getClientOriginalExtension();
+                if (in_array($extension, $banned_files)) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'File type not allowed',
+                    ])->status(400);
+                }
+                $path = storage_path('submissions/' . $new_name);
+                $file->move(storage_path('submissions'), $new_name);
+                $file = new ResourceFiles();
+                $file->name = $new_name;
+                $file->path = $path;
+                $file->type = mime_content_type($path); //$file->getMimeType();
+                $file->size = filesize($path); //$file->getSize();
+                $file->is_public = false;
+                $file->save();
+                $file_id = $file->id;
 
+                if(!$file_id) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'File could not be saved',
+                    ])->status(400);
+                }else{
+                    Log::info('-----------------------File saved: '.$file_id);
+                    $submissionModel = new SubmissionModel([
+                        "testing_date" => $submission["testingDate"],
+                        "kit_date_received" => $submission["kitReceivedDate"],
+                        "lot_date_received" => $submission["ptLotReceivedDate"],
+                        "kit_expiry_date" => $submission["kitExpiryDate"],
+                        "kit_lot_no" => $submission["kitLotNo"],
+                        "name_of_test" => $submission["nameOfTest"],
+                        "pt_lot_no" => $submission["ptLotNumber"],
+                        "lab_id" => $submission["labId"],
+                        "user_id" => $submission["userId"],
+                        "sample_reconstituion_date" => $submission["ptReconstituionDate"],
+                        "sample_type" => $submission["sampleType"],
+                        "tester_name" => $submission["testerName"],
+                        "test_justification" => $submission["testJustification"],
+                        "pt_tested" => $submission["isPTTested"],
+                        "not_test_reason" => $submission["ptNotTestedReason"],
+                        "other_not_tested_reason" => $submission["ptNotTestedOtherReason"],
+                        "pt_shipements_id" => $submission["ptShipementId"],
+                        "pt_submission_file_id" => $file_id,
+                    ]);
+
+                    Log::info('-----------------------Submission : '.json_encode($submissionModel));
+        
+                    $submissionModel->save();
+                    $submissionId = $submissionModel->id;
+        
+                    foreach ($submission["samples"] as $key => $val) {
+        
+                        $ptLtResult = new PtSubmissionResult([
+                            "interpretation" => $val["interpretation"],
+                            "ptsubmission_id" => $submissionId,
+                            "sample_id" => $key
+                        ]);
+                        $ptLtResult->save();
+                    }
+                }
+
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No file provided',
+                ])->status(400);
+            }
+            
             return response()->json(['Message' => 'Saved successfully'], 200);
         } catch (Exception $ex) {
             Log::error($ex);

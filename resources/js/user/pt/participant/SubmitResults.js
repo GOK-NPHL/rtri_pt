@@ -20,6 +20,7 @@ class SubmitResults extends React.Component {
             ptLotNumber: '',
             testingDate: '',
             sampleType: 'DTS',
+            ptFile: null,
             labId: '',
             userId: '',
             ptNegativeIntepreation: '',
@@ -136,6 +137,7 @@ class SubmitResults extends React.Component {
 
                 this.setState({
                     userDemographics: userDemographics,
+                    testerName: userDemographics.length > 0 ? (userDemographics[0].name + ' ' + userDemographics[0].second_name) : '',
                     labId: userDemographics[0].lab_id,
                     userId: userDemographics[0].user_id,
                     edittableSubmission: edittableSubmission,
@@ -175,7 +177,7 @@ class SubmitResults extends React.Component {
             this.state.kitLotNo.length == 0 ||
             this.state.nameOfTest.length == 0 ||
             this.state.testerName.length == 0 ||
-            this.state.ptLotNumber.length == 0 ||
+            // this.state.ptLotNumber.length == 0 ||
             this.state.ptReconstituionDate.length == 0 ||
             this.state.testingDate.length == 0
             // ||
@@ -195,7 +197,7 @@ class SubmitResults extends React.Component {
             submission["kitLotNo"] = this.state.kitLotNo;
             submission["ptReconstituionDate"] = this.state.ptReconstituionDate;
             submission["testingDate"] = this.state.testingDate;
-            submission["ptLotNumber"] = this.state.ptLotNumber;
+            submission["ptLotNumber"] = 0;//this.state.ptLotNumber;
             submission["nameOfTest"] = this.state.nameOfTest;
             submission["testerName"] = this.state.testerName;
             submission["isPTTested"] = this.state.isPtDone;
@@ -208,6 +210,9 @@ class SubmitResults extends React.Component {
             submission["ptShipementId"] = this.props.shipment.pt_shipements_id;
             submission["samples"] = this.state.samples;
             submission["id"] = this.state.submissionId;
+            // submission["file"] = this.state.ptFile;
+
+            // console.log("submission", submission)
 
 
             (async () => {
@@ -215,7 +220,7 @@ class SubmitResults extends React.Component {
                 if (this.props.selectedElementHasSubmmisions) {
                     response = await UpdateSubmission(submission);
                 } else {
-                    response = await SaveSubmission(submission);
+                    response = await SaveSubmission(submission, this.state.ptFile);
                 }
 
                 this.setState({
@@ -230,8 +235,8 @@ class SubmitResults extends React.Component {
     }
 
     ptInterpretation(event, sample_id) {
-        console.log("sample_id");
-        console.log(sample_id);
+        // console.log("sample_id");
+        // console.log(sample_id);
         let samples = this.state.samples;
         let interpretValue = event.target.value;
         let status = event.target.checked ? 1 : 0;
@@ -271,7 +276,7 @@ class SubmitResults extends React.Component {
 
     onTesternameChangeHandler(event) {
         this.setState({
-            testerName: event.target.value
+            testerName: this.state.userDemographics.length > 0 ? this.state.userDemographics[0].name + ' ' + this.state.userDemographics[0].second_name : event.target.value || ''
         });
     }
 
@@ -334,7 +339,7 @@ class SubmitResults extends React.Component {
     validateTestingAndRecivedDate(testingDate, receiveData) {
         if (testingDate < receiveData && (testingDate && receiveData)) {
             this.setState({
-                message: "PT lot Date received cannot be greater than testing date",
+                message: "PT Panel Date received cannot be greater than testing date",
                 testingDate: '',
                 kitReceivedDate: ''
             })
@@ -378,7 +383,7 @@ class SubmitResults extends React.Component {
     validateTestingAndPTLotRecivedDate(testingDate, receiveDate) {
         if (testingDate < receiveDate && (testingDate && receiveDate)) {
             this.setState({
-                message: "PT lot Date received cannot be greater than testing date",
+                message: "PT Panel Date received cannot be greater than testing date",
                 testingDate: '',
                 ptLotReceivedDate: ''
             })
@@ -581,16 +586,16 @@ class SubmitResults extends React.Component {
                     <div className="col-sm-12  pl-4 pr-4">
                         {/* PT Lot info */}
                         <div className="row">
-                            <div style={boxLine} className="col-sm-3">
+                            {/* <div style={boxLine} className="col-sm-3">
                                 <p><strong>PT Lot Number: *</strong></p>
                             </div>
                             <div style={boxLine} className="col-sm-3">
 
                                 <input value={this.state.ptLotNumber} onChange={() => this.onPtLotNumberHandler(event)} className="form-control" type="text" />
-                            </div>
+                            </div> */}
 
                             <div style={boxLineLeft} className="col-sm-3">
-                                <p><strong>PT Lot Date Received *</strong></p>
+                                <p><strong>PT Panel Date Received *</strong></p>
                             </div>
                             <div style={boxLine} className="col-sm-3">
                                 <input value={this.state.ptLotReceivedDate} onChange={() => this.onPtLotReceiceDateHandler(event)} className="form-control" type="date" />
@@ -610,7 +615,7 @@ class SubmitResults extends React.Component {
                                 <p><strong>Tester name: *</strong></p>
                             </div>
                             <div style={boxLine} className="col-sm-3">
-                                <input value={this.state.testerName} onChange={() => this.onTesternameChangeHandler(event)} className="form-control" type="text" />
+                                <input value={this.state.testerName} defaultValue={this.state.userDemographics.length > 0 ? this.state.userDemographics[0].name + ' ' + this.state.userDemographics[0].second_name : this.state.testerName || ''} readOnly onChange={() => this.onTesternameChangeHandler(event)} className="form-control" type="text" />
                             </div>
 
                         </div>
@@ -622,7 +627,7 @@ class SubmitResults extends React.Component {
                     <div className="col-sm-12  pl-4 pr-4">
                         {/* Test justification */}
                         <div className="row">
-                            <div style={boxLine} className="col-sm-3">
+                            {/* <div style={boxLine} className="col-sm-3">
                                 <p><strong>Jutification for PT testing: *</strong></p>
                             </div>
                             <div style={boxLine} className="col-sm-3">
@@ -633,9 +638,9 @@ class SubmitResults extends React.Component {
                                     <option>New kit lot/batch</option>
                                     <option>Change in environmental conditions</option>
                                 </select>
-                            </div>
+                            </div> */}
                             {/* sample type */}
-                            <div style={boxLine} className="col-sm-3">
+                            {/* <div style={boxLine} className="col-sm-3">
                                 <p><strong>Sample type:</strong></p>
                             </div>
                             <div style={boxLine} className="col-sm-3">
@@ -645,7 +650,7 @@ class SubmitResults extends React.Component {
                                     <option selected>DTS</option>
                                     <option>Plasma</option>
                                 </select>
-                            </div>
+                            </div> */}
 
                         </div>
                         {/* End Test justification */}
@@ -653,12 +658,12 @@ class SubmitResults extends React.Component {
                         <hr />
                     </div>
 
-                    <div className="col-sm-12  pl-4 pr-4" style={{marginTop: '2.1em'}}>
+                    <div className="col-sm-12  pl-4 pr-4" style={{ marginTop: '2.1em' }}>
                         <h5><b>Testing Instructions</b></h5>
                     </div>
                     <div className="col-sm-12  pl-4 pr-4 mb-3">
-                        <div style={{width: '100%', border: '1px solid #cdc5c5', backgroundColor: '#fffbea', padding: '15px 12px', borderRadius: '5px'}}>
-                            <pre style={{fontFamily: 'inherit', fontSize: '1em', whiteSpace: 'pre-wrap'}}>{this.state.test_instructions}</pre>
+                        <div style={{ width: '100%', border: '1px solid #cdc5c5', backgroundColor: '#fffbea', padding: '15px 12px', borderRadius: '5px' }}>
+                            <pre style={{ fontFamily: 'inherit', fontSize: '1em', whiteSpace: 'pre-wrap' }}>{this.state.test_instructions}</pre>
                         </div>
                         {/* <textarea readOnly
                             value={this.state.test_instructions}
@@ -712,6 +717,16 @@ class SubmitResults extends React.Component {
 
                         {/* PT Test results fields */}
                         <div className="row ml-5 mr-5">
+                            <div className="col-md-12">
+                                <div className="form-group">
+                                    <label htmlFor="file_">Scanned PT form:</label>
+                                    <input type="file" className="form-control" id="file_" name="file_" placeholder="Please select a file" onChange={(f) => {
+                                        this.setState({
+                                            ptFile: f.target.files[0]
+                                        })
+                                    }} />
+                                </div>
+                            </div>
                             <div className="col-sm-12">
                                 <table>
                                     <thead>
@@ -859,8 +874,8 @@ class SubmitResults extends React.Component {
 
 
                                 </table>
-                            </div>
 
+                            </div>
                         </div>
 
                         {/* End PT Test results fields */}

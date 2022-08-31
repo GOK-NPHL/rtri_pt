@@ -7,15 +7,24 @@ let cache = {
 
 }
 
-export async function SaveSubmission(submission) {
+export async function SaveSubmission(submission, ptFile) {
+    
     try {
-        const response = await axios({
-            method: 'post',
-            url: `${settings.serverBaseApi}/save_submission`,
-            data: {
-                submission: submission,
+        const formData = new FormData();
+        formData.append('file', ptFile);
+        formData.append('submission', JSON.stringify(submission));
+        response = await axios.post(`${settings.serverBaseApi}/save_submission`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
             }
         });
+        // const response = await axios({
+        //     method: 'post',
+        //     url: `${settings.serverBaseApi}/save_submission`,
+        //     data: {
+        //         submission: submission,
+        //     }
+        // });
         return response;
     } catch (err) {
         // Handle Error Here
