@@ -36,6 +36,7 @@ nbproject/
 
 storage/*.csv
 storage/files/*
+storage/submissions/*
 .editorconfig
 .styleci.yml
 public/js/app.js
