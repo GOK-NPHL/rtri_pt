@@ -123,7 +123,21 @@ class PTPerformanceReport extends React.Component {
             ///////// SCORING ///////////
             results.push(<tr className='tbBorder' key={uuidv4()} style={{textTransform: 'uppercase'}}>
                 <td style={tdtyle}>{data.sample_name}</td>
-                <td style={borderLeft}>{data.result_interpretation ? data.result_interpretation : 'No Result'}</td> 
+                <td style={borderLeft}>
+                    {/* {JSON.stringify(data)} */}
+                    <table style={{border: '0px solid transparent', verticalAlign: 'middle', textTransform: 'capitalize' }}>
+                        <tbody>
+                        <tr>
+                            <th style={{border: '0px solid transparent', padding: '0px', textTransform: 'capitalize'}}>Interpretation:</th>
+                            <td style={{border: '0px solid transparent', padding: '0px', textTransform: 'uppercase'}}>{data.result_interpretation ? data.result_interpretation : 'No Result'}</td>
+                        </tr>
+                        <tr>
+                            <th style={{border: '0px solid transparent', padding: '0px', textTransform: 'capitalize'}}>Visual result:</th>
+                            <td style={{border: '0px solid transparent', padding: '0px', textTransform: 'uppercase'}}>{data.control_line == 1 ? "Control" : data.verification_line == 1 ? "Verification" : data.longterm_line == 1 ? "Long-term" : "No result"}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td> 
                 <td>{data.reference_result}</td>
                 <td>{isPass ? 'ACCEPTABLE' : 'UNACCEPATBE'}</td>
             </tr>);
@@ -140,7 +154,7 @@ class PTPerformanceReport extends React.Component {
                             content={() => this.componentRef}
                         />
                     </div>
-                    <table className="unstrip table table-sm no-table-border"
+                    <table className="unstrip table table-sm no-table-border" style={{verticalAlign: 'middle'}}
                         ref={el => (this.componentRef = el)}>
                         <tbody >
                             <tr >
@@ -182,7 +196,7 @@ class PTPerformanceReport extends React.Component {
                             {/* <tr><td><p></p></tr</td>> */}
                             <tr>
                                 <td colSpan={3}>
-                                    <table className='tbBorder'>
+                                    <table className='tbBorder'  style={{verticalAlign: 'middle'}}>
                                         <tbody>
                                             <tr>
                                                 <td className='text-left tbBorder'>
@@ -212,7 +226,7 @@ class PTPerformanceReport extends React.Component {
                             <tr><td><p></p></td></tr>
                             <tr>
                                 <td colSpan={totalTableLength}>
-                                    <table className='tbBorder'>
+                                    <table className='tbBorder' style={{verticalAlign: 'middle'}}>
                                         <tbody>
                                             <tr style={{ "fontWeight": "bold" }} className='tbBorder'>
                                                 <td style={tdtyle} >SAMPLE </td>

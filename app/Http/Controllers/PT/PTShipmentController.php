@@ -398,12 +398,11 @@ class PTShipmentController extends Controller
                 "ptsubmissions.pt_lot_no",
             ]);
 
-
             //  one
-            $hipmentsRefResult = DB::table("pt_shipements")->distinct()
+            $shipmentsRefResult = DB::table("pt_shipements")->distinct()
                 ->join('pt_samples', 'pt_samples.ptshipment_id', '=', 'pt_shipements.id');
 
-            $hipmentsRefResult = $hipmentsRefResult->get([
+            $shipmentsRefResult = $shipmentsRefResult->get([
                 "pt_samples.reference_result as reference_result",
                 "pt_samples.name as sample_name"
             ]);
@@ -423,18 +422,24 @@ class PTShipmentController extends Controller
 
             $shipmentsResponsesRlt = $shipmentsResponsesRlt->get([
                 "pt_submission_results.interpretation as result_interpretation",
+                "pt_submission_results.control_line as control_line",
+                "pt_submission_results.verification_line as verification_line",
+                "pt_submission_results.longterm_line as longterm_line",
                 "pt_samples.name as sample_name"
             ]);
 
 
             $dataPayload = [];
-            foreach ($hipmentsRefResult as $refRslt) {
+            foreach ($shipmentsRefResult as $refRslt) {
                 foreach ($shipmentsResponsesRlt as $rslt) {
                     if ($refRslt->sample_name == $rslt->sample_name) {
                         $data = [];
                         $data['result_interpretation'] = $rslt->result_interpretation;
                         $data['sample_name'] = $refRslt->sample_name;
                         $data['reference_result'] = $refRslt->reference_result;
+                        $data['control_line'] = $rslt->control_line ?? null;
+                        $data['verification_line'] = $rslt->verification_line ?? null;
+                        $data['longterm_line'] = $rslt->longterm_line ?? null;
                         $dataPayload[] = $data;
                     }
                 }

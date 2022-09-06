@@ -459,7 +459,6 @@ class ShipmentForm extends React.Component {
                                 <label htmlFor="u_pass_mark" >Pass mark (%)*</label>
 
                                 <input
-                                    value={this.state.passMark}
                                     min={0}
                                     max={100}
                                     value={this.state.passMark}

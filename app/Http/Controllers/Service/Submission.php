@@ -101,6 +101,10 @@ class Submission extends Controller
                     foreach ($submission["samples"] as $key => $val) {
         
                         $ptLtResult = new PtSubmissionResult([
+                            "control_line" => $val["visual"]["c"],
+                            "verification_line" => $val["visual"]["v"],
+                            "interpretation" => $val["interpretation"],
+                            "longterm_line" => $val["visual"]["lt"],
                             "interpretation" => $val["interpretation"],
                             "ptsubmission_id" => $submissionId,
                             "sample_id" => $key
@@ -217,6 +221,9 @@ class Submission extends Controller
             foreach ($submission["samples"] as $key => $val) {
 
                 $ptLtResult = new PtSubmissionResult([
+                    "control_line" => $val["visual"]["c"] ?? null,
+                    "verification_line" => $val["visual"]["v"] ?? null,
+                    "longterm_line" => $val["visual"]["lt"] ?? null,
                     "interpretation" => $val["interpretation"],
                     "ptsubmission_id" =>  $submission['id'],
                     "sample_id" => $key
