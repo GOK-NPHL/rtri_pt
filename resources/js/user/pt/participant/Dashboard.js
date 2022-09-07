@@ -32,7 +32,8 @@ class Dashboard extends React.Component {
             page: 'list',
             listingName: ' Samples Submitted tests',
             listing: 'submitted',
-            readiness: []
+            readiness: [],
+            userPermissions: userPermissions || {},
         }
         this.handlePageChange = this.handlePageChange.bind(this);
         this.toggleView = this.toggleView.bind(this);
@@ -302,6 +303,8 @@ class Dashboard extends React.Component {
             </div>
 
             {/* Readiness */}
+            {/* check if user is lab manager in Gate */}
+            {this.state.userPermissions && Object.keys(this.state.userPermissions).includes('lab_manager') && this.state.userPermissions.lab_manager === true &&
             <div className="form-check form-check-inline pl-2 mt-2">
                 <input
                     onClick={() => {
@@ -313,8 +316,8 @@ class Dashboard extends React.Component {
                     defaultChecked={this.state.listing == 'readiness'} className="form-check-input"
                     type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3" />
                 <label className="form-check-label" htmlFor="inlineRadio3">View readiness</label>
-            </div>
-
+            </div>}
+            
         </div>
 
         let submittedPageContent = <div id='user_table' className='row'>

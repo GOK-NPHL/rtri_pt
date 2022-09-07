@@ -8,6 +8,7 @@ class UserRole extends Model
 {
     protected $fillable = [
         "name",
+        'slug',
         "permissions",
         "is_active",
     ];

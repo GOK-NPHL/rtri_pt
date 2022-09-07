@@ -115,7 +115,7 @@ class CustomAuthController extends Controller
             $user->is_active = 0;
             $user->has_qc_access = 0;
             $user->has_pt_access = 0;
-            $user->roles = [UserRole::where('name', 'like', '%guest%')->first()->id];
+            $user->roles = [UserRole::where('slug', 'like', '%guest%')->first()->id];
             $user->save();
             return redirect()->route('participant-login')->with('success', 'User created successfully. Please wait for administrator to activate your account.');
         } catch (\Exception $e) {
@@ -161,7 +161,7 @@ class CustomAuthController extends Controller
 
     public function signOut()
     {
-        HttpFoundationSessionSession::flush();
+        Session::flush();
         Auth::logout();
 
         return Redirect()->route('index');

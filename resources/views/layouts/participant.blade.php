@@ -3,6 +3,7 @@
 
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 ?>
 
@@ -34,6 +35,15 @@ use Illuminate\Support\Facades\Gate;
     <link href="{{ asset('css/OverlayScrollbars.min.css') }}" rel="stylesheet">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <script>
+        // set user permissions
+        var userPermissions = {
+            'administrator': <?php echo Gate::allows('administrator') ? 'true' : 'false'; ?>,
+            'guest': <?php echo Gate::allows('guest') ? 'true' : 'false'; ?>,
+            'participant': <?php echo Gate::allows('participant') ? 'true' : 'false'; ?>,
+            'lab_manager': <?php echo Gate::allows('lab_manager') ? 'true' : 'false'; ?>,
+        };
+    </script>
 
 </head>
 
@@ -183,7 +193,6 @@ use Illuminate\Support\Facades\Gate;
             <!-- Content Header (Page header) -->
             <div class="content-header">
                 <div class="container-fluid">
-
                     <!-- Begin Page Content -->
                     <div class="container-fluid">
                         @yield('content')

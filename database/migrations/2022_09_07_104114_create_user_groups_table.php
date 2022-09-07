@@ -16,6 +16,7 @@ class CreateUserGroupsTable extends Migration
         Schema::create('user_groups', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
+            $table->boolean('is_active')->default(true);
             $table->json('roles')->nullable();
             $table->timestamps();
         });

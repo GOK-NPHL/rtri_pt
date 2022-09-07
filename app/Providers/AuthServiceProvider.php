@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Services\SystemAuthorities;
 use App\User;
+use App\UserRole;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -48,12 +49,52 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         // lab manager
-        // Gate::define(SystemAuthorities::$authorities['lab_manager'], function ($user) {
-        //     $curUser = Auth::user();
-        //     // check if user has lab manager role
-        //     $labManagerRole = $curUser->getRoles()->where('name', 'lab_manager')->first();
+        Gate::define(SystemAuthorities::$authorities['lab_manager'], function ($user) {
+            $curUser = Auth::user();
+            $lab_mgr_role = UserRole::where('slug', 'like', '%lab_admin%')->orWhere('slug', 'like', '%lab_manager%')->first()->id;
+            // check if roles array in user table contains lab manager role
+            if (in_array($lab_mgr_role, json_decode($curUser->roles))) {
+                return true;
+            } else {
+                return false;
+            }
+        });
 
-        // });
+        //participant
+        Gate::define(SystemAuthorities::$authorities['participant'], function ($user) {
+            $curUser = Auth::user();
+            $participant_role = UserRole::where('slug', 'like', '%participant%')->first()->id;
+            // check if roles array in user table contains participant role
+            if (in_array($participant_role, json_decode($curUser->roles))) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+
+        //admin
+        Gate::define(SystemAuthorities::$authorities['administrator'], function ($user) {
+            $curUser = Auth::user();
+            $admin_role = UserRole::where('slug', 'administrator')->first()->id;
+            // check if roles array in user table contains admin role
+            if (in_array($admin_role, json_decode($curUser->roles))) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+
+        //guest
+        Gate::define(SystemAuthorities::$authorities['guest'], function ($user) {
+            $curUser = Auth::user();
+            $guest_role = UserRole::where('slug', 'guest')->first()->id;
+            // check if roles array in user table contains guest role
+            if (in_array($guest_role, json_decode($curUser->roles))) {
+                return true;
+            } else {
+                return false;
+            }
+        });
 
         Gate::define(SystemAuthorities::$authorities['view_log_book_report'], function ($user) {
             return $this->runAthurizationQuery(SystemAuthorities::$authorities['view_log_book_report']);

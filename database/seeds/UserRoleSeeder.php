@@ -15,11 +15,14 @@ class UserRoleSeeder extends Seeder
         $roles = array(
             array(
                 'name' => 'Guest',
+                'slug' => 'guest',
+                'is_active' => true,
                 'permissions' => json_encode([])
             ),
             array(
                 'name' => 'Lab Administrator',
-                // 'is_active' => true,
+                'is_active' => true,
+                'slug' => 'lab_administrator',
                 'permissions' => json_encode([
                     'add_user',
                     'edit_user',
@@ -35,7 +38,8 @@ class UserRoleSeeder extends Seeder
             ),
             array(
                 'name' => 'Participant',
-                // 'is_active' => true,
+                'is_active' => true,
+                'slug' => 'participant',
                 'permissions' => json_encode([
                     'view_laboratory',
                     'view_readiness',
@@ -45,8 +49,9 @@ class UserRoleSeeder extends Seeder
                 ]),
             ),
             array(
-                'name' => 'Admin',
-                // 'is_active' => true,
+                'name' => 'Administrator',
+                'is_active' => true,
+                'slug' => 'administrator',
                 'permissions' => json_encode([
                     'add_user',
                     'edit_user',
