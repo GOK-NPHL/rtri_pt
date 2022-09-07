@@ -54,13 +54,14 @@ class PersonelForm extends React.Component {
             path: `/edit-personel/:personelId`,
         });
         let participantList = [];
+        
         (async () => {
             participantList = await FetchParticipantList();
             this.setState({
                 participantList: participantList
             });
-
         })();
+
         (async () => {
             let returnedData = await getAMresource('roles');
             if (returnedData.status === 200) {
@@ -104,7 +105,7 @@ class PersonelForm extends React.Component {
                         hasPtAccess: editData.has_pt_access == 1 ? true : false,
                         isActive: editData.is_active,
                         pageState: 'edit',
-                        userRoles: JSON.parse(editData.roles) || []
+                        userRoles: editData.roles ? JSON.parse(editData.roles) : []
                     });
                 }
             })();
@@ -441,7 +442,7 @@ class PersonelForm extends React.Component {
                                         // onChange={this.handleRolesChange}
                                         />
                                         {/* <pre>All: {JSON.stringify(this.state.allRoles)}</pre> */}
-                                        <pre>Picked: {JSON.stringify(this.state.userRoles)}</pre>
+                                        {/* <pre>Picked: {JSON.stringify(this.state.userRoles)}</pre> */}
                                     </>}
                                 </div>
 

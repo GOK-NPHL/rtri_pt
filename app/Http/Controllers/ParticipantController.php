@@ -134,7 +134,8 @@ class ParticipantController extends Controller
                 'users.phone_number',
                 'users.has_pt_access',
                 'users.is_active',
-                'users.second_name'
+                'users.second_name',
+                'users.roles'
             )->join('laboratories', 'laboratories.id', '=', 'users.laboratory_id')
                 ->get();
 
@@ -158,7 +159,8 @@ class ParticipantController extends Controller
                 'users.phone_number',
                 'users.has_pt_access',
                 'users.is_active',
-                'users.second_name'
+                'users.second_name',
+                'users.roles'
             )->join('laboratories', 'laboratories.id', '=', 'users.laboratory_id')
                 ->where('users.id', '=', $request->id)
                 ->get();
