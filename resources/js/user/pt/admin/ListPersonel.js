@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { v4 as uuidv4 } from 'uuid';
 import Pagination from "react-js-pagination";
-import { FetchLabPersonel } from '../../../components/utils/Helpers';
+import { FetchLabPersonel, exportToExcel, getAMresource} from '../../../components/utils/Helpers';
 
 
 class ListPersonel extends React.Component {
@@ -19,6 +19,7 @@ class ListPersonel extends React.Component {
             startTableData: 0,
             endeTableData: 10,
             activePage: 1,
+            allRoles: [],
         }
         this.handlePageChange = this.handlePageChange.bind(this)
     }
@@ -26,17 +27,33 @@ class ListPersonel extends React.Component {
     componentDidMount() {
 
         (async () => {
-            let response = await FetchLabPersonel();
-            this.setState({
-                data: response
-            });
-            console.log(response);
+            let returnedData = await getAMresource('roles');
+            if (returnedData.status === 200) {
+                this.setState({
+                    allRoles: returnedData.data,
+                });
+            } else {
+                this.setState({
+                    allRoles: [],
+                    message: returnedData.statusText || returnedData.message || 'An error occured while fetching roles'
+                });
+            }
         })();
+        setTimeout(() => {
+            (async () => {
+                let response = await FetchLabPersonel();
+                this.setState({
+                    data: response
+                });
+            })();
+        }, 200);
+
 
     }
 
+    
+
     handlePageChange(pageNumber) {
-        console.log(`active page is ${pageNumber}`);
         let pgNumber = pageNumber * 10 + 1;
         this.setState({
             startTableData: pgNumber - 11,
@@ -68,12 +85,22 @@ class ListPersonel extends React.Component {
         if (this.state.data.length > 0) {
 
             this.state.data.map((element, index) => {
-                console.log(element);
                 tableElem.push(<tr key={index}>
                     <th scope="row">{index + 1}</th>
                     <td>{element.lab_name}</td>
                     <td>{element.name} {element.second_name}</td>
                     <td>{element.phone_number}</td>
+                    <td style={{textAlign: 'left'}}><small><ul style={{listStyleType:'disc', margin:'0', padding: '0 12px'}}>{
+                    (element.roles && element.roles.length>0 && this.state.allRoles.length>0) ? 
+                    Array.from(this.state.allRoles, r=>{
+                        if (JSON.parse(element.roles).includes(r.id)) {
+                            return r.name
+                        }
+                    }).map(x=>{
+                        if(x && x.length>0){
+                            return <li key={x}>{x}</li>
+                        }
+                    }) : null}</ul></small></td>
                     <td>{element.email}</td>
                     <td>{element.is_active ? 'Active' : 'Inactive'}</td>
 
@@ -87,9 +114,9 @@ class ListPersonel extends React.Component {
                                         window.location.assign('edit-personel/' + element.id)
                                     }
                                 }
-                                style={{ 'marginRight': '5px' }}
-                                className="d-none d-sm-inline-block btn btn-xs btn-info shadow-sm text-white">
-                                <i className="fas fa-user-edit"></i> Edit
+                                style={{ 'marginRight': '5px', display:'flex', alignItems: 'center' }}
+                                className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm text-white">
+                                <i className="fas fa-edit"></i> Edit
                             </a>
                             {/* <a
                                 onClick={() => {
@@ -123,24 +150,44 @@ class ListPersonel extends React.Component {
                 <a style={{ "color": "white" }} type="button" href="add-personel" className="btn btn-info float-right">Add Lab Personel</a>
             </div>
             <div className='col-sm-12 col-md-12'>
-                <div className="form-group mb-2">
-                    <input type="text"
-                        onChange={(event) => {
-                            let searchTerm = event.target.value.trim().toLowerCase() || '';
-                            console.log(this.state.allTableElements);
-                            
-                            
-                            let currElementsTableEl = this.state.allTableElements.filter(elemnt =>
-                                {
-                                    return elemnt['props']['children'][1]['props']['children'].toString().toLowerCase().trim().includes(searchTerm) ||
-                                    elemnt['props']['children'][2]['props']['children'].join(' ').toLowerCase().trim().includes(searchTerm) ||
-                                    elemnt['props']['children'][3]['props']['children'].toLowerCase().trim().includes(searchTerm) ||
-                                    elemnt['props']['children'][4]['props']['children'].toLowerCase().trim().includes(searchTerm)
+                <div className='row'>
+                    <div className="col-md-10 form-group mb-2">
+                        <input type="text"
+                            style={{ maxWidth: '300px' }}
+                            onChange={(event) => {
+                                let currElementsTableEl = this.state.allTableElements.filter(elemnt =>
+                                    elemnt['props']['children'][1]['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
+                                    elemnt['props']['children'][2]['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
+                                    elemnt['props']['children'][3]['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
+                                    elemnt['props']['children'][4]['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
+                                    elemnt['props']['children'][5]['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase())
+                                );
+                                this.updatedSearchItem(currElementsTableEl);
+                            }}
+                            className="form-control" placeholder="Search"></input>
+                    </div>
+                    <div className='col-md-2 text-right'>
+                        <button type="button" className="btn btn-success btn-sm mx-1" onClick={() => {
+                            if (this.state.data && this.state.data.length > 0) {
+                                let final_data = this.state.data.map(element => {
+                                    return {
+                                        'Lab/Facility': element.lab_name,
+                                        'Personnel name': element.name,
+                                        'Phone number (mobile)': element.phone_number,
+                                        'Email': element.email,
+                                        'Status': element.is_active ? 'Active' : 'Inactive'
+                                    }
+                                })
+                                exportToExcel(final_data, 'Users');
+                            } else {
+                                console.error('No data to export');
+                                alert('No data to export')
                             }
-                            );
-                            this.updatedSearchItem(currElementsTableEl);
-                        }}
-                        className="form-control" placeholder="search personel"></input>
+                        }}>
+                            <i className='fa fa-download'></i>&nbsp;
+                            Excel/CSV
+                        </button>
+                    </div>
                 </div>
 
                 <table className="table table-striped table-sm  table-hover">
@@ -150,6 +197,7 @@ class ListPersonel extends React.Component {
                             <th scope="col">Laboratory Name</th>
                             <th scope="col">Personel Name</th>
                             <th scope="col">Cell/Mobile</th>
+                            <th scope="col">Roles</th>
                             <th scope="col">Primary Email</th>
                             <th scope="col">Status</th>
                             <th scope="col">Action</th>
