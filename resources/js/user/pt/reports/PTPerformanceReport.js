@@ -133,7 +133,7 @@ class PTPerformanceReport extends React.Component {
                         </tr>
                         <tr>
                             <th style={{border: '0px solid transparent', padding: '0px', textTransform: 'capitalize'}}>Visual result:</th>
-                            <td style={{border: '0px solid transparent', padding: '0px', textTransform: 'uppercase'}}>{data.control_line == 1 ? "Control" : data.verification_line == 1 ? "Verification" : data.longterm_line == 1 ? "Long-term" : "No result"}</td>
+                            <td style={{border: '0px solid transparent', padding: '0px', textTransform: 'uppercase'}}>{data.control_line == 1 ? "Control line" : data.verification_line == 1 ? "Verification line" : data.longterm_line == 1 ? "Long-term line" : "No result"}</td>
                         </tr>
                         </tbody>
                     </table>

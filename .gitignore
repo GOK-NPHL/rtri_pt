@@ -40,3 +40,4 @@ storage/submissions/*
 .editorconfig
 .styleci.yml
 public/js/app.js
+public/app.js

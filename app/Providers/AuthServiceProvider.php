@@ -47,6 +47,14 @@ class AuthServiceProvider extends ServiceProvider
             }
         });
 
+        // lab manager
+        // Gate::define(SystemAuthorities::$authorities['lab_manager'], function ($user) {
+        //     $curUser = Auth::user();
+        //     // check if user has lab manager role
+        //     $labManagerRole = $curUser->getRoles()->where('name', 'lab_manager')->first();
+
+        // });
+
         Gate::define(SystemAuthorities::$authorities['view_log_book_report'], function ($user) {
             return $this->runAthurizationQuery(SystemAuthorities::$authorities['view_log_book_report']);
         });

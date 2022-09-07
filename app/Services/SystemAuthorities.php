@@ -30,4 +30,11 @@ class SystemAuthorities
         'upload_new_orgunit_structure'=>'upload_new_orgunit_structure'
 
     ];
+
+    public static $roles = [
+        'super_admin' => 'super_admin',
+        'admin' => 'admin',
+        'lab_manager' => 'lab_manager',
+        'participant' => 'participant',
+    ];
 }

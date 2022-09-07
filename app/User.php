@@ -51,4 +51,20 @@ class User extends Authenticatable
     {
         return $this->belongsTo('Laboratory');
     }
+
+    public function roles()
+    {
+        return $this->belongsToMany('App\Role','user_role');
+    }
+
+    public function groups()
+    {
+        return $this->belongsToMany('App\Group','user_group');
+    }
+
+    // get roles
+    // public function getRoles()
+    // {
+    //     return $this->roles;
+    // }
 }

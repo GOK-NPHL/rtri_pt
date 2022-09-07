@@ -169,7 +169,7 @@ use Illuminate\Support\Facades\Gate;
                 text-align: center;
             }
         </style>
-        <footer class="m-footer pl-3 pr-3">
+        <footer class="m-footer pl-3 pr-3" style="background-color: white;">
             <strong>Copyright &copy; 2014- <script>
                     document.write(new Date().getFullYear());
                 </script> <a href="https://nphl.go.ke/">NPHL KNEQAS -QC/PT</a>.</strong>
