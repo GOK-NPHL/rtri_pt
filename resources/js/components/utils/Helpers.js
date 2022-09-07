@@ -346,6 +346,160 @@ export async function SaveLabPersonel(personel) {
     }
 }
 
+export async function getAMresource(resource, id) {
+    try {
+        let url = `${settings.serverBaseApi}/access-management/${resource}`
+        if(id && id !== '') {
+            url += `/${id}`
+        }
+        let response = await axios(url);
+        return response;
+    } catch (err) {
+        console.log(err);
+        return err.response
+    }
+}
+
+export async function saveAMresource(payload, resource) {
+    try {
+        const response = await axios({
+            method: 'post',
+            url: `${settings.serverBaseApi}/access-management/${resource}`,
+            data: {
+                ...payload
+            }
+        });
+        return response;
+    } catch (err) {
+        console.log(err);
+        return err.response
+    }
+}
+
+export async function updateAMresource(payload, resource, id) {
+    try {
+        const response = await axios({
+            method: 'put',
+            url: `${settings.serverBaseApi}/access-management/${resource}/` + id,
+            data: {
+                ...payload
+            }
+        });
+        return response;
+    } catch (err) {
+        console.log(err);
+        return err.response
+    }
+}
+export async function deleteAMresource(payload, resource, id) {
+    try {
+        const response = await axios({
+            method: 'delete',
+            url: `${settings.serverBaseApi}/access-management/${resource}/` + id,
+            data: {
+                ...payload
+            }
+        });
+        return response;
+    } catch (err) {
+        console.log(err);
+        return err.response
+    }
+}
+
+export async function FetchAuthorities() {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/authorities`);
+        const authoritiesList = response.data;
+        return authoritiesList;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+
+}
+
+export async function FetchUserAuthorities() {
+
+    try {
+        let response = await axios.get(`${settings.serverBaseApi}/user_authorities`);
+        // let response = await axios.get(`${settings.serverBaseApi}/access-management/permissions`);
+        return response.data;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+
+}
+
+
+export async function FetchRoles() {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/roles`);
+        const rolesList = response.data;
+        return rolesList;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+
+}
+
+export async function SaveRole(roleName, authoritiesSelected) {
+    try {
+        const response = await axios({
+            method: 'post',
+            url: `${settings.serverBaseApi}/save_role`,
+            data: {
+                name: roleName,
+                authoritiesSelected: authoritiesSelected
+            }
+        });
+        console.log("saved role");
+    } catch (err) {
+        // Handle Error Here
+        console.log(err);
+        return err.response
+    }
+}
+
+export async function DeleteRole(roleId) {
+    let response = '';
+    try {
+        response = await axios({
+            method: 'post',
+            url: `${settings.serverBaseApi}/delete_role`,
+            data: {
+                role_id: roleId,
+            }
+
+        });
+        return response;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+}
+
+
+export async function UpdateRole(role_id, roleName, authoritiesSelected) {
+    try {
+        const response = await axios({
+            method: 'post',
+            url: `${settings.serverBaseApi}/update_role`,
+            data: {
+                role_id: role_id,
+                name: roleName,
+                authoritiesSelected: authoritiesSelected
+            }
+        });
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+}
 
 export async function UpdateLabPersonel(personel) {
     try {
@@ -579,6 +733,166 @@ export async function FetchuserId(id) {
     }
 }
 
+export async function Saveuser(first_name, last_name, email, password, orgunits, role) {
+
+    try {
+        let orgsId = [];
+        for (const [key, value] of Object.entries(orgunits)) {
+            orgsId.push(key);
+        }
+
+        const response = await axios({
+            method: 'put',
+            url: `${settings.serverBaseApi}/save_user`,
+            data: {
+                name: first_name,
+                last_name: last_name,
+                email: email,
+                password: password,
+                orgunits: orgsId,
+                role: role
+            }
+        });
+        return response;
+    } catch (err) {
+        // Handle Error Here
+        console.log(err);
+        return err.response
+    }
+}
+
+
+export async function FetchUsers() {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/users`);
+        const userList = response.data;
+        return userList;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+
+}
+
+export async function FetchUserProfile() {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_user_profile`);
+        const userProfile = response.data;
+        return userProfile;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+
+}
+
+export async function updateUserProfile(first_name, last_name, email, password) {
+    try {
+        const response = await axios({
+            method: 'post',
+            url: `${settings.serverBaseApi}/update_user_profile`,
+            data: {
+                name: first_name,
+                last_name: last_name,
+                email: email,
+                password: password
+            }
+        });
+        return response;
+    } catch (err) {
+        return err.response
+    }
+}
+
+export async function DeleteUser(user) {
+    try {
+        const response = await axios({
+            method: 'delete',
+            url: `${settings.serverBaseApi}/delete_user`,
+            data: {
+                user: user,
+            }
+        });
+        return response;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+}
+
+export async function FetchOrgunits() {
+    let cacheOrgUnit = localStorage.getItem("orgunitList");
+    if (cacheOrgUnit == null || JSON.parse(cacheOrgUnit).payload[0].length == 0) {
+        let response;
+        try {
+            response = await axios.get(`${settings.serverBaseApi}/org_units`);
+            const orgunitList = response.data;
+            localStorage.setItem("orgunitList", JSON.stringify(orgunitList));
+            return orgunitList;
+        } catch (err) {
+            console.error(err);
+            return response;
+        }
+    } else {
+        return JSON.parse(cacheOrgUnit);
+    }
+}
+
+export async function AddSubOrg(org, name) {
+
+    let response;
+    try {
+        response = await axios({
+            method: 'put',
+            url: `${settings.serverBaseApi}/add_sub_org`,
+            data: {
+                parent_org: org,
+                child_org: name
+            }
+        });
+        console.log(response);
+        return response;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+}
+
+export function DevelopOrgStructure(orunitData) {
+    let cacheOrgUnit = localStorage.getItem("orgunitTableStruc");
+    if (cacheOrgUnit == null) {
+        let tableOrgs = [];
+        let processedItems = [];
+        orunitData.payload[0].map((orgUnitToAdd) => {
+            OrgUnitStructureMaker(tableOrgs, orgUnitToAdd, processedItems);
+            if (!processedItems.includes(orgUnitToAdd.org_unit_id)) {
+                let orgUnit = {
+                    id: orgUnitToAdd.org_unit_id,
+                    name: orgUnitToAdd.odk_unit_name,
+                    level: orgUnitToAdd.level,
+                    parentId: orgUnitToAdd.parent_id,
+                    updatedAt: orgUnitToAdd.updated_at,
+                    children: [
+                    ]
+                };
+                tableOrgs.push(orgUnit);
+                processedItems.push(orgUnitToAdd.org_unit_id)
+            }
+        });
+
+        try {
+            localStorage.setItem("orgunitTableStruc", JSON.stringify(tableOrgs));
+        } catch (err) {
+
+        }
+        return tableOrgs;
+    } else {
+        return JSON.parse(cacheOrgUnit);
+    }
+
+}
 export async function FetchuserParams(id) {
 
     try {

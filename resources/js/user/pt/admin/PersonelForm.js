@@ -1,8 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { SaveLabPersonel, FetchParticipantList, FetchLabPersonelById, UpdateLabPersonel } from '../../../components/utils/Helpers';
+import LineGraph from '../../../components/utils/charts/LineGraph';
+import RTCard from '../../../components/utils/RTCard';
+import StackedHorizontal from '../../../components/utils/charts/StackedHorizontal'
+import { SaveLabPersonel, FetchParticipantList, FetchLabPersonelById, UpdateLabPersonel, getAMresource } from '../../../components/utils/Helpers';
 import { v4 as uuidv4 } from 'uuid';
 import { matchPath } from "react-router";
+import MultiSelect from "@kenshooui/react-multi-select";
+import "@kenshooui/react-multi-select/dist/style.css"
 
 class PersonelForm extends React.Component {
 
@@ -24,7 +29,9 @@ class PersonelForm extends React.Component {
             hasPtAccess: true,
             isActive: 1,
             participantList: [],
-            pageState: 'add'
+            pageState: 'add',
+            allRoles: [],
+            userRoles: [],
         }
 
         this.handleEmailChange = this.handleEmailChange.bind(this);
@@ -53,6 +60,19 @@ class PersonelForm extends React.Component {
                 participantList: participantList
             });
 
+        })();
+        (async () => {
+            let returnedData = await getAMresource('roles');
+            if (returnedData.status === 200) {
+                this.setState({
+                    allRoles: returnedData.data,
+                });
+            } else {
+                this.setState({
+                    allRoles: [],
+                    message: returnedData.statusText || returnedData.message || 'An error occured while fetching roles'
+                });
+            }
         })();
 
         if (pathObject) {
@@ -84,11 +104,8 @@ class PersonelForm extends React.Component {
                         hasPtAccess: editData.has_pt_access == 1 ? true : false,
                         isActive: editData.is_active,
                         pageState: 'edit',
+                        userRoles: JSON.parse(editData.roles) || []
                     });
-
-                    setTimeout(() => {
-                        document.querySelector('#u_facility').value = editData.laboratory_id;
-                    }, 4000);
                 }
             })();
         }
@@ -181,7 +198,7 @@ class PersonelForm extends React.Component {
         if (!this.validatePassword(this.state.password) && this.state.pageState == 'edit' && (this.state.password)) {
             return;
         }
-      
+
         if (
             this.state.facility == '' ||
             this.state.email == '' ||
@@ -210,6 +227,7 @@ class PersonelForm extends React.Component {
                 personel['has_qc_access'] = this.state.hasQcAccess ? 1 : 0;
                 personel['has_pt_access'] = this.state.hasPtAccess ? 1 : 0;
                 personel['is_active'] = this.state.isActive;
+                personel['roles'] = this.state.userRoles;
 
                 let response;
 
@@ -224,13 +242,13 @@ class PersonelForm extends React.Component {
                         this.setState({
                             message: response.data.Message,
                             email: '',
-                            facility: '',
                             firstName: '',
                             secondName: '',
                             phoneNumber: '',
                             password: '',
                             hasQcAccess: true,
                             hasPtAccess: true,
+                            userRoles: [],
                         });
                     } else {
                         this.setState({
@@ -289,7 +307,7 @@ class PersonelForm extends React.Component {
 
                 <div className="card" style={{ "backgroundColor": "#ecf0f1" }}>
                     <div className="card-body">
-                        <h5 className="card-title">Add New Lab Personel</h5><br />
+                        <h5 className="card-title">Add New Lab Personel.</h5><br />
                         <hr />
                         <div>
                             <form action="#" >
@@ -306,7 +324,7 @@ class PersonelForm extends React.Component {
 
                                     {/* add */}
                                     <div className="col-md-6 mb-3">
-                                        <label htmlFor="u_facility" >Laboratory *</label>
+                                        <label htmlFor="u_facility" >Laboratory  *</label>
 
                                         {labSelect}
                                     </div>
@@ -359,14 +377,13 @@ class PersonelForm extends React.Component {
                                             }}
                                             onChange={(event) => this.handlePasswordChange(event.target.value)}
                                             type="email" className="form-control" id="u_password" />
-                                            {this.state.pageState == 'edit' ?
+                                        {this.state.pageState == 'edit' ?
                                             <small style={{ "color": "red" }} className="form-text">Leave blank to retain previous password.</small> :
                                             ''}
                                     </div>
                                 </div>
 
                                 <div className="form-row">
-
                                     <div className="col-md-6 mb-3">
                                         <label htmlFor="u_active" >Active</label>
                                         <select
@@ -378,24 +395,20 @@ class PersonelForm extends React.Component {
                                             <option value={0}>False</option>
                                         </select>
                                     </div>
-
-
-
-                                </div>
-
-                                <div className="form-row">
-
                                     <div className="col-md-6 mb-3">
-
+                                        <label className="ml-3" htmlFor="u_qc_access" >Has QC Access:</label><br/>
                                         <input
                                             checked={this.state.hasQcAccess}
                                             onChange={(event) => this.handleIsQcActiveChange(event.target.checked)}
                                             type="checkbox"
-                                            id="u_qc_access" />
-                                        <label className="ml-3" htmlFor="u_qc_access" >Has PT Access</label>
-
+                                            id="u_qc_access" 
+                                        />
+                                        &nbsp;
+                                        <label>Yes</label>
                                     </div>
+                                </div>
 
+                                <div className="form-row">
                                     {/* <div className="col-md-6 mb-3">
                                         <input
                                             checked={this.state.hasPtAccess}
@@ -404,6 +417,32 @@ class PersonelForm extends React.Component {
                                             id="u_pt_access" />
                                         <label className="ml-3" htmlFor="u_pt_access" > Has PT Access</label>
                                     </div> */}
+                                </div>
+
+                                <div className="col-md-12 mb-3">
+                                    <label htmlFor="u_is_active" >User roles</label>
+                                    {(this.state.allRoles && this.state.allRoles.length > 0) && <>
+                                        <MultiSelect
+                                            items={Array.from(this.state.allRoles.filter(r => { return r.is_active == 1 || r.is_active == true }), (ap, ax) => {
+                                                return {
+                                                    id: ap.id,
+                                                    label: ap.name
+                                                }
+                                            })}
+                                            selectedItems={Array.from(this.state.userRoles, sp => {
+                                                return {
+                                                    id: sp,
+                                                    label: this.state.allRoles.find(p => p.id == sp).name
+                                                }
+                                            })}
+                                            onChange={w => this.setState({
+                                                userRoles: Array.from(w, item => item.id)
+                                            })}
+                                        // onChange={this.handleRolesChange}
+                                        />
+                                        {/* <pre>All: {JSON.stringify(this.state.allRoles)}</pre> */}
+                                        <pre>Picked: {JSON.stringify(this.state.userRoles)}</pre>
+                                    </>}
                                 </div>
 
                                 <div className="form-group row">

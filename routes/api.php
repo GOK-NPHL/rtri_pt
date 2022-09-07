@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\AuthAccessController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\PT\PTReadinessController;
 use App\Http\Controllers\PT\PTShipmentController;
@@ -95,3 +96,48 @@ Route::get('resources/files_private',['as'=>'resources.files_private', 'uses'=>'
 Route::delete('resources/files/{id}',['as'=>'resources.delete', 'uses'=>'ResourceFilesController@destroy']);
 Route::get('resources/files/download/{id}',['as'=>'resources.download', 'uses'=>'ResourceFilesController@download']);
 Route::post('resources/files',['as'=>'resources.store', 'uses'=>'ResourceFilesController@store']);
+
+
+////RBAC
+Route::prefix('/access-management')->group(function (){
+    Route::get('/permissions', [AuthAccessController::class, 'getPermissions']);
+    Route::get('/user-permissions', [AuthAccessController::class, 'getUserPermissions']);
+    Route::get('/permission/{id}', [AuthAccessController::class, 'getPermission']);
+    Route::get('/permission', [AuthAccessController::class, 'getPermission']);
+    Route::post('/permission', [AuthAccessController::class, 'createPermission']);
+    Route::post('/permissions', [AuthAccessController::class, 'createPermission']);
+    Route::put('/permission/{id}', [AuthAccessController::class, 'updatePermission']);
+    Route::delete('/permission/{id}', [AuthAccessController::class, 'deletePermission']);
+
+    Route::get('/roles', [AuthAccessController::class, 'getRoles']);
+    Route::get('/user-roles', [AuthAccessController::class, 'getUserRoles']);
+    Route::get('/user-with-role', [AuthAccessController::class, 'getAllUsersWithRole']);
+    Route::get('/role/{id}', [AuthAccessController::class, 'getRole']);
+    Route::get('/role', [AuthAccessController::class, 'getRole']);
+    Route::post('/role', [AuthAccessController::class, 'createRole']);
+    Route::post('/roles', [AuthAccessController::class, 'createRole']);
+    Route::put('/role/{id}', [AuthAccessController::class, 'updateRole']);
+    Route::delete('/role/{id}', [AuthAccessController::class, 'deleteRole']);
+
+    Route::get('/groups', [AuthAccessController::class, 'getGroups']);
+    Route::get('/user-groups', [AuthAccessController::class, 'getUserGroups']);
+    Route::get('/group/{id}', [AuthAccessController::class, 'getGroup']);
+    Route::get('/group', [AuthAccessController::class, 'getGroup']);
+    Route::post('/group', [AuthAccessController::class, 'createGroup']);
+    Route::post('/groups', [AuthAccessController::class, 'createGroup']);
+    Route::put('/group/{id}', [AuthAccessController::class, 'updateGroup']);
+    Route::delete('/group/{id}', [AuthAccessController::class, 'deleteGroup']);
+
+    //users
+    Route::get('/users', [AuthAccessController::class, 'getUsers']);
+    Route::get('/user/me', [AuthAccessController::class, 'getCurrentUserParams']);
+    Route::get('users-by-role', [AuthAccessController::class, 'getUsersByRole']);
+    Route::get('/user/{id}', [AuthAccessController::class, 'getUser']);
+    Route::get('/user', [AuthAccessController::class, 'getUser']);
+    Route::post('/user', [AuthAccessController::class, 'createUser']);
+    Route::post('/users', [AuthAccessController::class, 'createUser']);
+    Route::put('/user/{id}', [AuthAccessController::class, 'updateUser']);
+    Route::delete('/user/{id}', [AuthAccessController::class, 'deleteUser']);
+
+});
+//////

@@ -59,7 +59,7 @@ use Illuminate\Support\Facades\Gate;
 
         <!-- Navbar -->
         <div style="background-color: #2c3e50;" class="container-fluid">
-            <div class="container">
+            <div class="container-fluid">
                 <nav style="background-color: #2c3e50 !important;" class="navbar navbar-expand-md navbar-light bg-light">
                     <a class="navbar-brand" href="{{route('admin-home')}}">KNEQAS PT</a>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,6 +81,19 @@ use Illuminate\Support\Facades\Gate;
                                     <a class="dropdown-item" href="{{route('list-personel')}}">PT Lab Personel</a>
                                 </div>
                             </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Access Management
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="{{route('manage-permissions')}}">Permissions</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="{{route('manage-roles')}}">Access Roles</a>
+                                    {{--<div class="dropdown-divider"></div>
+        <a class="dropdown-item" href="{{route('manage-groups')}}">User groups</a>--}}
+                                </div>
+                            </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Laboratories
@@ -98,95 +111,95 @@ use Illuminate\Support\Facades\Gate;
                                     <a class="dropdown-item" href="{{route('pt-shipment')}}">PT Shipment</a>
                                 </div>
                             </li>
-                            {{--  <li class="nav-item dropdown">
+                            {{-- <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Configure
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="{{route('list-admin-user')}}">PT System Managers</a>
-                                    <a class="dropdown-item" href="{{route('list-lab')}}">PT Laboratories</a>
-                                    <a class="dropdown-item" href="{{route('list-personel')}}">PT Lab Personel</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="{{route('list-readiness')}}">Readiness Checklists</a>
-                                    <a class="dropdown-item" href="{{route('pt-shipment')}}">PT Shipment</a>
-                                </div>
-                            </li>  --}}
-
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Reports &amp; Resources
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{route('pt-shipment-report-list')}}">PT Response Reports</a>
-                                    <a class="dropdown-item" href="{{route('resourcesIndex')}}">Files / Resources</a>
-                                </div>
-                            </li>
-
-                        </ul>
-
-                        <ul class="navbar-nav ml-auto">
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Account
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" style="text-transform:capitalize;" href="{{route('edit-admin-user',['userId'=>'bad6b8cf97131fceab'])}}">{{Auth()->user()->name ?? "Account"}}</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="{{route('admin-logout')}}">Logout</a>
-                                </div>
-                            </li>
-                        </ul>
+                            <a class="dropdown-item" href="{{route('list-lab')}}">PT Laboratories</a>
+                            <a class="dropdown-item" href="{{route('list-personel')}}">PT Lab Personel</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{{route('list-readiness')}}">Readiness Checklists</a>
+                            <a class="dropdown-item" href="{{route('pt-shipment')}}">PT Shipment</a>
                     </div>
-                </nav>
+                    </li> --}}
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Reports &amp; Resources
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{route('pt-shipment-report-list')}}">PT Response Reports</a>
+                            <a class="dropdown-item" href="{{route('resourcesIndex')}}">Files / Resources</a>
+                        </div>
+                    </li>
+
+                    </ul>
+
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Account
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" style="text-transform:capitalize;" href="{{route('edit-admin-user',['userId'=>'bad6b8cf97131fceab'])}}">{{Auth()->user()->name ?? "Account"}}</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{{route('admin-logout')}}">Logout</a>
+                            </div>
+                        </li>
+                    </ul>
             </div>
+            </nav>
         </div>
-        <!-- /.navbar -->
+    </div>
+    <!-- /.navbar -->
 
 
-        <!-- Content Wrapper. Contains page content -->
-        <div style="background-color: white;" class="">
-            <!-- Content Header (Page header) -->
-            <div class="content-header">
-                <div class="container">
+    <!-- Content Wrapper. Contains page content -->
+    <div style="background-color: white;" class="">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container">
 
-                    <!-- Begin Page Content -->
-                    <div class="container-fluid">
-                        @yield('content')
-                    </div>
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                    @yield('content')
+                </div>
 
-                </div><!-- /.container-fluid -->
-            </div>
-
-            <!-- /.content -->
+            </div><!-- /.container-fluid -->
         </div>
-        <!-- /.content-wrapper -->
-        <style>
-            .m-footer {
-                position: fixed;
-                left: 0;
-                bottom: 0;
-                width: 100%;
-                text-align: center;
-            }
-        </style>
-        <footer class="m-footer pl-3 pr-3" style="background-color: white;">
-            <strong>Copyright &copy; 2014- <script>
-                    document.write(new Date().getFullYear());
-                </script> <a href="https://nphl.go.ke/">NPHL KNEQAS -QC/PT</a>.</strong>
-            All rights reserved. | <a href="http://helpdesk.nphl.go.ke/">Recency QC/PT HELP DESK</a>
-            <div class="float-right d-none d-sm-inline-block">
-                <b>Version</b> 1.0.0
-            </div>
-        </footer>
 
-        <!-- Control Sidebar -->
-        <aside class="control-sidebar control-sidebar-dark">
-            <!-- Control sidebar content goes here -->
-        </aside>
-        <!-- /.control-sidebar -->
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+    <style>
+        .m-footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+    <footer class="m-footer pl-3 pr-3" style="background-color: white;">
+        <strong>Copyright &copy; 2014- <script>
+                document.write(new Date().getFullYear());
+            </script> <a href="https://nphl.go.ke/">NPHL KNEQAS -QC/PT</a>.</strong>
+        All rights reserved. | <a href="http://helpdesk.nphl.go.ke/">Recency QC/PT HELP DESK</a>
+        <div class="float-right d-none d-sm-inline-block">
+            <b>Version</b> 1.0.0
+        </div>
+    </footer>
 
-        <!-- Custom scripts for all pages-->
-        <script src="{{ asset('js/adminlte.js') }}" defer></script>
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+        <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+
+    <!-- Custom scripts for all pages-->
+    <script src="{{ asset('js/adminlte.js') }}" defer></script>
     </div>
 </body>
 

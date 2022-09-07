@@ -25,31 +25,31 @@ class AuthAccessController extends Controller
 
     public function manageRoles()
     {
-        return view('user.qc.admin.manage_roles');
+        return view('user.system.admin.manage_roles');
     }
     public function newRole()
     {
-        return view('user.qc.admin.roles_form');
+        return view('user.system.admin.roles_form');
     }
     public function editRole()
     {
-        return view('user.qc.admin.roles_form');
+        return view('user.system.admin.roles_form');
     }
     public function managePermissions()
     {
-        return view('user.qc.admin.manage_permissions');
+        return view('user.system.admin.manage_permissions');
     }
     public function manageGroups()
     {
-        return view('user.qc.admin.manage_groups');
+        return view('user.system.admin.manage_groups');
     }
     public function newGroup()
     {
-        return view('user.qc.admin.groups_form');
+        return view('user.system.admin.groups_form');
     }
     public function editGroup()
     {
-        return view('user.qc.admin.groups_form');
+        return view('user.system.admin.groups_form');
     }
 
     // permissions

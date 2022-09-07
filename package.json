@@ -27,6 +27,7 @@
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.3",
+        "@kenshooui/react-multi-select": "^1.1.6",
         "bootstrap-select": "^1.13.18",
         "datatables.net": "^1.10.24",
         "datatables.net-autofill": "^2.3.9",

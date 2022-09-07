@@ -40,6 +40,15 @@ require('./user/pt/reports/ListShipmentReport');
 require('./user/pt/reports/ListShipmentResponseReport');
 require('./user/pt/reports/PTPerformanceReport');
 
+//access-control
+require('./user/settings/ManageRoles');
+require('./user/settings/RolesForm');
+require('./user/settings/ManagePermissions');
+require('./user/settings/ManageGroups');
+require('./user/settings/GroupsForm');
+
+require('./components/system/role/Roles');
+require('./components/system/users/Users');
 
 require('./user/general/Dashboard');
 //Intrface code
