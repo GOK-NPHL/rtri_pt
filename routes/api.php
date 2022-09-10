@@ -51,6 +51,7 @@ Route::post('/create_lab_personel', [ParticipantController::class, 'createLabPer
 Route::post('/edit_lab_personel', [ParticipantController::class, 'editPersonel'])->name('edit_lab_personel')->middleware('auth:admin');
 
 Route::get('/get_readiness', [PTReadinessController::class, 'getReadiness'])->name('get_readiness')->middleware('auth:admin');
+Route::get('/get_default_readiness_qns', [PTReadinessController::class, 'getDefaultReadinessQuestions'])->name('get_default_readiness_qns')->middleware('auth:admin');
 Route::get('/get_shipment_readiness', [PTReadinessController::class, 'getShipmentReadiness'])->name('get_shipment_readiness')->middleware('auth:admin');
 Route::post('/approve_readiness_answer', [PTReadinessController::class, 'approveReadinessAnswer'])->middleware('auth:admin');
 

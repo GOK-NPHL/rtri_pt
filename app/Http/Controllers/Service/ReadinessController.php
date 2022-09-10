@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Service;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\PT\PTReadinessController;
 use App\Readiness;
 use App\ReadinessAnswer;
+use App\ReadinessQuestion;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,7 +36,9 @@ class ReadinessController extends Controller
                     "readinesses.id",
                     "readinesses.start_date",
                     "readinesses.end_date",
+                    "readinesses.ask_default_qn",
                     "readinesses.name",
+                    "readinesses.ask_default_qn",
                     "pt_shipements.round_name",
                     "readinesses.admin_id",
                     "readiness_answers.readiness_id as aswered_id",
@@ -74,11 +78,13 @@ class ReadinessController extends Controller
                     "readinesses.id",
                     "readinesses.start_date",
                     "readinesses.end_date",
+                    "readinesses.ask_default_qn",
                     "readinesses.name",
                     "readinesses.admin_id",
                     "laboratories.id as lab_id",
                     "readiness_questions.id as question_id",
                     "readiness_questions.question",
+                    "readiness_questions.is_default",
                     "readiness_questions.answer_options",
                     "readiness_questions.answer_type",
                     "readiness_questions.qustion_position",
@@ -106,11 +112,11 @@ class ReadinessController extends Controller
     public function saveSurveyAnswers(Request $request)
     {
         try {
+            // if the user has answered the default question with a yes, then mark the readiness as approved
             //$request->survey['questionsAnswerMap']
             $user = Auth::user();
 
             foreach ($request->survey['questionsAnswerMap']  as $key => $value) {
-
                 $readinessAswers = ReadinessAnswer::updateOrCreate(
 
                     [
@@ -128,6 +134,27 @@ class ReadinessController extends Controller
                     ]
 
                 );
+            }
+
+
+            // get readiness and find out if it has a default question
+            $readiness = Readiness::find($request->survey['readiness_id']);
+
+            // if it has a default question, then check if the user has answered the default question with a yes or no
+            if ($readiness->ask_default_qn) {
+                $defaultQuestions = ReadinessQuestion::where('is_default', 1)->get();
+
+                $aq_ids = ReadinessAnswer::where('readiness_id', $request->survey['readiness_id'])->get()->pluck('question_id')->toArray();
+                // get question text for each question
+                $answered_qns = [];
+                foreach ($aq_ids as $qn) {
+                    $answered_qns[] = ReadinessQuestion::find($qn);
+                }
+                dd($answered_qns);
+                // loop through the default questions and check if the user has answered them
+                // foreach ($defaultQuestions as $dqn) {
+                    
+                // }
             }
 
             return response()->json(['Message' => 'Saved successfully'], 200);
@@ -166,6 +193,7 @@ class ReadinessController extends Controller
                     "readinesses.id",
                     "readinesses.start_date",
                     "readinesses.end_date",
+                    "readinesses.ask_default_qn",
                     "readinesses.name",
                     "laboratories.id as lab_id",
                     "users.name as fname",

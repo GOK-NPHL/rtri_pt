@@ -14,7 +14,8 @@ class Readiness extends Model
         "name",
         "admin_id",
         "readiness_id",
-        "answer"
+        "answer",
+        "ask_default_qn",
     ];
 
     public function getCreatedAtAttribute($value)

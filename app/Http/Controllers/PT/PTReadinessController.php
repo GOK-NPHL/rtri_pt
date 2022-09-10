@@ -39,6 +39,7 @@ class PTReadinessController extends Controller
                 'name' => $request->readiness['name'],
                 'start_date' => $request->readiness['start_date'],
                 'end_date' => $request->readiness['end_date'],
+                'ask_default_qn' => $request->readiness['ask_default_qn'] ?? 0,
                 'admin_id' => $user->id
             ]);
 
@@ -53,7 +54,7 @@ class PTReadinessController extends Controller
                     $readinessQuestion->qustion_position = $questionItem['qustion_position'];
                     $readinessQuestion->qustion_type = $questionItem['qustion_type'];
                     $readinessQuestion->is_required = $questionItem['is_required'];
-
+                    $readinessQuestion->is_default = false;
                     // $readiness->readinessQuestion()->associate($readinessQuestion);
                     $readinessQuestion->readiness()->associate($readiness);
                     $readinessQuestion->save();
@@ -68,6 +69,17 @@ class PTReadinessController extends Controller
         }
     }
 
+    // get default readiness questions
+    public function getDefaultReadinessQuestions(Request $request)
+    {
+        try {
+            $readinessQuestions = ReadinessQuestion::where('is_default', 1)->get();
+            return $readinessQuestions;
+        } catch (Exception $ex) {
+            return response()->json(['Message' => 'Could not fetch default readiness questions ' . $ex->getMessage()], 500);
+        }
+    }
+
 
     public function editReadiness(Request $request)
     {
@@ -79,6 +91,7 @@ class PTReadinessController extends Controller
             $checklist->name = $request->readiness['name'];
             $checklist->start_date = $request->readiness['start_date'];
             $checklist->end_date = $request->readiness['end_date'];
+            $checklist->ask_default_qn = $request->readiness['ask_default_qn'] ?? 0;
             $checklist->admin_id = $user->id;
             $checklist->save();
 
@@ -106,6 +119,7 @@ class PTReadinessController extends Controller
                     $readinessQuestion->qustion_position = $questionItem['qustion_position'];
                     $readinessQuestion->qustion_type = $questionItem['qustion_type'];
                     $readinessQuestion->is_required = $questionItem['is_required'];
+                    $readinessQuestion->is_default = false;
 
                     $readinessQuestion->readiness()->associate($checklist);
 
@@ -130,6 +144,7 @@ class PTReadinessController extends Controller
                 "readinesses.id",
                 "readinesses.name",
                 "readinesses.updated_at as last_update",
+                "readinesses.ask_default_qn",
                 "admins.name as created_by",
                 DB::raw('count(*) as participant_count')
             )->join('admins', 'admins.id', '=', 'readinesses.admin_id')
@@ -154,6 +169,7 @@ class PTReadinessController extends Controller
                     "readinesses.id",
                     "readinesses.name",
                     "readinesses.updated_at as last_update",
+                    "readinesses.ask_default_qn",
                     "admins.name as created_by",
                 )->join('admins', 'admins.id', '=', 'readinesses.admin_id')
                     ->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'readinesses.id')
@@ -165,6 +181,7 @@ class PTReadinessController extends Controller
                     "readinesses.id",
                     "readinesses.name",
                     "readinesses.updated_at as last_update",
+                    "readinesses.ask_default_qn",
                     "admins.name as created_by",
                 )->join('admins', 'admins.id', '=', 'readinesses.admin_id')
                     ->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'readinesses.id')
@@ -189,7 +206,7 @@ class PTReadinessController extends Controller
         try {
 
             $readinessQuestions = DB::table('readiness_questions')
-                ->select('readiness_questions.id', 'question', 'answer_options', 'answer_type', 'qustion_position', 'qustion_type', 'is_required')
+                ->select('readiness_questions.id', 'question', 'answer_options', 'answer_type', 'qustion_position', 'qustion_type', 'is_required', 'is_default')
                 ->join('readinesses', 'readiness_questions.readiness_id', '=', 'readinesses.id')
                 ->where('readinesses.id', $request->id)
                 ->get();
@@ -212,6 +229,7 @@ class PTReadinessController extends Controller
                 "readinesses.name",
                 "readinesses.start_date",
                 "readinesses.end_date",
+                "readinesses.ask_default_qn",
             )
                 ->where('readinesses.id', $request->id)
                 ->get();

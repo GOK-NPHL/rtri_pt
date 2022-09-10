@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { FetchReadinessById, FetchParticipantList, SaveReadiness, UpdateReadiness } from '../../../components/utils/Helpers';
+import { FetchReadinessById, FetchParticipantList, SaveReadiness, UpdateReadiness, FetchDefaultReadinessQn } from '../../../components/utils/Helpers';
 import { v4 as uuidv4 } from 'uuid';
 import DualListBox from 'react-dual-listbox';
 import AddReadinessQuestion from './AddReadinessQuestion';
@@ -18,6 +18,7 @@ class ReadinessForm extends React.Component {
             startDate: '',
             endDate: '',
             selected: [],
+            askDefaultQuestion: 0,
             dualListptions: [],
             readinessQuestions: [],
             readinessItems: [],
@@ -26,6 +27,8 @@ class ReadinessForm extends React.Component {
         }
 
         this.handleNameChange = this.handleNameChange.bind(this);
+        this.removeQn = this.removeQn.bind(this);
+        this.handleDefaultQnChange = this.handleDefaultQnChange.bind(this);
         this.handleEndDateChange = this.handleEndDateChange.bind(this);
         this.handleStartDateChange = this.handleStartDateChange.bind(this);
         this.authoritiesOnChange = this.authoritiesOnChange.bind(this);
@@ -62,6 +65,7 @@ class ReadinessForm extends React.Component {
                         id: editData.payload.readiness[0].id,
                         dualListptions: partsList,
                         name: editData.payload.readiness[0].name,
+                        askDefaultQn: editData.payload.readiness[0].ask_default_qn,
                         startDate: editData.payload.readiness[0].start_date,
                         endDate: editData.payload.readiness[0].end_date,
                         selected: editData.payload.labs,
@@ -109,6 +113,43 @@ class ReadinessForm extends React.Component {
         });
     }
 
+    handleDefaultQnChange(checked) {
+        console.log('handleDefaultQnChange: ', checked);
+        try {
+            if (checked && (this.state.readinessQuestions.length == 0 || this.state.readinessQuestions.indexOf(q => q.is_default == true) == -1)) {
+                let defaultQns = FetchDefaultReadinessQn();
+                defaultQns.then((data) => {
+                    data.map((questionItem) => {
+                        this.addReadinessQuestion({
+                            is_default: true,
+                            ...questionItem
+                        });
+                    });
+                });
+                this.setState({
+                    askDefaultQuestion: 1
+                });
+            } else {
+                // remove default questions
+                let newReadinessQuestions = this.state.readinessQuestions.filter((question) => {
+                    // return (question?.is_default != 1);
+                    return (question?.props['data-default'] == undefined || question?.props['data-default'] != 1);
+                });
+                let newReadinessItems = this.state.readinessItems.filter((questionItem) => {
+                    return (questionItem?.is_default != 1);
+                });
+                console.log('newReadinessQuestions: ', newReadinessQuestions);
+                this.setState({
+                    readinessQuestions: newReadinessQuestions,
+                    readinessItems: newReadinessItems,
+                    askDefaultQuestion: 0
+                });
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     handleEndDateChange(endDate) {
         try {
             if (this.state.startDate != null && this.state.startDate.length != 0) {
@@ -132,6 +173,32 @@ class ReadinessForm extends React.Component {
         });
     }
 
+    removeQn(itemIndex) {
+        let readinessItems = this.state.readinessItems;
+        let questions = this.state.readinessQuestions;
+
+        if (this.state.pageState == 'edit') { //for edit mark as one to be deleted from controller and database
+            let qItem = readinessItems[itemIndex];
+            qItem['delete_status'] = 1;
+            readinessItems[itemIndex] = qItem;
+        } else {
+            // readinessItems[itemIndex] = null;
+            readinessItems = readinessItems.filter((item, index) => {
+                return index != itemIndex;
+            });
+        }
+
+        // questions[itemIndex] = null;
+        questions = questions.filter((item, index) => {
+            return index != itemIndex;
+        });
+
+        this.setState({
+            readinessQuestions: questions,
+            readinessItems: readinessItems
+        })
+    }
+
     authoritiesOnChange(selected) {
         this.setState({ selected: selected });
     }
@@ -148,43 +215,27 @@ class ReadinessForm extends React.Component {
                 let id = uuidv4();
                 let qstOptins = readiness['answer_options'].split(',');
                 let qstElement =
-                    <div key={id} className="card">
-                    <div className="card-body">
-                    <div className="form-group text-left">
-                        <a href="#" onClick={
-                            (event) => {
-                                event.preventDefault();
-                                let readinessItems = this.state.readinessItems;
-                                let questions = this.state.readinessQuestions;
-
-                                if (this.state.pageState == 'edit') { //for edit mark as one to be deleted from controller and database
-                                    let qItem = readinessItems[itemIndex];
-                                    qItem['delete_status'] = 1;
-                                    readinessItems[itemIndex] = qItem;
-                                } else {
-                                    readinessItems[itemIndex] = null;
+                    <div key={id} data-default={readiness?.is_default ? "1": null} className="card">
+                        <div className="card-body">
+                            <div className="form-group text-left">
+                                {!readiness.is_default && <a href="#" onClick={
+                                    (event) => {
+                                        event.preventDefault();
+                                        this.removeQn(itemIndex);
+                                    }
                                 }
-
-                                questions[itemIndex] = null;
-
-                                this.setState({
-                                    readinessQuestions: questions,
-                                    readinessItems: readinessItems
-                                })
-                            }
-                        }
-                            className="float-right" style={{ padding: '2px', fontSize: '22px', lineHeight: 0, color: 'red', fontWeight: 'bold' }}>
-                            &times;
-                        </a>
-                        <label className="float-left text-left" style={{ fontSize: '18px' }} htmlFor={id + "qst_answer"}>{readiness['question']}  <span style={{ color: 'red' }}>{(readiness['is_required'] && parseInt(readiness['is_required']) == 1) ? "*" : ""}</span></label>
-                        <select
-                            className="custom-select" id={id + "qst_answer"}>
-                            {qstOptins.map((option) => {
-                                return <option key={uuidv4()} value={option}>{option}</option>
-                            })}
-                        </select>
-                    </div>
-                    </div>
+                                    className="float-right" style={{ padding: '2px', fontSize: '22px', lineHeight: 0, color: 'red', fontWeight: 'bold' }}>
+                                    &times;
+                                </a>}
+                                <label className="float-left text-left" style={{ fontSize: '18px' }} htmlFor={id + "qst_answer"}>{readiness['question']}  <span style={{ color: 'red' }}>{(readiness['is_required'] && parseInt(readiness['is_required']) == 1) ? "*" : ""}</span></label>
+                                <select
+                                    className="custom-select" id={id + "qst_answer"}>
+                                    {qstOptins.map((option) => {
+                                        return <option key={uuidv4()} value={option}>{option}</option>
+                                    })}
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 let questions = this.state.readinessQuestions;
                 questions.push(qstElement);
@@ -195,7 +246,7 @@ class ReadinessForm extends React.Component {
             } else if (readiness['answer_type'] == 'number') {
                 let id = uuidv4();
                 let qstElement =
-                    <div key={id} className="card">
+                    <div key={id} data-default={readiness?.is_default ? "1": null} className="card">
                         <div className="card-body">
                             <div className="form-group">
                                 <a href="#" onClick={
@@ -236,7 +287,7 @@ class ReadinessForm extends React.Component {
         } else if (readiness['qustion_type'] == 'comment') {
             let id = uuidv4();
             let qstElement =
-                <div className="form-group">
+                <div className="form-group" data-default={readiness?.is_default ? "1": null}>
                     <a href="#" onClick={
                         (event) => {
                             event.preventDefault();
@@ -287,7 +338,7 @@ class ReadinessForm extends React.Component {
 
         ) {
             this.setState({
-                message: "Kindly fill all fileds marked * in the form",
+                message: "Kindly fill all fields marked * in the form",
                 submitting: false
             })
             $('#addAdminUserModal').modal('toggle');
@@ -301,6 +352,7 @@ class ReadinessForm extends React.Component {
                 readiness['end_date'] = this.state.endDate;
                 readiness['participants'] = this.state.selected;
                 readiness['readiness_questions'] = this.state.readinessItems;
+                readiness['ask_default_qn'] = this.state.askDefaultQuestion || 0;
 
                 let response;
                 if (this.state.pageState == 'edit') {
@@ -359,6 +411,21 @@ class ReadinessForm extends React.Component {
                         <h5 className="card-title">
                             {this.state.pageState == 'edit' ? 'Update Readiness Checklist' : 'Add Readiness Checklist'}
                         </h5><br />
+                        <span>askDefaultQuestion ({this.state.askDefaultQuestion})</span>
+                        <hr />
+                        <details>
+                            <summary>readinessItems ({this.state.readinessItems.length})</summary>
+                            <pre style={{whiteSpace: 'pre'}}>
+                                {JSON.stringify(this.state.readinessItems)}
+                            </pre>
+                        </details>
+                        <hr />
+                        <details>
+                            <summary>readinessQuestions ({this.state.readinessQuestions.length})</summary>
+                            <pre style={{whiteSpace: 'pre'}}>
+                                {JSON.stringify(this.state.readinessQuestions)}
+                            </pre>
+                        </details>
                         <hr />
                         <div style={{ "margin": "0 auto", "width": "80%" }} className="text-center">
 
@@ -406,6 +473,24 @@ class ReadinessForm extends React.Component {
                                 </div>
                             </div>
 
+                            <div className="form-group row">
+                                <label htmlFor="u_end_date" className="col-sm-6 col-form-label">Ask default readiness question? *</label>
+                                <div className="col-sm-6">
+                                    <input
+                                        type='radio'
+                                        name='ask_default_qn'
+                                        defaultChecked={this.state.askDefaultQuestion == true}
+                                        onChange={(event) => this.handleDefaultQnChange(true)}
+                                    /> Yes
+                                    &nbsp; &nbsp; &nbsp;
+                                    <input
+                                        type='radio'
+                                        name='ask_default_qn'
+                                        defaultChecked={this.state.askDefaultQuestion == false}
+                                        onChange={(event) => this.handleDefaultQnChange(false)}
+                                    /> No
+                                </div>
+                            </div>
                             <div className="form-row">
                                 <div className="col-sm-2 mb-3">
                                     <label className="float-left">Checklist Question(s) *</label><br />
@@ -414,7 +499,7 @@ class ReadinessForm extends React.Component {
 
                                     {this.state.readinessQuestions.map((rdnsQuestion) => {
                                         return (<React.Fragment key={uuidv4()}>
-                                                {rdnsQuestion}
+                                            {rdnsQuestion}
                                         </React.Fragment>)
                                     })}
 
