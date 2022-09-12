@@ -111,7 +111,6 @@ class ResourceFilesController extends Controller
                 'is_admin' => $is_admin == true || $is_admin == 1
             ], 200);
         } else {
-            dd('not logged in');
             return redirect('/');
         }
     }

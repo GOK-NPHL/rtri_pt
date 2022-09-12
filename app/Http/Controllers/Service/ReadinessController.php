@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\PT\PTReadinessController;
 use App\Readiness;
 use App\ReadinessAnswer;
+use App\ReadinessApproval;
 use App\ReadinessQuestion;
 use Exception;
 use Illuminate\Http\Request;
@@ -142,19 +143,42 @@ class ReadinessController extends Controller
 
             // if it has a default question, then check if the user has answered the default question with a yes or no
             if ($readiness->ask_default_qn) {
-                $defaultQuestions = ReadinessQuestion::where('is_default', 1)->get();
+                $defaultQuestion = ReadinessQuestion::where('is_default', 1)
+                    ->where('readiness_id', 0)
+                    ->first();
 
                 $aq_ids = ReadinessAnswer::where('readiness_id', $request->survey['readiness_id'])->get()->pluck('question_id')->toArray();
                 // get question text for each question
                 $answered_qns = [];
                 foreach ($aq_ids as $qn) {
-                    $answered_qns[] = ReadinessQuestion::find($qn);
+                    $qna = ReadinessQuestion::find($qn);
+                    $qna['answer'] = ReadinessAnswer::where('question_id', $qn)->first()->answer;
+                    $answered_qns[] = $qna;
                 }
-                dd($answered_qns);
+                // dd( json_encode($defaultQuestion), json_encode($answered_qns) );
                 // loop through the default questions and check if the user has answered them
-                // foreach ($defaultQuestions as $dqn) {
-                    
-                // }
+                foreach ($answered_qns as $aqn) {
+                    if(($aqn->question == $defaultQuestion->question) && ($aqn->answer == 'Yes')){
+                        // dd(json_encode(array( 'status' => 'success', 'qa' => $aqn )));
+                        // $readiness->status = 1;
+                        // $readiness->save();
+                        $rapproval = ReadinessApproval::updateOrCreate(
+                            [
+                                'lab_id' => $request->survey['lab_id'],
+                                'readiness_id' =>  $request->survey['readiness_id']
+                            ],
+                            [
+                                'lab_id' => $request->survey['lab_id'],
+                                'readiness_id' =>  $request->survey['readiness_id'],
+                                'admin_id' => 0,
+                                'approved' => 1
+                            ]
+                        );
+                        // if($rapproval){
+                        //     return response()->json(['Message' => 'Readiness approved'], 200);
+                        // }
+                    }
+                }
             }
 
             return response()->json(['Message' => 'Saved successfully'], 200);
