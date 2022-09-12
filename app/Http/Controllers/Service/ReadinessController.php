@@ -155,13 +155,8 @@ class ReadinessController extends Controller
                     $qna['answer'] = ReadinessAnswer::where('question_id', $qn)->first()->answer;
                     $answered_qns[] = $qna;
                 }
-                // dd( json_encode($defaultQuestion), json_encode($answered_qns) );
-                // loop through the default questions and check if the user has answered them
                 foreach ($answered_qns as $aqn) {
                     if(($aqn->question == $defaultQuestion->question) && ($aqn->answer == 'Yes')){
-                        // dd(json_encode(array( 'status' => 'success', 'qa' => $aqn )));
-                        // $readiness->status = 1;
-                        // $readiness->save();
                         $rapproval = ReadinessApproval::updateOrCreate(
                             [
                                 'lab_id' => $request->survey['lab_id'],
@@ -174,9 +169,6 @@ class ReadinessController extends Controller
                                 'approved' => 1
                             ]
                         );
-                        // if($rapproval){
-                        //     return response()->json(['Message' => 'Readiness approved'], 200);
-                        // }
                     }
                 }
             }
