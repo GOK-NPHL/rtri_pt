@@ -58,7 +58,7 @@ class ReadinessQuestions extends React.Component {
                             value={this.props.questionsAnswerMap[readiness['question_id']]}
                             onChange={
                                 (event) => {
-                                    console.log(this.props.questionsAnswerMap[readiness['question_id']]);
+                                    // console.log(this.props.questionsAnswerMap[readiness['question_id']]);
                                     this.props.questionAnswerHandler(event)
                                 }}
                             type="number" className="form-control"

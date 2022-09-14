@@ -702,8 +702,8 @@ class SubmitResults extends React.Component {
                                 </select>
                             </div>
                             <div className="form-group">
-                                <label htmlFor="exampleFormControlTextarea2">Other comments</label>
-                                <textarea value={this.state.otherComments} onChange={() => this.otherCommentsHandler(event)} className="form-control" id="exampleFormControlTextarea2" rows="3"></textarea>
+                                <label htmlFor="otherCommentsTxtbox">Other comments</label>
+                                <textarea value={this.state.otherComments} onChange={() => this.otherCommentsHandler(event)} className="form-control" id="otherCommentsTxtbox" rows="3"></textarea>
                             </div>
                         </form>
                         {/* End why test not done */}
@@ -722,6 +722,10 @@ class SubmitResults extends React.Component {
                                             ptFile: f.target.files[0]
                                         })
                                     }} />
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="otherCommentsTxtbox">Other comments</label>
+                                    <textarea value={this.state.otherComments} onChange={() => this.otherCommentsHandler(event)} className="form-control" id="otherCommentsTxtbox" rows="3"></textarea>
                                 </div>
                             </div>
                             <div className="col-sm-12">

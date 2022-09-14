@@ -140,8 +140,8 @@ class ReadinessForm extends React.Component {
                 });
                 console.log('newReadinessQuestions: ', newReadinessQuestions);
                 this.setState({
-                    readinessQuestions: newReadinessQuestions,
-                    readinessItems: newReadinessItems,
+                    readinessQuestions: newReadinessQuestions.filter(n=>n!=null),
+                    readinessItems: newReadinessItems.filter(n=>n!=null),
                     askDefaultQuestion: 0
                 });
             }
@@ -174,6 +174,7 @@ class ReadinessForm extends React.Component {
     }
 
     removeQn(itemIndex) {
+        console.log('removeQn: ', itemIndex);
         let readinessItems = this.state.readinessItems;
         let questions = this.state.readinessQuestions;
 
@@ -240,8 +241,8 @@ class ReadinessForm extends React.Component {
                 let questions = this.state.readinessQuestions;
                 questions.push(qstElement);
                 this.setState({
-                    readinessQuestions: questions,
-                    readinessItems: rdItems
+                    readinessQuestions: questions.filter(n=>n!=null),
+                    readinessItems: rdItems.filter(n=>n!=null)
                 })
             } else if (readiness['answer_type'] == 'number') {
                 let id = uuidv4();
@@ -410,8 +411,8 @@ class ReadinessForm extends React.Component {
                     <div className="card-body">
                         <h5 className="card-title">
                             {this.state.pageState == 'edit' ? 'Update Readiness Checklist' : 'Add Readiness Checklist'}
-                        </h5><br />
-                        <span>askDefaultQuestion ({this.state.askDefaultQuestion})</span>
+                        </h5><hr />
+                        {/* <span>askDefaultQuestion ({this.state.askDefaultQuestion})</span>
                         <hr />
                         <details>
                             <summary>readinessItems ({this.state.readinessItems.length})</summary>
@@ -426,7 +427,7 @@ class ReadinessForm extends React.Component {
                                 {JSON.stringify(this.state.readinessQuestions)}
                             </pre>
                         </details>
-                        <hr />
+                        <hr /> */}
                         <div style={{ "margin": "0 auto", "width": "80%" }} className="text-center">
 
                             <div className="form-group row">
