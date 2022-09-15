@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AuthAccessController;
+use App\Http\Controllers\LotController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\PT\PTReadinessController;
 use App\Http\Controllers\PT\PTShipmentController;
@@ -142,3 +143,12 @@ Route::prefix('/access-management')->group(function (){
 
 });
 //////
+
+// lots crud
+Route::get('/get_lots', [LotController::class, 'getLots']);
+Route::get('/get_lot/{id}', [LotController::class, 'getLot']);
+Route::get('/get_lot_by_shipment/{shipment_id}', [LotController::class, 'getLotByShipmentId']);
+Route::get('/get_lot/{id}/participants', [LotController::class, 'getLotParticipants']);
+Route::post('/lot', [LotController::class, 'createLot']);
+Route::put('/lot/{id}', [LotController::class, 'updateLot']);
+Route::delete('/lot/{id}', [LotController::class, 'deleteLot']);

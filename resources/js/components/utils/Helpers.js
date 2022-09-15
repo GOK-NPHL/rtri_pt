@@ -8,7 +8,7 @@ let cache = {
 }
 
 export async function SaveSubmission(submission, ptFile) {
-    
+
     try {
         const formData = new FormData();
         formData.append('file', ptFile);
@@ -349,7 +349,7 @@ export async function SaveLabPersonel(personel) {
 export async function getAMresource(resource, id) {
     try {
         let url = `${settings.serverBaseApi}/access-management/${resource}`
-        if(id && id !== '') {
+        if (id && id !== '') {
             url += `/${id}`
         }
         let response = await axios(url);
@@ -590,7 +590,7 @@ export async function FetchReadiness() {
 
 export async function FetchShipmentReadiness(getAll) {
     let url = `${settings.serverBaseApi}/get_shipment_readiness`;
-    if(getAll && (getAll===true || getAll===1)){
+    if (getAll && (getAll === true || getAll === 1)) {
         url = `${settings.serverBaseApi}/get_shipment_readiness?get_all=1`;
     }
     try {
@@ -1033,6 +1033,85 @@ export async function DeleteFile(fileId) {
         response = await axios({
             method: 'delete',
             url: `${settings.serverBaseApi}/resources/files/${fileId}`,
+        });
+        return response;
+    } catch (err) {
+        return err.response
+    }
+}
+
+
+// Lots CRUD
+export async function FetchLots() {
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_lots`);
+        const lots = response.data;
+        return lots;
+    } catch (err) {
+        return err.response
+    }
+}
+
+//one
+export async function FetchLot(lotId) {
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_lot/${lotId}`);
+        const lot = response.data;
+        return lot;
+    }
+    catch (err) {
+        return err.response
+    }
+}
+
+// by shipment
+export async function FetchLotsByShipment(shipmentId) {
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_lot_by_shipment/${shipmentId}`);
+        const lots = response.data;
+        return lots;
+    } catch (err) {
+        return err.response
+    }
+}
+
+// lot participants
+export async function FetchLotParticipants(lotId) {
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_lot/${lotId}/participants`);
+        const participants = response.data;
+        return participants;
+    } catch (err) {
+        return err.response
+    }
+}
+
+export async function SaveLot(payload) {
+    let response;
+    try {
+        response = await axios.post(`${settings.serverBaseApi}/lot`, payload);
+        return response;
+    } catch (err) {
+        return err.response
+    }
+}
+
+export async function UpdateLot(id, payload) {
+    let response;
+    try {
+        response = await axios.put(`${settings.serverBaseApi}/lot/${id}`, payload);
+        return response;
+    } catch (err) {
+        return err.response
+    }
+}
+
+export async function DeleteLot(id) {
+    let response;
+    try {
+        response = await axios({
+            method: 'delete',
+            url: `${settings.serverBaseApi}/lot/${id}`,
         });
         return response;
     } catch (err) {

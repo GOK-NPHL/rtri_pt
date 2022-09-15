@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AuthAccessController;
 use App\Http\Controllers\CustomAuthController;
+use App\Http\Controllers\LotController;
 use App\Http\Controllers\PT\PTAdminController;
 use App\Http\Controllers\QC\QCAdminController;
 use App\Http\Controllers\QC\QCParticipantController;
@@ -114,3 +115,14 @@ Route::prefix('access-management')->group(function () {
     });
 });
 //////
+
+/// Lots CRUD
+Route::get('lots', [LotController::class, 'index'])->name('lots');
+Route::get('lots/new', [LotController::class, 'create'])->name('new-lot');
+// Route::post('lots/save', [LotController::class, 'save'])->name('save-lot');
+Route::get('lots/{lotId}', [LotController::class, 'show'])->name('view-lot');
+Route::get('lots/{lotId}/participants', [LotController::class, 'show_participants'])->name('view-lot-participants');
+Route::get('lots/edit/{lotId}', [LotController::class, 'edit'])->name('edit-lot');
+// Route::put('lots/update/{lotId}', [LotController::class, 'update'])->name('update-lot');
+// Route::get('lots/delete/{lotId}', [LotController::class, 'delete'])->name('delete-lot');
+///////
