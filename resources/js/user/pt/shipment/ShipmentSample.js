@@ -53,8 +53,10 @@ class ShipmentSample extends React.Component {
                 <td className="px-lg-2" style={{ "maxWidth": "150px" }}>
                     <input
                         value={this.state.name}
-                        onChange={(event) => this.sampleNameChange(this.state.index, event.target.value)} className="form-control"
-                        placeholder="please enter sample name" />
+                        onChange={(event) => {
+                            this.sampleNameChange(this.state.index, event.target.value)
+                        }} className="form-control"
+                        placeholder="Sample name" />
                 </td>
                 {/* <td onChange={this.qcInterpretationLongterm.bind(this)}> */}
                 <td style={{ "maxWidth": "150px" }}>

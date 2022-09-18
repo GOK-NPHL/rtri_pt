@@ -108,7 +108,9 @@ use Illuminate\Support\Facades\Gate;
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown3">
                                     <a class="dropdown-item" href="{{route('list-readiness')}}">Readiness Checklists</a>
-                                    <a class="dropdown-item" href="{{route('pt-shipment')}}">PT Shipment</a>
+                                    <a class="dropdown-item" href="{{route('lots')}}">PT Lots</a>
+                                    <a class="dropdown-item" href="{{route('panels')}}">Panels</a>
+                                    <a class="dropdown-item" href="{{route('pt-shipment')}}">PT Shipments</a>
                                 </div>
                             </li>
                             {{-- <li class="nav-item dropdown">

@@ -6,6 +6,7 @@ use App\Http\Controllers\LotController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\PT\PTReadinessController;
 use App\Http\Controllers\PT\PTShipmentController;
+use App\Http\Controllers\PtPanelController;
 use App\Http\Controllers\QC\QCAdminUsersController;
 use App\Http\Controllers\Service\CommonsController;
 use App\Http\Controllers\Service\ReadinessController;
@@ -51,7 +52,7 @@ Route::get('/get_lab_personel/{id}', [ParticipantController::class, 'getLabPerso
 Route::post('/create_lab_personel', [ParticipantController::class, 'createLabPersonel'])->name('create_lab_personel')->middleware('auth:admin');
 Route::post('/edit_lab_personel', [ParticipantController::class, 'editPersonel'])->name('edit_lab_personel')->middleware('auth:admin');
 
-Route::get('/get_readiness', [PTReadinessController::class, 'getReadiness'])->name('get_readiness')->middleware('auth:admin');
+Route::get('/get_readiness', [PTReadinessController::class, 'getReadiness'])->name('get_readiness');//->middleware('auth:admin');
 Route::get('/get_default_readiness_qns', [PTReadinessController::class, 'getDefaultReadinessQuestions'])->name('get_default_readiness_qns')->middleware('auth:admin');
 Route::get('/get_shipment_readiness', [PTReadinessController::class, 'getShipmentReadiness'])->name('get_shipment_readiness')->middleware('auth:admin');
 Route::post('/approve_readiness_answer', [PTReadinessController::class, 'approveReadinessAnswer'])->middleware('auth:admin');
@@ -152,3 +153,11 @@ Route::get('/get_lot/{id}/participants', [LotController::class, 'getLotParticipa
 Route::post('/lot', [LotController::class, 'createLot']);
 Route::put('/lot/{id}', [LotController::class, 'updateLot']);
 Route::delete('/lot/{id}', [LotController::class, 'deleteLot']);
+
+// panels crud
+Route::get('/get_panels', [PtPanelController::class, 'getPanels']);
+Route::get('/get_panel/{id}/participants', [PtPanelController::class, 'getPanelParticipants']);
+Route::get('/get_panel/{id}', [PtPanelController::class, 'getPanel']);
+Route::post('/panel', [PtPanelController::class, 'createPanel']);
+Route::put('/panel/{id}', [PtPanelController::class, 'updatePanel']);
+Route::delete('/panel/{id}', [PtPanelController::class, 'deletePanel']);

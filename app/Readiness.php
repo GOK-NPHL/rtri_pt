@@ -34,6 +34,16 @@ class Readiness extends Model
         return $this->belongsToMany('App\Laboratory');
     }
 
+    public function participants()
+    {
+        $labs = $this->laboratories;
+        $participants = [];
+        foreach ($labs as $lab) {
+            $participants = array_merge($participants, $lab->personel->toArray());
+        }
+        return $participants;
+    }
+
     public function readinessQuestion()
     {
         return $this->hasMany('App\ReadinessQuestion');

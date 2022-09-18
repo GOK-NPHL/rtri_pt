@@ -61,13 +61,15 @@ class AuthAccessController extends Controller
             $user_id = $user->id;
             $user_name = $user->name;
             $user_email = $user->email;
-            $user_role_ids = json_decode($user->roles);
+            $user_role_ids = $user->roles;
+            // $user_role_ids = json_decode($user->roles);
             $user_roles = [];
             $user_permissions = [];
             if($user_role_ids != null && count($user_role_ids) > 0) {
                 foreach($user_role_ids as $role_id) {
                     $role = UserRole::find($role_id) ?? null;
-                    $role_permissions = json_decode($role->permissions);
+                    $role_permissions = $role->permissions;
+                    // $role_permissions = json_decode($role->permissions);
                     $user_roles[] = [
                         'id' => $role->id,
                         'name' => $role->name,
@@ -80,7 +82,8 @@ class AuthAccessController extends Controller
                     }
                 }
             }
-            $user_group_ids = json_decode($user->groups);
+            $user_group_ids = $user->groups;
+            // $user_group_ids = json_decode($user->groups);
             $user_groups = [];
             if($user_group_ids != null && count($user_group_ids) > 0) {
                 foreach($user_group_ids as $group_id) {
@@ -121,7 +124,8 @@ class AuthAccessController extends Controller
         try {
             $user = request()->user();
             $user = User::find($user->id);
-            $user_groups = json_decode($user->groups);
+            $user_groups = $user->groups;
+            // $user_groups = json_decode($user->groups);
             $group_permissions = [];
             foreach ($user_groups as $group) {
                 $group_permissions[] = $group->permissions;
@@ -187,7 +191,8 @@ class AuthAccessController extends Controller
             $permission->delete();
             $roles = UserRole::where('permissions', 'like', '%' . $slug . '%')->get();
             foreach ($roles as $role) {
-                $role_permissions = json_decode($role->permissions);
+                $role_permissions = $role->permissions;
+                // $role_permissions = json_decode($role->permissions);
                 $key = array_search($slug, $role_permissions);
                 if ($key !== false) {
                     unset($role_permissions[$key]);
@@ -219,7 +224,8 @@ class AuthAccessController extends Controller
         try {
             $user = request()->user();
             $user = User::find($user->id);
-            $user_roles = json_decode($user->roles);
+            $user_roles = $user->roles;
+            // $user_roles = json_decode($user->roles);
             $roles = UserRole::whereIn('id', $user_roles)->get();
             return response()->json($roles);
         } catch (Exception $ex) {
@@ -287,7 +293,8 @@ class AuthAccessController extends Controller
             $role->delete();
             $users = User::where('roles', 'like', '%' . $request->id . '%')->get();
             foreach ($users as $usr) {
-                $user_roles = json_decode($usr->roles);
+                $user_roles = $usr->roles;
+                // $user_roles = json_decode($usr->roles);
                 $key = array_search($request->id, $user_roles);
                 if ($key !== false) {
                     unset($user_roles[$key]);
@@ -320,7 +327,8 @@ class AuthAccessController extends Controller
         try {
             $user = request()->user();
             $user = User::find($user->id);
-            $user_groups = json_decode($user->groups);
+            $user_groups = $user->groups;
+            // $user_groups = json_decode($user->groups);
             $groups = UserGroup::whereIn('id', $user_groups)->get();
             return response()->json($groups);
         } catch (Exception $ex) {
@@ -388,7 +396,8 @@ class AuthAccessController extends Controller
             $group->delete();
             $users = User::where('groups', 'like', '%' . $request->id . '%')->get();
             foreach ($users as $usr) {
-                $user_groups = json_decode($usr->groups);
+                $user_groups = $usr->groups;
+                // $user_groups = json_decode($usr->groups);
                 $key = array_search($request->id, $user_groups);
                 if ($key !== false) {
                     unset($user_groups[$key]);

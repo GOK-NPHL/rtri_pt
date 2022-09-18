@@ -39,7 +39,7 @@ class PTReadinessController extends Controller
                 'name' => $request->readiness['name'],
                 'start_date' => $request->readiness['start_date'],
                 'end_date' => $request->readiness['end_date'],
-                'ask_default_qn' => $request->readiness['ask_default_qn'] ?? 0,
+                'ask_default_qn' => $request->ask_default_qn ?? $request->readiness['ask_default_qn'] ?? 0,
                 'admin_id' => $user->id
             ]);
 

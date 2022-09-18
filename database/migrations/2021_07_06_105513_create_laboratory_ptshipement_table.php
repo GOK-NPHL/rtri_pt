@@ -26,6 +26,6 @@ class CreateLaboratoryPtshipementTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('laboratory_ptshipement');
+        Schema::dropIfExists('laboratory_pt_shipement');
     }
 }

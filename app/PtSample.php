@@ -14,12 +14,13 @@ class PtSample extends Model
     protected $fillable = [
         'name',
         'reference_result',
-        'ptshipment_id'
+        // 'ptshipment_id', // change to panel
+        'ptpanel_id',
 
     ];
 
-    public function ptshipment()
+    public function ptpanel()
     {
-        return $this->belongsTo('App\PtShipement');
+        return $this->belongsTo(PtPanel::class); //'App\PtShipement');
     }
 }

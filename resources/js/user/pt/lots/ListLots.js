@@ -72,7 +72,7 @@ class ListLots extends React.Component {
                     <td>{element.name}</td>
                     <td>{element.ending_ids}</td>
                     <td>{element?.participant_count || 0 }</td>
-                    <td>{element.shipment['round_name'] || element.shipment_id}</td>
+                    <td>{element?.readiness_name || element.readiness_id}</td>
                     <td>{element.created_at ? new Date(element.created_at).toLocaleString() : '-'}</td>
                     {
 
@@ -141,7 +141,7 @@ class ListLots extends React.Component {
                             <th scope="col">Lot Name</th>
                             <th scope="col">Ending IDs</th>
                             <th scope="col">No. of participants</th>
-                            <th scope="col">Shipment/Round</th>
+                            <th scope="col">Readiness Checklist</th>
                             <th scope="col">Created on</th>
                             <th scope="col">Action</th>
                         </tr>

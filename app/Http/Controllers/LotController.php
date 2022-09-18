@@ -49,7 +49,11 @@ class LotController extends Controller
         $lots = Lot::where('deleted_at', null)->get();
         foreach ($lots as $lot) {
             $lot->participant_count = count($lot->participants());
-            $lot->shipment = $lot->shipment();
+            // $lot->readiness = $lot->readiness();
+            $lr = $lot->readiness();
+            if($lr){
+                $lot->readiness_name = $lr->name;
+            }
         }
         return response()->json($lots);
     }
@@ -65,40 +69,29 @@ class LotController extends Controller
     }
     public function getLotParticipants(Request $request)
     {
-        // $lot = Lot::where('id', $request->id)->first();
-        // $participants = $lot->participants();
-        // foreach ($participants as $usr) {
-        //     // dd($usr['laboratory_id']);
-        //     if($usr['laboratory_id']){
-        //         $usr['lab'] = Laboratory::where('id', $usr['laboratory_id'])->first();
-        //     }else{
-        //         $usr['lab'] = null;
-        //     }
-        // }
-        // return response()->json($participants);
-
-        $lot = Lot::where('id', $request->id)->first();
-        $ending_ids = explode(",", $request->ending_ids);
-
         $participants = [];
-        foreach ($ending_ids as $ending_id) {
-            $participant = User::select('users.*', 
-            'laboratories.institute_name', 'laboratories.lab_name',  'laboratories.facility_level', 'laboratories.mfl_code'
-            )
-                ->join('laboratories', 'users.laboratory_id', '=', 'laboratories.id')
-                ->where('users.id', 'like', '%' . $ending_id);
-            if ($participant) {
-                // array_push($participants, $participant);
-                $participants = array_merge($participants, $participant->get()->toArray());
+        $lot = Lot::where('id', $request->id)->first();
+        $pcpts = $lot->participants();
+
+        // add laboratory info
+        foreach ($pcpts as $pcpt) {
+            if($pcpt['laboratory_id'] != null){
+                $pc_lab = Laboratory::where('id', $pcpt['laboratory_id'])->first();
+                if($pc_lab != null){
+                    $pcpt['lab_name'] = $pc_lab->lab_name;
+                    $pcpt['mfl_code'] = $pc_lab->mfl_code;
+                }
             }
+            $participants[] = $pcpt;
         }
+        
         return response()->json($participants);
     }
     public function createLot(Request $request)
     {
         $lot = Lot::create([
             'name' => $request->name,
-            'shipment_id' => $request->shipment_id,
+            'readiness_id' => $request->readiness_id,
             // 'lot' => $request->lot,
             'ending_ids' => $request->ending_ids,
             'created_by' => $request->created_by ?? Auth::user()->id,
@@ -111,7 +104,7 @@ class LotController extends Controller
         $lot = Lot::where('id', $request->id)->first();
         if ($lot) {
             $lot->name = $request->name;
-            $lot->shipment_id = $request->shipment_id;
+            $lot->readiness_id = $request->readiness_id;
             // $lot->lot = $request->lot;
             $lot->ending_ids = $request->ending_ids;
             $lot->created_by = $request->created_by;

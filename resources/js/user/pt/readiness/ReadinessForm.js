@@ -62,13 +62,13 @@ class ReadinessForm extends React.Component {
                         this.addReadinessQuestion(questionItem);
                     });
                     this.setState({
-                        id: editData.payload.readiness[0].id,
+                        id: editData?.payload?.readiness[0]?.id,
                         dualListptions: partsList,
-                        name: editData.payload.readiness[0].name,
-                        askDefaultQn: editData.payload.readiness[0].ask_default_qn,
-                        startDate: editData.payload.readiness[0].start_date,
-                        endDate: editData.payload.readiness[0].end_date,
-                        selected: editData.payload.labs,
+                        name: editData?.payload?.readiness[0]?.name,
+                        askDefaultQuestion: editData?.payload?.readiness[0]?.ask_default_qn == 1 ? true : false,
+                        startDate: editData?.payload?.readiness[0]?.start_date,
+                        endDate: editData?.payload?.readiness[0]?.end_date,
+                        selected: editData?.payload?.labs,
                         pageState: 'edit',
                     });
                 }
@@ -127,7 +127,7 @@ class ReadinessForm extends React.Component {
                     });
                 });
                 this.setState({
-                    askDefaultQuestion: 1
+                    askDefaultQuestion: checked
                 });
             } else {
                 // remove default questions
@@ -142,7 +142,7 @@ class ReadinessForm extends React.Component {
                 this.setState({
                     readinessQuestions: newReadinessQuestions.filter(n=>n!=null),
                     readinessItems: newReadinessItems.filter(n=>n!=null),
-                    askDefaultQuestion: 0
+                    askDefaultQuestion: checked
                 });
             }
         } catch (err) {
@@ -353,7 +353,7 @@ class ReadinessForm extends React.Component {
                 readiness['end_date'] = this.state.endDate;
                 readiness['participants'] = this.state.selected;
                 readiness['readiness_questions'] = this.state.readinessItems;
-                readiness['ask_default_qn'] = this.state.askDefaultQuestion || 0;
+                readiness['ask_default_qn'] = this.state.askDefaultQuestion || false;
 
                 let response;
                 if (this.state.pageState == 'edit') {
@@ -411,13 +411,14 @@ class ReadinessForm extends React.Component {
                     <div className="card-body">
                         <h5 className="card-title">
                             {this.state.pageState == 'edit' ? 'Update Readiness Checklist' : 'Add Readiness Checklist'}
-                        </h5><hr />
+                        </h5>
+                        <hr />
                         {/* <span>askDefaultQuestion ({this.state.askDefaultQuestion})</span>
                         <hr />
                         <details>
-                            <summary>readinessItems ({this.state.readinessItems.length})</summary>
+                            <summary>state</summary>
                             <pre style={{whiteSpace: 'pre'}}>
-                                {JSON.stringify(this.state.readinessItems)}
+                                {JSON.stringify(this.state,null,2)}
                             </pre>
                         </details>
                         <hr />
@@ -480,14 +481,16 @@ class ReadinessForm extends React.Component {
                                     <input
                                         type='radio'
                                         name='ask_default_qn'
-                                        defaultChecked={this.state.askDefaultQuestion == true}
+                                        value={true}
+                                        checked={this.state.askDefaultQuestion === true}
                                         onChange={(event) => this.handleDefaultQnChange(true)}
                                     /> Yes
                                     &nbsp; &nbsp; &nbsp;
                                     <input
                                         type='radio'
                                         name='ask_default_qn'
-                                        defaultChecked={this.state.askDefaultQuestion == false}
+                                        value={false}
+                                        checked={this.state.askDefaultQuestion === false}
                                         onChange={(event) => this.handleDefaultQnChange(false)}
                                     /> No
                                 </div>

@@ -53,7 +53,8 @@ class AuthServiceProvider extends ServiceProvider
             $curUser = Auth::user();
             $lab_mgr_role = UserRole::where('slug', 'like', '%lab_admin%')->orWhere('slug', 'like', '%lab_manager%')->first()->id;
             // check if roles array in user table contains lab manager role
-            if (in_array($lab_mgr_role, json_decode($curUser->roles))) {
+            // if (in_array($lab_mgr_role, json_decode($curUser->roles))) {
+            if (in_array($lab_mgr_role, $curUser->roles)) {
                 return true;
             } else {
                 return false;
@@ -65,7 +66,8 @@ class AuthServiceProvider extends ServiceProvider
             $curUser = Auth::user();
             $participant_role = UserRole::where('slug', 'like', '%participant%')->first()->id;
             // check if roles array in user table contains participant role
-            if (in_array($participant_role, json_decode($curUser->roles))) {
+            // if (in_array($participant_role, json_decode($curUser->roles))) {
+            if (in_array($participant_role, $curUser->roles)) {
                 return true;
             } else {
                 return false;
@@ -77,7 +79,8 @@ class AuthServiceProvider extends ServiceProvider
             $curUser = Auth::user();
             $admin_role = UserRole::where('slug', 'administrator')->first()->id;
             // check if roles array in user table contains admin role
-            if (in_array($admin_role, json_decode($curUser->roles))) {
+            // if (in_array($admin_role, json_decode($curUser->roles))) {
+            if (in_array($admin_role, $curUser->roles)) {
                 return true;
             } else {
                 return false;
@@ -89,7 +92,8 @@ class AuthServiceProvider extends ServiceProvider
             $curUser = Auth::user();
             $guest_role = UserRole::where('slug', 'guest')->first()->id;
             // check if roles array in user table contains guest role
-            if (in_array($guest_role, json_decode($curUser->roles))) {
+            // if (in_array($guest_role, json_decode($curUser->roles))) {
+            if (in_array($guest_role, $curUser->roles)) {
                 return true;
             } else {
                 return false;

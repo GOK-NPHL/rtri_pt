@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { SaveLot, FetchShipments, FetchuserId } from '../../../components/utils/Helpers';
+import { SaveLot, FetchuserId, FetchReadiness } from '../../../components/utils/Helpers';
 // import { v4 as uuidv4 } from 'uuid';
 
 class AddLots extends React.Component {
@@ -9,7 +9,8 @@ class AddLots extends React.Component {
         super(props);
         this.state = {
             payload: null,
-            shipments: [],
+            readinesses: [],
+            readiness_id: null,
             userId: '156f41ed97',
             message: null,
             status: null
@@ -41,9 +42,9 @@ class AddLots extends React.Component {
 
     componentDidMount() {
         (async () => {
-            let response = await FetchShipments(this.state.userId, 0);
+            let response = await FetchReadiness(this.state.userId, 0);
             this.setState({
-                shipments: response
+                readinesses: response
             });
         })();
     }
@@ -109,19 +110,19 @@ class AddLots extends React.Component {
                                                 </div>
                                                 <div className='col-md-12'>
                                                     <div className="form-group">
-                                                        <label htmlFor="description">Shipment</label>
-                                                        <select className='form-control' id='shipment' onChange={ev => {
+                                                        <label htmlFor="description">Readiness</label>
+                                                        <select className='form-control' id='readiness' onChange={ev => {
                                                             this.setState({
                                                                 payload: {
                                                                     ...this.state.payload || {},
-                                                                    shipment_id: parseInt(ev.target.value)
+                                                                    readiness_id: parseInt(ev.target.value)
                                                                 }
                                                             });
                                                         }}>
-                                                            <option value=''>Select Shipment</option>
-                                                            {this.state.shipments.length > 0 && this.state.shipments.map((shipment, index) => {
+                                                            <option value=''>Select Readiness</option>
+                                                            {this.state.readinesses.length > 0 && this.state.readinesses.map((readiness, index) => {
                                                                 return (
-                                                                    <option key={index} value={shipment.id}>{shipment.round_name}</option>
+                                                                    <option key={index} value={readiness.id}>{readiness.name}</option>
                                                                 )
                                                             })}
                                                         </select>
@@ -167,7 +168,7 @@ class AddLots extends React.Component {
                                                 </div>
                                                 <div className='col-md-12 mt-3'>
                                                     <input type="submit" disabled={
-                                                        !this.state.payload?.name || !this.state.payload?.shipment_id || !this.state.payload?.ending_ids || (this.state.payload?.ending_ids.length < 2 || this.state.payload?.ending_ids.length > 2)
+                                                        !this.state.payload?.name || !this.state.payload?.readiness_id || !this.state.payload?.ending_ids || (this.state.payload?.ending_ids.length < 2 || this.state.payload?.ending_ids.length > 2)
                                                     } className="btn btn-primary" value='Save' onClick={(ev) => {
                                                         ev.preventDefault();
                                                         this.saveLot();

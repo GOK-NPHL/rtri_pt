@@ -978,6 +978,10 @@ export function exportToExcel(bundle, filename) {
 }
 
 
+
+
+
+
 export async function FetchAllFiles() {
 
     try {
@@ -1039,6 +1043,12 @@ export async function DeleteFile(fileId) {
         return err.response
     }
 }
+
+
+
+
+
+
 
 
 // Lots CRUD
@@ -1112,6 +1122,81 @@ export async function DeleteLot(id) {
         response = await axios({
             method: 'delete',
             url: `${settings.serverBaseApi}/lot/${id}`,
+        });
+        return response;
+    } catch (err) {
+        return err.response
+    }
+}
+
+
+
+
+
+
+
+
+
+// Panels CRUD
+export async function FetchPanels() {
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_panels`);
+        const panels = response.data;
+        return panels;
+    } catch (err) {
+        return err.response
+    }
+}
+
+//one
+export async function FetchPanel(panelId) {
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_panel/${panelId}`);
+        const panel = response.data;
+        return panel;
+    }
+    catch (err) {
+        return err.response
+    }
+}
+
+// panel participants
+export async function FetchPanelParticipants(panelId) {
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_panel/${panelId}/participants`);
+        const participants = response.data;
+        return participants;
+    } catch (err) {
+        return err.response
+    }
+}
+
+export async function SavePanel(payload) {
+    let response;
+    try {
+        response = await axios.post(`${settings.serverBaseApi}/panel`, payload);
+        return response;
+    } catch (err) {
+        return err.response
+    }
+}
+
+export async function UpdatePanel(id, payload) {
+    let response;
+    try {
+        response = await axios.put(`${settings.serverBaseApi}/panel/${id}`, payload);
+        return response;
+    } catch (err) {
+        return err.response
+    }
+}
+
+export async function DeletePanel(id) {
+    let response;
+    try {
+        response = await axios({
+            method: 'delete',
+            url: `${settings.serverBaseApi}/panel/${id}`,
         });
         return response;
     } catch (err) {

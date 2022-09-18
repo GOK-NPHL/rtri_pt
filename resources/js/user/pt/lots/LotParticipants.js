@@ -92,10 +92,10 @@ class LotParticipants extends React.Component {
                 tableElem.push(<tr key={index}>
                     <th scope="row">{index + 1}</th>
                     {/* <td colSpan={5}>{JSON.stringify(element)}</td> */}
+                    <td>{element.lab_name}</td>
                     <td>{element.name} {element.second_name}</td>
                     <td>{element.email}</td>
                     <td>{element.phone_number}</td>
-                    <td>{element.lab_name}</td>
                     <td>{element.mfl_code}</td>
 
                 </tr>
@@ -136,7 +136,7 @@ class LotParticipants extends React.Component {
                             );
                             this.updatedSearchItem(currElementsTableEl);
                         }}
-                        className="form-control" placeholder="search personel"></input>
+                        className="form-control" style={{display:'none'}} placeholder="search personel"></input>
                 </div>
 
                 <table className="table table-striped table-sm  table-hover">

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { matchPath } from 'react-router';
-import { UpdateLot, FetchShipments, FetchuserId, FetchLot } from '../../../components/utils/Helpers';
+import { UpdateLot, FetchReadiness, FetchuserId, FetchLot } from '../../../components/utils/Helpers';
 // import { v4 as uuidv4 } from 'uuid';
 
 class EditLot extends React.Component {
@@ -10,7 +10,8 @@ class EditLot extends React.Component {
         super(props);
         this.state = {
             payload: null,
-            shipments: [],
+            readinesses: [],
+            readiness_id: null,
             userId: '156f41ed97',
             message: null,
             status: null
@@ -70,9 +71,9 @@ class EditLot extends React.Component {
         })();
 
         (async () => {
-            let response = await FetchShipments(this.state.userId, 0);
+            let response = await FetchReadiness(this.state.userId, 0);
             this.setState({
-                shipments: response
+                readinesses: response
             });
         })();
     }
@@ -136,22 +137,22 @@ class EditLot extends React.Component {
                                                 </div>
                                                 <div className='col-md-12'>
                                                     <div className="form-group">
-                                                        <label htmlFor="description">Shipment</label>
-                                                        <select className='form-control' id='shipment'
-                                                            value={this.state.payload?.shipment_id || ''}
+                                                        <label htmlFor="description">Readiness</label>
+                                                        <select className='form-control' id='readiness'
+                                                            value={this.state.payload?.readiness_id || ''}
                                                             onChange={ev => {
                                                                 this.setState({
                                                                     payload: {
                                                                         ...this.state.payload || {},
-                                                                        shipment_id: parseInt(ev.target.value)
+                                                                        readiness_id: parseInt(ev.target.value)
                                                                     }
                                                                 });
                                                             }}>
-                                                            <option value=''>Select Shipment</option>
-                                                            {this.state.shipments.length > 0 && this.state.shipments.map((shipment, index) => {
+                                                            <option value=''>Select Readiness</option>
+                                                            {this.state.readinesses.length > 0 && this.state.readinesses.map((readiness, index) => {
                                                                 return (
                                                                     <option
-                                                                        key={index} value={shipment.id}>{shipment.round_name}</option>
+                                                                        key={index} value={readiness.id}>{readiness.name}</option>
                                                                 )
                                                             })}
                                                         </select>
@@ -199,7 +200,7 @@ class EditLot extends React.Component {
                                                 </div>
                                                 <div className='col-md-12 mt-3'>
                                                     <input type="submit" disabled={
-                                                        !this.state.payload?.name || !this.state.payload?.shipment_id || !this.state.payload?.ending_ids || (this.state.payload?.ending_ids.length < 2 || this.state.payload?.ending_ids.length > 2)
+                                                        !this.state.payload?.name || !this.state.payload?.readiness_id || !this.state.payload?.ending_ids || (this.state.payload?.ending_ids.length < 2 || this.state.payload?.ending_ids.length > 2)
                                                     } className="btn btn-primary" value='Save' onClick={(ev) => {
                                                         ev.preventDefault();
                                                         this.saveLot();

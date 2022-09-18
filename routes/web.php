@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthAccessController;
 use App\Http\Controllers\CustomAuthController;
 use App\Http\Controllers\LotController;
 use App\Http\Controllers\PT\PTAdminController;
+use App\Http\Controllers\PtPanelController;
 use App\Http\Controllers\QC\QCAdminController;
 use App\Http\Controllers\QC\QCParticipantController;
 use App\Http\Controllers\Service\ReadinessController;
@@ -126,3 +127,12 @@ Route::get('lots/edit/{lotId}', [LotController::class, 'edit'])->name('edit-lot'
 // Route::put('lots/update/{lotId}', [LotController::class, 'update'])->name('update-lot');
 // Route::get('lots/delete/{lotId}', [LotController::class, 'delete'])->name('delete-lot');
 ///////
+
+// Panels CRUD
+Route::get('panels', [PtPanelController::class, 'index'])->name('panels');
+Route::get('panels/new', [PtPanelController::class, 'create'])->name('new-panel');
+// Route::post('panels/save', [PtPanelController::class, 'save'])->name('save-panel');
+Route::get('panels/{panelId}', [PtPanelController::class, 'show'])->name('view-panel');
+Route::get('panels/edit/{panelId}', [PtPanelController::class, 'edit'])->name('edit-panel');
+// Route::put('panels/update/{panelId}', [PtPanelController::class, 'update'])->name('update-panel');
+// Route::get('panels/delete/{panelId}', [PtPanelController::class, 'delete'])->name('delete-panel');
