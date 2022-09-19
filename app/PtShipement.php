@@ -19,6 +19,8 @@ class PtShipement extends Model
 
     ];
 
+    protected $softDelete = true;
+
     public function laboratories()
     {
         return $this->belongsToMany('App\Laboratory');

@@ -39,9 +39,25 @@ class PtPanel extends Model
         return $lots;
     }
 
+    //participants
+    public function participants()
+    {
+        $lots = $this->lots();
+        $participants = [];
+        foreach ($lots as $lot) {
+            $participants = array_merge($participants, $lot->participants());
+        }
+        return $participants;
+    }
+
     //shipments
     public function ptshipment()
     {
         return $this->belongsTo('App\PtShipement');
+    }
+
+    public function laboratories()
+    {
+        return $this->belongsToMany('App\Laboratory');
     }
 }

@@ -81,11 +81,12 @@ class ListShipment extends React.Component {
             this.state.data.map((element, index) => {
                 tableElem.push(<tr key={index}>
                     <th scope="row">{index + 1}</th>
-                    <td>{element.round_name}</td>
-                    <td>{element.shipment_code}</td>
-                    <td>{element.pass_mark}</td>
-                    <td>{element.participant_count}</td>
-                    <td>{element.last_update}</td>
+                    <td className='text-center'>{element.round_name}</td>
+                    <td className='text-center'>{element.code || element.shipment_code}</td>
+                    <td className='text-center'>{element.pass_mark}</td>
+                    <td className='text-center'>{element?.panel?.name}</td>
+                    <td className='text-center'>{element?.panel?.participant_count || 0}</td>
+                    <td className='text-center'>{new Date(element.updated_at).toLocaleString('en-GB')}</td>
                     {
 
                         <td>
@@ -160,13 +161,14 @@ class ListShipment extends React.Component {
                         className="form-control" placeholder="search shipment"></input>
                 </div>
 
-                <table className="table table-striped table-sm  table-hover">
+                <table className="table table-striped table-bordered table-condensed table-hover">
                     <thead>
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Round Name</th>
                             <th scope="col">Shipement Code</th>
                             <th scope="col">Pass Mark</th>
+                            <th scope="col">Panel</th>
                             <th scope="col">Participant Count</th>
                             <th scope="col">Last Update</th>
                             <th scope="col">Action</th>

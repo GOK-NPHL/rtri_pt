@@ -57,4 +57,12 @@ class Lot extends Model
         }
         return $participants;
     }
+
+    // lab
+    public function laboratory()
+    {
+        $readiness = $this->readiness();
+        $laboratory = $readiness->laboratory();
+        return $laboratory;
+    }
 }

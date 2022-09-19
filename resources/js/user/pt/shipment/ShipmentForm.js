@@ -6,7 +6,6 @@ import './PtShipment.css';
 
 import ReactTooltip from 'react-tooltip';
 import { matchPath } from "react-router";
-import ShipmentSample from './ShipmentSample';
 
 
 class ShipmentForm extends React.Component {
@@ -24,17 +23,14 @@ class ShipmentForm extends React.Component {
             resultDueDate: '',
             passMark: 100,
             testInstructions: '',
-            samples: [],
-            readinessId: '',
-            samplesNumber: 0,
-            tableRows: [], //samples elements,
             participantSource: 'checklist',
             dualListptions: [],
             readinessChecklists: [],
             selected: [],
             pageState: '',
             panels: [],
-            panelDetails: null
+            panelDetails: null,
+            panel_id: ''
         }
 
         this.handleRoundChange = this.handleRoundChange.bind(this);
@@ -43,10 +39,6 @@ class ShipmentForm extends React.Component {
         this.handlePassMarkChange = this.handlePassMarkChange.bind(this);
         this.handlePanelChange = this.handlePanelChange.bind(this);
         this.handleTestInstructionsChange = this.handleTestInstructionsChange.bind(this);
-        this.addSampleRow = this.addSampleRow.bind(this);
-        this.deleteSampleRow = this.deleteSampleRow.bind(this);
-        this.sampleReferenceResultChange = this.sampleReferenceResultChange.bind(this);
-        this.sampleNameChange = this.sampleNameChange.bind(this);
         this.handleParticipantSourceChange = this.handleParticipantSourceChange.bind(this);
         this.dualListOnChange = this.dualListOnChange.bind(this);
         this.getShipementDataById = this.getShipementDataById.bind(this);
@@ -87,11 +79,11 @@ class ShipmentForm extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevState.panelDetails != this.state.panelDetails) {
-            this.setState({
-                panelDetails: this.state.panelDetails
-            });
-        }
+        // if (prevState.panelDetails != this.state.panelDetails) {
+        //     this.setState({
+        //         panelDetails: this.state.panelDetails
+        //     });
+        // }
     }
 
     componentDidMount() {
@@ -109,42 +101,42 @@ class ShipmentForm extends React.Component {
             }
         })();
 
-        (async () => {
-            let partsList = await FetchParticipantList();
-            if (this.props.pageState == 'edit') {
+        // (async () => {
+        //     let partsList = await FetchParticipantList();
+        //     if (this.props.pageState == 'edit') {
 
-                let readinessChecklists = await FetchReadiness(1);
+        //         let readinessChecklists = await FetchReadiness(1);
 
-                this.getShipementDataById(this.props.id);
-                this.setState({
-                    dualListptions: partsList,
-                    readinessChecklists: readinessChecklists,
-                });
+        //         this.getShipementDataById(this.props.id);
+        //         this.setState({
+        //             dualListptions: partsList,
+        //             readinessChecklists: readinessChecklists,
+        //         });
 
-            } else {
+        //     } else {
 
-                let readinessChecklists = await FetchReadiness();
-                this.setState({
-                    dualListptions: partsList,
-                    readinessChecklists: readinessChecklists,
-                    pageState: this.props.pageState,
-                    id: '',
-                    message: '',
-                    round: '',
-                    shipmentCode: '',
-                    resultDueDate: '',
-                    passMark: 100,
-                    testInstructions: '',
-                    samples: [],
-                    readinessId: '',
-                    samplesNumber: 0,
-                    tableRows: [], //samples elements,
-                    participantSource: 'checklist',
-                    selected: [],
-                });
-            }
+        //         let readinessChecklists = await FetchReadiness();
+        //         this.setState({
+        //             dualListptions: partsList,
+        //             readinessChecklists: readinessChecklists,
+        //             pageState: this.props.pageState,
+        //             id: '',
+        //             message: '',
+        //             round: '',
+        //             shipmentCode: '',
+        //             resultDueDate: '',
+        //             passMark: 100,
+        //             testInstructions: '',
+        //             samples: [],
+        //             readinessId: '',
+        //             samplesNumber: 0,
+        //             tableRows: [], //samples elements,
+        //             participantSource: 'checklist',
+        //             selected: [],
+        //         });
+        //     }
 
-        })();
+        // })();
     }
 
     dualListOnChange(selected) {
@@ -216,41 +208,28 @@ class ShipmentForm extends React.Component {
 
 
     saveShipment() {
-        let isSamplesDataFilled = true;
-        this.state.samples.map((samples) => {
-            if (
-                samples['reference_result'] == null ||
-                samples['name'] == null ||
-                samples['reference_result'] == '' ||
-                samples['name'] == ''
-            ) {
-                isSamplesDataFilled = false
-            }
-        });
         if (
-            this.state.passMark == '' ||
-            this.state.resultDueDate == '' ||
-            this.state.shipmentCode == '' ||
-            this.state.round == '' ||
-            this.state.samplesNumber == 0 ||
-            !isSamplesDataFilled ||
-            (this.state.selected.length == 0 && this.state.readinessId == '')
+            (!this.state.passMark || this.state.passMark == '') ||
+            (!this.state.resultDueDate || this.state.resultDueDate == '') ||
+            (!this.state.shipmentCode || this.state.shipmentCode == '') ||
+            (!this.state.round || this.state.round == '') ||
+            (!this.state.panel_id || this.state.panel_id == '')
 
         ) {
-            let msg = [<p>Errors in:</p>,
-            <p>{this.state.passMark == '' ? <strong>Pass mark field</strong> : ''}</p>,
-            <p>{this.state.resultDueDate == '' ? <strong>Result Due Date field</strong> : ''}</p>,
-            <p>{this.state.shipmentCode == '' ? <strong>Shipement code field</strong> : ''}</p>,
-            <p>{this.state.round == '' ? <strong>Round Name field</strong> : ''}</p>,
-            <p>{this.state.samplesNumber == '' ? <strong>No samples attached</strong> : ''}</p>,
-            <p>{!this.state.isSamplesDataFilled ? <strong>Not all samples have a name and reference result</strong> : '11'}</p>,
-            <p>{(this.state.selected.length == 0 && this.state.readinessId == '') ? <strong>No readiness of participants selected</strong> : ''}</p>]
+            let msg = [
+                <p>Please fix the following errors:</p>,
+                <p>{(!this.state.passMark || this.state.passMark == '') ? <strong>Pass mark field</strong> : ''}</p>,
+                <p>{(!this.state.resultDueDate || this.state.resultDueDate == '') ? <strong>Result Due Date field</strong> : ''}</p>,
+                <p>{(!this.state.shipmentCode || this.state.shipmentCode == '') ? <strong>Shipement code field</strong> : ''}</p>,
+                <p>{(!this.state.round || this.state.round == '') ? <strong>Round Name field</strong> : ''}</p>,
+                <p>{(!this.state.panel_id || this.state.panel_id == '') ? <strong>Panel field</strong> : ''}</p>,
+            ]
 
             this.setState({
                 message:
                     [
                         <p>Kindly fill the required fileds marked in *</p>,
-                        <p>{msg}</p>
+                        <div>{msg}</div>
                     ]
             });
             $('#addShipmentModal').modal('toggle');
@@ -263,10 +242,8 @@ class ShipmentForm extends React.Component {
                 shipement['result_due_date'] = this.state.resultDueDate;
                 shipement['shipment_code'] = this.state.shipmentCode;
                 shipement['round'] = this.state.round;
-                shipement['samples'] = this.state.samples;
+                shipement['panel_id'] = this.state.panel_id;
                 shipement['test_instructions'] = this.state.testInstructions;
-                shipement['selected'] = this.state.selected;
-                shipement['readiness_id'] = this.state.readinessId;
 
                 if (this.state.pageState == 'edit') {
                     let response = await UpdateShipment(shipement);
@@ -282,12 +259,11 @@ class ShipmentForm extends React.Component {
                             resultDueDate: '',
                             shipmentCode: '',
                             round: '',
-                            samples: [],
-                            tableRows: [],
-                            samplesNumber: 0,
                             selected: [],
-                            readinessId: '',
-                            testInstructions: ''
+                            panel_id: '',
+                            testInstructions: '',
+                            panelDetails: null,
+                            panels: [],
                         });
                     } else {
                         this.setState({
@@ -300,70 +276,11 @@ class ShipmentForm extends React.Component {
         }
     }
 
-
-    deleteSampleRow(index) {
-
-        let tableRows = this.state.tableRows;
-        let samples = this.state.samples;
-        delete samples[index];
-        delete tableRows[index];
-        this.setState({
-            tableRows: tableRows,
-            samples: samples,
-            samplesNumber: this.state.samplesNumber - 1
-        })
-    }
-
-    sampleReferenceResultChange(index, refResult) {
-        let samples = this.state.samples;
-        let sample = samples[index];
-        sample['reference_result'] = refResult;
-        samples[index] = sample;
-        this.setState({
-            samples: samples
-        })
-    }
-
-    sampleNameChange(index, name) {
-        let samples = this.state.samples;
-        let sample = samples[index];
-        sample['name'] = name;
-        samples[index] = sample;
-        this.setState({
-            samples: samples
-        })
-    }
-
-    addSampleRow(index, val) {
-        let tableRows = this.state.tableRows;
-
-        let samples = this.state.samples;
-        let newSample = {};
-        newSample['name'] = '';
-        newSample['reference_result'] = '';
-
-        tableRows.push(<ShipmentSample
-            key={uuidv4()}
-            index={index}
-            deleteSampleRow={this.deleteSampleRow}
-            result={val ? val.reference_result : ''}
-            name={val ? val.name : ''}
-            sampleReferenceResultChange={this.sampleReferenceResultChange}
-            sampleNameChange={this.sampleNameChange}
-        />);
-
-        samples.push(newSample);
-
-        this.setState({
-            tableRows: tableRows,
-            samples: samples,
-            samplesNumber: this.state.samplesNumber + 1
-        });
-
-    }
-
     handlePanelChange(panel) {
         if (panel) {
+            this.setState({
+                panel_id: panel
+            });
             FetchPanel(panel).then((response) => {
                 this.setState({
                     panelDetails: response
@@ -456,9 +373,9 @@ class ShipmentForm extends React.Component {
                     {/* <div className='col-md-3'>
                         <small>
                             <details open>
-                                <summary>this.state.panelDetails</summary>
+                                <summary>this.state</summary>
                                 <pre>
-                                    {JSON.stringify(this.state.panelDetails, null, 2)}
+                                    {JSON.stringify(this.state, null, 2)}
                                 </pre>
                             </details>
                         </small>
@@ -651,34 +568,6 @@ class ShipmentForm extends React.Component {
                                                 </table>
                                             </div>
                                         </div>
-
-                                        {/* <table className="table unstrip table-bordered table-sm ">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">Sample *</th>
-                                                <th scope="col">Reference result *</th>
-                                                <th scope="col">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-
-                                            {this.state.tableRows.map((row) => {
-                                                if (row != undefined)
-                                                    return row;
-                                            })}
-                                            <tr>
-                                                <td>
-                                                    <a onClick={() => {
-                                                        this.addSampleRow(this.state.tableRows.length)
-                                                    }}>
-                                                        <ReactTooltip />
-                                                        <i data-tip="Add sample" style={{ "color": "blue" }} className="fas fa-plus-circle fa-2x"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-
-                                        </tbody>
-                                    </table> */}
                                     </div>
                                 </div>}
 
@@ -715,7 +604,11 @@ class ShipmentForm extends React.Component {
                             </div>
                             <div className="modal-body">
                                 {
-                                    this.state.message ? this.state.message : ''
+                                    // this.state.message ? this.state.message : ''
+                                    // check of array of elements
+                                    this.state.message && Array.isArray(this.state.message) && this.state.message.length > 0 ? this.state.message.map((msg, index) => {
+                                        return <React.Fragment key={index}>{msg}</React.Fragment>
+                                    }) : this.state.message ? this.state.message : ''
                                 }
                             </div>
                             <div className="modal-footer">

@@ -24,6 +24,7 @@ class CreatePtShipementsTable extends Migration
             $table->integer('pass_mark');
             // $table->unsignedBigInteger('readiness_id')->nullable();
             $table->integer('ptpanel_id')->nullable();
+            $table->softDeletes();
         });
     }
 
