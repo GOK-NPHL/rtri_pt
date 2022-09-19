@@ -57,9 +57,6 @@ class ShipmentForm extends React.Component {
                 $('#addPersonelModal').modal('toggle');
             } else {
 
-                for (let i = 0; i < editData.samples.length; i++) {
-                    this.addSampleRow(i, editData.samples[i]);
-                }
                 this.setState({
                     id: id,
                     round: editData.shipment.round_name,
@@ -67,11 +64,6 @@ class ShipmentForm extends React.Component {
                     resultDueDate: editData.shipment.end_date,
                     passMark: editData.shipment.pass_mark,
                     testInstructions: editData.shipment.test_instructions,
-                    samples: editData.samples,
-                    readinessId: editData.shipment.readiness_id,
-                    samplesNumber: editData.samples.length,
-                    participantSource: editData.shipment.readiness_id == null ? 'participants' : 'checklist',
-                    selected: editData.labs,
                     pageState: 'edit',
                 });
             }
@@ -101,42 +93,30 @@ class ShipmentForm extends React.Component {
             }
         })();
 
-        // (async () => {
-        //     let partsList = await FetchParticipantList();
-        //     if (this.props.pageState == 'edit') {
-
-        //         let readinessChecklists = await FetchReadiness(1);
-
-        //         this.getShipementDataById(this.props.id);
-        //         this.setState({
-        //             dualListptions: partsList,
-        //             readinessChecklists: readinessChecklists,
-        //         });
-
-        //     } else {
-
-        //         let readinessChecklists = await FetchReadiness();
-        //         this.setState({
-        //             dualListptions: partsList,
-        //             readinessChecklists: readinessChecklists,
-        //             pageState: this.props.pageState,
-        //             id: '',
-        //             message: '',
-        //             round: '',
-        //             shipmentCode: '',
-        //             resultDueDate: '',
-        //             passMark: 100,
-        //             testInstructions: '',
-        //             samples: [],
-        //             readinessId: '',
-        //             samplesNumber: 0,
-        //             tableRows: [], //samples elements,
-        //             participantSource: 'checklist',
-        //             selected: [],
-        //         });
-        //     }
-
-        // })();
+        (async () => {
+            if (this.props.pageState == 'edit') {
+                this.getShipementDataById(this.props.id);
+                FetchPanel(this.props.id).then((panel) => {
+                    this.setState({
+                        panelDetails: panel,
+                        panel_id: panel.id,
+                    });
+                });
+            }
+            else {
+                    this.setState({
+                        pageState: this.props.pageState,
+                        id: '',
+                        message: '',
+                        round: '',
+                        shipmentCode: '',
+                        resultDueDate: '',
+                        passMark: 100,
+                        testInstructions: '',
+                        panel_id: '',
+                    });
+            }
+        })();
     }
 
     dualListOnChange(selected) {
@@ -482,7 +462,9 @@ class ShipmentForm extends React.Component {
                                         <hr />
                                         <div className="form-group w-100">
                                             <label htmlFor="panel">Select a panel</label>
-                                            <select data-dropup-auto="false" data-live-search="true" className="form-control" id="panel" name="panel" onChange={(event) => this.handlePanelChange(event.target.value)}>
+                                            <select data-dropup-auto="false" data-live-search="true" className="form-control" id="panel" name="panel"
+                                                onChange={(event) => this.handlePanelChange(event.target.value)}
+                                                value={this.state?.panel_id || ''}>
                                                 <option value="">Select a panel</option>
                                                 {this.state.panels.map((panel, index) => {
                                                     return <option key={index} value={panel.id}>{panel.name}</option>
