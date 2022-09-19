@@ -1,56 +1,157 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import DualListBox from 'react-dual-listbox';
+import { UpdatePanel, FetchLots, FetchPanel } from '../../../components/utils/Helpers';
+import '../shipment/PtShipment.css';
+import { v4 as uuidv4 } from 'uuid';
 import { matchPath } from 'react-router';
-import { UpdatePanel, FetchReadiness, FetchuserId, FetchPanel } from '../../../components/utils/Helpers';
-// import { v4 as uuidv4 } from 'uuid';
+import ReactTooltip from 'react-tooltip';
+import ShipmentSample from '../shipment/ShipmentSample';
 
-class EditPanel extends React.Component {
+class AddPanels extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
             payload: null,
-            readinesses: [],
-            readiness_id: null,
-            userId: '156f41ed97',
+            lots: [],
+            samples: [],
+            samplesNumber: 0,
+            tableRows: [], //samples elements,
             message: null,
-            status: null
+            status: null,
         }
         this.savePanel = this.savePanel.bind(this);
+        this.addSampleRow = this.addSampleRow.bind(this);
+        this.deleteSampleRow = this.deleteSampleRow.bind(this);
+        this.sampleReferenceResultChange = this.sampleReferenceResultChange.bind(this);
+        this.sampleNameChange = this.sampleNameChange.bind(this);
+    }
+
+
+
+    ///////////////////////////////////<<<<<<<<<<<<<<<<<<////////////////////////////////////////
+    /////////////////////////////////SAMPLE MANAGEMENT////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+    deleteSampleRow(index) {
+        let tableRows = this.state.tableRows;
+        let pl_samples_ds = this.state?.payload?.samples;
+        // if there is a 'deleted' attribute, set it to true, otherwise remove the element
+        let pl_sample = pl_samples_ds.find(p=>p.index==index)
+        console.log('deleteSampleRow', index, pl_sample);
+        if(pl_sample && pl_sample?.deleted == 0 && pl_sample?.id){ // mark existing sample as deleted
+            pl_sample.deleted = 1;
+            pl_sample.name = null;
+            pl_sample.reference_result = null;
+        }else{
+            pl_samples_ds = pl_samples_ds.filter(p=>p.index!=index);
+        }
+        // delete pl_samples_ds[index];
+        // delete tableRows[index];
+        tableRows = tableRows.filter((row, i) => row.props.index != index);
+        this.setState({
+            tableRows: tableRows,
+            samplesNumber: this.state.samplesNumber - 1,
+            payload: {
+                ...this.state.payload,
+                samples: pl_samples_ds.filter(pf => pf != null)
+            }
+        })
+    }
+    sampleReferenceResultChange(index, refResult) {
+        let pl_samples_nc = this.state?.payload?.samples;
+        let pl_sample = pl_samples_nc.find(p=>p.index==index)
+        if (!pl_sample || pl_sample == null || pl_sample == undefined) {
+            console.log('sample ', index, ' not found');
+            if (index > pl_samples_nc.length) {
+                pl_sample = pl_samples_nc[pl_samples_nc.length - 1];
+            }
+        } else {
+            pl_sample.reference_result = refResult;
+            pl_samples_nc.filter(p=>p.index==index)[0] = pl_sample;
+            this.setState({
+                payload: {
+                    ...this.state.payload,
+                    samples: pl_samples_nc.filter(pf => pf != null)
+                }
+            })
+        }
+    }
+    sampleNameChange(index, name) {
+        let pl_samples_nc = this.state?.payload?.samples;
+        let pl_sample = pl_samples_nc.find(p=>p.index==index)
+        if (!pl_sample || pl_sample == null || pl_sample == undefined) {
+            console.log('sample ', index, ' not found');
+            if (index > pl_samples_nc.length) {
+                pl_sample = pl_samples_nc[pl_samples_nc.length - 1];
+            }
+        } else {
+            pl_sample.name = name;
+            pl_samples_nc.filter(p=>p.index==index)[0] = pl_sample;
+            this.setState({
+                payload: {
+                    ...this.state.payload,
+                    samples: pl_samples_nc.filter(pf => pf != null)
+                }
+            })
+        }
+    }
+    addSampleRow(index, val) {
+        console.log('addSampleRow', index, val);
+        let tableRows = this.state.tableRows;
+
+        // let samples = this.state.samples;
+        let pl_samples_as = this.state?.payload?.samples;
+        let newSample = {};
+        newSample['index'] = index;
+        newSample['name'] = '';
+        newSample['reference_result'] = '';
+
+        tableRows.push(<ShipmentSample
+            key={uuidv4()}
+            index={index}
+            deleteSampleRow={this.deleteSampleRow}
+            result={val ? val.reference_result : ''}
+            name={val ? val.name : ''}
+            sampleReferenceResultChange={this.sampleReferenceResultChange}
+            sampleNameChange={this.sampleNameChange}
+        />);
+        // samples.push(newSample);
+        pl_samples_as.push(newSample);
+        this.setState({
+            tableRows: tableRows,
+            // samples: samples,
+            samplesNumber: this.state.samplesNumber + 1,
+            payload: {
+                ...this.state.payload,
+                samples: pl_samples_as.filter(pf => pf != null)
+            }
+        });
     }
 
     
+
     savePanel() {
-        // console.log('savePanel', this.state.payload);
+        console.log('updatePanel', this.state.panelId, this.state.payload);
         (async () => {
-            if (this.state.payload && this.state.payload.ending_ids.length > 0 && this.state.panelId) {
-                let response = await UpdatePanel(this.state.panelId, {
-                    ...this.state.payload,
-                    ending_ids: this.state.payload.ending_ids.join(',') //JSON.stringify(this.state.payload.ending_ids),
-                });
-                // console.log('response', response);
+            let response = await UpdatePanel(this.state.panelId, this.state.payload);
+            this.setState({
+                message: response.status == 200 ? 'Panel updated successfully' : 'Error updating panel',
+                status: response.status
+            });
+            if (response.status === 200) {
                 this.setState({
-                    message: response.status == 200 ? 'Panel updated successfully' : 'Error updating panel',
-                    status: response.status
-                });
-                if (response.status === 200) {
-                    setTimeout(() => {
-                        window.location.href = '/panels';
-                    }, 2000);
-                }
-            } else {
-                this.setState({
-                    message: 'Panel not updated. Please check the form',
-                    status: 400
+                    payload: null
                 });
             }
 
         })();
-
     }
+    //////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////SAMPLE MANAGEMENT////////////////////////////////////////
+    //////////////////////////////////>>>>>>>>>>>>>/////////////////////////////////////////////
 
     componentDidMount() {
-
         let pathname = window.location.pathname;
         let pathObject = matchPath(pathname, {
             path: `/panels/edit/:panelId`,
@@ -61,19 +162,43 @@ class EditPanel extends React.Component {
         });
 
         (async () => {
-            let response = await FetchPanel(pathObject.params.panelId);
-            this.setState({
-                payload: {
-                    ...response,
-                    ending_ids: Array.from(response.ending_ids.split(','), Number)
-                }
+            FetchPanel(pathObject.params.panelId).then((response) => {
+                this.setState({
+                    payload: {
+                        name: response.name,
+                        samples: Array.from(response.samples, (sp, sx) => {
+                            return {
+                                id: sp.id,
+                                index: sx,
+                                name: sp.name,
+                                reference_result: sp.reference_result,
+                                deleted: 0
+                            }
+                        }),
+                        lot_ids: Array.from(response.lots, l => l.id) || [],
+                    }
+                });
+            }).then(() => {
+                this.setState({
+                    tableRows: this.state.payload.samples.map((sp, index) => {
+                        return <ShipmentSample
+                            key={uuidv4()}
+                            index={index}
+                            deleteSampleRow={this.deleteSampleRow}
+                            result={sp.reference_result}
+                            name={sp.name}
+                            sampleReferenceResultChange={this.sampleReferenceResultChange}
+                            sampleNameChange={this.sampleNameChange}
+                        />
+                    })
+                });
             });
         })();
 
         (async () => {
-            let response = await FetchReadiness(this.state.userId, 0);
+            let response = await FetchLots();
             this.setState({
-                readinesses: response
+                lots: response
             });
         })();
     }
@@ -104,7 +229,7 @@ class EditPanel extends React.Component {
                                 <div className="card-body">
                                     <div className="row text-center">
                                         <div className="col-md-12">
-                                            <h3 className="text-bold">Edit Panel</h3>
+                                            <h3 className="text-bold">Edit Panel {this.state?.payload?.name || ''}</h3>
                                             {/* alerts */}
                                             {this.state.status && this.state.message && <div className='row'>
                                                 <div className='col-md-12'>
@@ -124,8 +249,7 @@ class EditPanel extends React.Component {
                                                     <div className="form-group">
                                                         <label htmlFor="name">Name</label>
                                                         <input type="text" className="form-control" id="name" placeholder="Enter name"
-                                                            defaultValue={this.state.payload && this.state.payload.name}
-                                                            onChange={ev => {
+                                                            defaultValue={this.state.payload && this.state.payload.name} onChange={ev => {
                                                                 this.setState({
                                                                     payload: {
                                                                         ...this.state.payload || {},
@@ -137,71 +261,79 @@ class EditPanel extends React.Component {
                                                 </div>
                                                 <div className='col-md-12'>
                                                     <div className="form-group">
-                                                        <label htmlFor="description">Readiness</label>
-                                                        <select className='form-control' id='readiness'
-                                                            value={this.state.payload?.readiness_id || ''}
-                                                            onChange={ev => {
+                                                        <label className='mt-3' htmlFor="description">Lots</label>
+                                                        &nbsp;<small>(Randomized participant groups)</small>
+                                                        <DualListBox
+                                                            canFilter
+                                                            options={Array.from(this.state.lots).map(lot => {
+                                                                return {
+                                                                    value: lot.id,
+                                                                    label: lot.name + ' (Readiness: ' + lot.readiness_name + ', Participants: ' + lot.participant_count + ')'
+                                                                }
+                                                            })}
+                                                            selected={(this.state.payload?.lot_ids && this.state.payload?.lot_ids.length > 0) ? this.state.payload.lot_ids : []}
+                                                            onChange={(selected) => {
                                                                 this.setState({
+                                                                    lot_ids: selected,
                                                                     payload: {
                                                                         ...this.state.payload || {},
-                                                                        readiness_id: parseInt(ev.target.value)
+                                                                        lot_ids: selected
                                                                     }
                                                                 });
-                                                            }}>
-                                                            <option value=''>Select Readiness</option>
-                                                            {this.state.readinesses.length > 0 && this.state.readinesses.map((readiness, index) => {
-                                                                return (
-                                                                    <option
-                                                                        key={index} value={readiness.id}>{readiness.name}</option>
-                                                                )
-                                                            })}
-                                                        </select>
+                                                            }}
+                                                        />
                                                     </div>
                                                 </div>
+
+                                                {/* //////////////////<<<<<<<<<///////////////// */}
+                                                {/* /////////////////SAMPLE STUFF/////////////// */}
+                                                {/* //////////////////////////////////////////// */}
                                                 <div className='col-md-12'>
-                                                    <div className="form-group">
-                                                        <div style={{ width: '100%', display: 'flex', flexDirection: 'row', marginBottom: '6px', gap: '5px' }}>
-                                                            <label className='control-label mb-0' htmlFor="description">Ending IDs (pick 2 random)</label>
-                                                            {this.state.payload && this.state.payload.ending_ids && this.state.payload.ending_ids.length > 2
-                                                                && <div><small className='alert alert-default-danger' style={{ padding: '1px 2px' }}>Please select only 2</small></div>}
+                                                    <div className="form-row bg-white">
+                                                        <label className='mt-3'>Sample results</label>
+                                                        <div className="col-sm-12">
+                                                            <table className="table unstrip table-bordered table-sm ">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th scope="col">Sample *</th>
+                                                                        <th scope="col">Reference result *</th>
+                                                                        <th scope="col">Action</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+
+                                                                    {this.state.tableRows.map((row) => {
+                                                                        if (row != undefined)
+                                                                            return row;
+                                                                    })}
+                                                                    <tr>
+                                                                        <td>
+                                                                            <a onClick={() => {
+                                                                                this.addSampleRow(this.state.tableRows.length)
+                                                                            }}>
+                                                                                <ReactTooltip />
+                                                                                <i data-tip="Add sample" style={{ "color": "blue" }} className="fas fa-plus-circle fa-2x"></i>
+                                                                            </a>
+                                                                        </td>
+                                                                    </tr>
+
+                                                                </tbody>
+                                                            </table>
                                                         </div>
-                                                        <div style={{ display: 'flex', gap: '15px', flexDirection: 'row' }}>
-                                                            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((item, index) => {
-                                                                return (
-                                                                    <div key={item} style={{ display: 'flex', gap: '3px', flexDirection: 'row' }}>
-                                                                        <input type="checkbox" id="ending_ids" placeholder="Enter ending ids" name='ending_ids' value={item}
-                                                                            defaultChecked={this.state.payload && this.state.payload.ending_ids && this.state.payload.ending_ids.includes(item)}
-                                                                            onInput={ev => {
-                                                                                if (ev.target.checked) {
-                                                                                    this.setState({
-                                                                                        payload: {
-                                                                                            ...this.state.payload || {},
-                                                                                            ending_ids: [
-                                                                                                ...this.state.payload?.ending_ids || [],
-                                                                                                Number(ev.target.value)
-                                                                                            ]
-                                                                                        }
-                                                                                    });
-                                                                                } else {
-                                                                                    this.setState({
-                                                                                        payload: {
-                                                                                            ...this.state.payload || {},
-                                                                                            ending_ids: this.state.payload?.ending_ids?.filter(id => id != Number(ev.target.value))
-                                                                                        }
-                                                                                    });
-                                                                                }
-                                                                            }} />
-                                                                        {' '}{item}
-                                                                    </div>
-                                                                )
-                                                            })}
-                                                        </div>
+
                                                     </div>
                                                 </div>
-                                                <div className='col-md-12 mt-3'>
+                                                {/* //////////////////////////////////////////// */}
+                                                {/* /////////////////SAMPLE STUFF/////////////// */}
+                                                {/* //////////////////>>>>>>>>>///////////////// */}
+
+
+
+
+                                                <div className='col-md-12 mt-3 text-center'>
                                                     <input type="submit" disabled={
-                                                        !this.state.payload?.name || !this.state.payload?.readiness_id || !this.state.payload?.ending_ids || (this.state.payload?.ending_ids.length < 2 || this.state.payload?.ending_ids.length > 2)
-                                                    } className="btn btn-primary" value='Save' onClick={(ev) => {
+                                                        !this.state.payload?.name || !this.state.payload?.lot_ids || this.state.payload?.lot_ids.length < 1 || !this.state?.payload?.samples || this.state?.payload?.samples.length < 1
+                                                    } className="btn btn-primary" value='Save Panel' onClick={(ev) => {
                                                         ev.preventDefault();
                                                         this.savePanel();
                                                     }} />
@@ -220,8 +352,8 @@ class EditPanel extends React.Component {
 
 }
 
-export default EditPanel;
+export default AddPanels;
 
 if (document.getElementById('edit_panel')) {
-    ReactDOM.render(<EditPanel />, document.getElementById('edit_panel'));
+    ReactDOM.render(<AddPanels />, document.getElementById('edit_panel'));
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { v4 as uuidv4 } from 'uuid';
 import Pagination from "react-js-pagination";
-import { FetchLots } from '../../../components/utils/Helpers';
+import { DeleteLot, FetchLots } from '../../../components/utils/Helpers';
 
 
 class ListLots extends React.Component {
@@ -93,9 +93,27 @@ class ListLots extends React.Component {
                                         window.location.assign('/lots/edit/' + element.id)
                                     }
                                 }
-                                data-toggle="tooltip" data-placement="top" title="Edit readiness"
+                                data-toggle="tooltip" data-placement="top" title="Edit Lot"
                                 className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm text-white">
                                 <i className="fas fa-edit"></i> Edit
+                            </a>&nbsp;
+                            <a
+                                onClick={
+                                    (ev) => {
+                                        ev.preventDefault();
+                                        ev.stopPropagation();
+                                        window.confirm('Are you sure you wish to delete this item?') &&
+                                        ( async () => {
+                                            let response = await DeleteLot(element.id);
+                                            if (response) {
+                                                window.location.reload();
+                                            }
+                                        } )();
+                                    }
+                                }
+                                data-toggle="tooltip" data-placement="top" title="Delete Lot"
+                                className="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm text-white">
+                                <i className="fas fa-trash"></i> Delete
                             </a>
 
                         </td>

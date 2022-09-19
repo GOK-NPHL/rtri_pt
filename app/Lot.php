@@ -35,6 +35,8 @@ class Lot extends Model
         // return $this->belongsTo('App\Readiness');
         $r = $this->belongsTo(Readiness::class, 'readiness_id')->first();
         return $r;
+
+        // return $this->belongsTo(Readiness::class, 'readiness_id');
     }
 
     //participants

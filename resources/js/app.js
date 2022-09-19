@@ -72,7 +72,6 @@ require('./user/pt/lots/ViewLot');
 
 // panels
 require('./user/pt/panels/ListPanels');
-require('./user/pt/panels/PanelParticipants');
 require('./user/pt/panels/AddPanel');
 require('./user/pt/panels/EditPanel');
 require('./user/pt/panels/ViewPanel');

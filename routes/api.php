@@ -156,7 +156,6 @@ Route::delete('/lot/{id}', [LotController::class, 'deleteLot']);
 
 // panels crud
 Route::get('/get_panels', [PtPanelController::class, 'getPanels']);
-Route::get('/get_panel/{id}/participants', [PtPanelController::class, 'getPanelParticipants']);
 Route::get('/get_panel/{id}', [PtPanelController::class, 'getPanel']);
 Route::post('/panel', [PtPanelController::class, 'createPanel']);
 Route::put('/panel/{id}', [PtPanelController::class, 'updatePanel']);

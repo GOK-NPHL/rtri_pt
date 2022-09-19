@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { v4 as uuidv4 } from 'uuid';
 import Pagination from "react-js-pagination";
-import { FetchPanels } from '../../../components/utils/Helpers';
+import { DeletePanel, FetchPanels } from '../../../components/utils/Helpers';
 
 
 class ListPanels extends React.Component {
@@ -70,32 +70,45 @@ class ListPanels extends React.Component {
                 tableElem.push(<tr key={index}>
                     <th scope="row">{index + 1}</th>
                     <td>{element.name}</td>
-                    <td>{element.ending_ids}</td>
-                    <td>{element?.participant_count || 0 }</td>
-                    <td>{element?.readiness['name'] || element.readiness_id}</td>
-                    <td>{element.created_at ? new Date(element.created_at).toLocaleString() : '-'}</td>
+                    <td style={{display: 'flex', flexDirection: 'column'}}>{
+                        (element.lots && element.lots.length > 0) ?
+                            element.lots.map(
+                                (l, x) => <span className='badge py-2' key={l.name + "_" + x}>
+                                    {l.name} ({l.participants} participants)
+                                </span>) :
+                            <div><label style={{ fontWeight: 'normal', color: 'black' }} className='badge badge-warning'>No lots found</label></div>
+                    }</td>
+                    <td style={{verticalAlign: 'middle'}}>{element.created_at ? new Date(element.created_at).toLocaleString() : '-'}</td>
                     {
 
                         <td>
-
-                            <a
-                                onClick={() => {
-                                    window.location.assign('/panels/' + element.id + '/participants')
-                                }}
-                                style={{ 'marginRight': '5px' }}
-                                data-toggle="tooltip" data-placement="top" title="View readiness responses"
-                                className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm text-white">
-                                <i className="fas fa-file"></i> View participants
-                            </a>
                             <a
                                 onClick={
                                     () => {
                                         window.location.assign('/panels/edit/' + element.id)
                                     }
                                 }
-                                data-toggle="tooltip" data-placement="top" title="Edit readiness"
+                                data-toggle="tooltip" data-placement="top" title="Edit Panel"
                                 className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm text-white">
                                 <i className="fas fa-edit"></i> Edit
+                            </a> &nbsp;
+                            <a
+                                onClick={
+                                    (ev) => {
+                                        ev.preventDefault();
+                                        ev.stopPropagation();
+                                        window.confirm('Are you sure you wish to delete this item?') &&
+                                        ( async () => {
+                                            let response = await DeletePanel(element.id);
+                                            if (response) {
+                                                window.location.reload();
+                                            }
+                                        } )();
+                                    }
+                                }
+                                data-toggle="tooltip" data-placement="top" title="Delete Panel"
+                                className="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm text-white">
+                                <i className="fas fa-trash"></i> Delete
                             </a>
 
                         </td>
@@ -126,7 +139,7 @@ class ListPanels extends React.Component {
                             console.log(this.state.allTableElements);
                             let currElementsTableEl = this.state.allTableElements.filter(elemnt =>
                                 elemnt['props']['children'][1]['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
-                                elemnt['props']['children'][2]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) 
+                                elemnt['props']['children'][2]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase())
                                 // || elemnt['props']['children'][3]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase())
                             );
                             this.updatedSearchItem(currElementsTableEl);
@@ -139,9 +152,7 @@ class ListPanels extends React.Component {
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Panel Name</th>
-                            <th scope="col">Ending IDs</th>
-                            <th scope="col">No. of participants</th>
-                            <th scope="col">Readiness Checklist</th>
+                            <th scope="col">Lots</th>
                             <th scope="col">Created on</th>
                             <th scope="col">Action</th>
                         </tr>

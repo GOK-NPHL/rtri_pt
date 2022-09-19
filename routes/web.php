@@ -120,19 +120,13 @@ Route::prefix('access-management')->group(function () {
 /// Lots CRUD
 Route::get('lots', [LotController::class, 'index'])->name('lots');
 Route::get('lots/new', [LotController::class, 'create'])->name('new-lot');
-// Route::post('lots/save', [LotController::class, 'save'])->name('save-lot');
 Route::get('lots/{lotId}', [LotController::class, 'show'])->name('view-lot');
 Route::get('lots/{lotId}/participants', [LotController::class, 'show_participants'])->name('view-lot-participants');
 Route::get('lots/edit/{lotId}', [LotController::class, 'edit'])->name('edit-lot');
-// Route::put('lots/update/{lotId}', [LotController::class, 'update'])->name('update-lot');
-// Route::get('lots/delete/{lotId}', [LotController::class, 'delete'])->name('delete-lot');
 ///////
 
 // Panels CRUD
 Route::get('panels', [PtPanelController::class, 'index'])->name('panels');
 Route::get('panels/new', [PtPanelController::class, 'create'])->name('new-panel');
-// Route::post('panels/save', [PtPanelController::class, 'save'])->name('save-panel');
 Route::get('panels/{panelId}', [PtPanelController::class, 'show'])->name('view-panel');
 Route::get('panels/edit/{panelId}', [PtPanelController::class, 'edit'])->name('edit-panel');
-// Route::put('panels/update/{panelId}', [PtPanelController::class, 'update'])->name('update-panel');
-// Route::get('panels/delete/{panelId}', [PtPanelController::class, 'delete'])->name('delete-panel');

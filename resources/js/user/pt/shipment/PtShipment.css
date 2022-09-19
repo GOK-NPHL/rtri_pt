@@ -1,4 +1,4 @@
-.unstrip tr:nth-child(2n) {
+.unstrip .table tr:nth-child(2n) {
     background-color: white;
 }
 
@@ -6,6 +6,6 @@
     background-color: white;
 }
 
-/* tr:nth-child(even) {
+/* .table tr:nth-child(even) {
     background-color: #dddddd;
   } */

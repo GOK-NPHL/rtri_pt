@@ -1,5 +1,5 @@
 import React from 'react';
-import { FetchParticipantList, SaveShipment, FetchShipmentReadiness as FetchReadiness, FetchShipmentById, UpdateShipment } from '../../../components/utils/Helpers';
+import { FetchPanel, FetchPanels, FetchParticipantList, SaveShipment, FetchShipmentReadiness as FetchReadiness, FetchShipmentById, UpdateShipment } from '../../../components/utils/Helpers';
 import { v4 as uuidv4 } from 'uuid';
 import DualListBox from 'react-dual-listbox';
 import './PtShipment.css';
@@ -32,13 +32,16 @@ class ShipmentForm extends React.Component {
             dualListptions: [],
             readinessChecklists: [],
             selected: [],
-            pageState: ''
+            pageState: '',
+            panels: [],
+            panelDetails: null
         }
 
         this.handleRoundChange = this.handleRoundChange.bind(this);
         this.handleShipmentCodeChange = this.handleShipmentCodeChange.bind(this);
         this.handleResultDueDateChange = this.handleResultDueDateChange.bind(this);
         this.handlePassMarkChange = this.handlePassMarkChange.bind(this);
+        this.handlePanelChange = this.handlePanelChange.bind(this);
         this.handleTestInstructionsChange = this.handleTestInstructionsChange.bind(this);
         this.addSampleRow = this.addSampleRow.bind(this);
         this.deleteSampleRow = this.deleteSampleRow.bind(this);
@@ -84,10 +87,28 @@ class ShipmentForm extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-
+        if (prevState.panelDetails != this.state.panelDetails) {
+            this.setState({
+                panelDetails: this.state.panelDetails
+            });
+        }
     }
 
     componentDidMount() {
+        (async () => {
+            let panels = await FetchPanels();
+            if (panels.status == 500) {
+                this.setState({
+                    message: panels.data.Message,
+                });
+                $('#addShipmentModal').modal('toggle');
+            } else {
+                this.setState({
+                    panels: panels
+                });
+            }
+        })();
+
         (async () => {
             let partsList = await FetchParticipantList();
             if (this.props.pageState == 'edit') {
@@ -341,6 +362,16 @@ class ShipmentForm extends React.Component {
 
     }
 
+    handlePanelChange(panel) {
+        if (panel) {
+            FetchPanel(panel).then((response) => {
+                this.setState({
+                    panelDetails: response
+                });
+            });
+        }
+    }
+
 
     render() {
         let dualListValues = [];
@@ -421,166 +452,259 @@ class ShipmentForm extends React.Component {
         return (
             <React.Fragment>
 
-                <div className="card" style={{ "backgroundColor": "#ecf0f1" }}>
-                    <div className="card-body">
+                <div className="row">
+                    {/* <div className='col-md-3'>
+                        <small>
+                            <details open>
+                                <summary>this.state.panelDetails</summary>
+                                <pre>
+                                    {JSON.stringify(this.state.panelDetails, null, 2)}
+                                </pre>
+                            </details>
+                        </small>
+                    </div>
+                    <div className='col-md-9'> */}
+                    <div className='col-md-12'>
+                        <div className="card" style={{ "backgroundColor": "#ecf0f1" }}>
+                            <div className="card-body">
 
-                        <div className="form-row">
+                                <div className="form-row">
 
-                            <div className="col-md-6 mb-3">
-                                <label htmlFor="u_round" >Round Name *</label>
-                                <input
-                                    value={this.state.round}
-                                    onChange={(event) => this.handleRoundChange(event.target.value)} type="text"
-                                    className="form-control" id="u_round" />
-                            </div>
-
-                            <div className="col-md-6 mb-3">
-                                <label htmlFor="u_shipment_code" >Shipment Code *</label>
-                                <input
-                                    value={this.state.shipmentCode}
-                                    onChange={(event) => this.handleShipmentCodeChange(event.target.value)} type="text"
-                                    className="form-control" id="u_shipment_code" />
-                            </div>
-
-                        </div>
-
-
-                        <div className="form-row">
-                            {/* add */}
-                            <div className="col-md-6 mb-3">
-                                <label htmlFor="u_result_due_date" >Result Due Date  *</label>
-                                <input
-                                    value={this.state.resultDueDate}
-                                    onChange={(event) => this.handleResultDueDateChange(event.target.value)}
-                                    type="date" className="form-control" id="u_result_due_date" />
-                            </div>
-
-                            <div className="col-md-6 mb-3">
-                                <label htmlFor="u_pass_mark" >Pass mark (%)*</label>
-
-                                <input
-                                    min={0}
-                                    max={100}
-                                    value={this.state.passMark}
-                                    onChange={(event) => this.handlePassMarkChange(event.target.value)}
-                                    type="number" className="form-control" id="u_pass_mark" />
-                            </div>
-
-                        </div>
-
-                        <div className="form-row">
-
-                            <div className="col-sm-12 mb-3">
-                                <label htmlFor="test_instructions" >Testing Instructions</label>
-                                <textarea
-                                    value={this.state.testInstructions}
-                                    onChange={(event) => this.handleTestInstructionsChange(event.target.value)}
-                                    className="form-control" id="test_instructions" rows="3"></textarea>
-                            </div>
-                        </div>
-
-                        <div className="form-row bg-white mb-3 pt-2 rounded">
-                            {/* choose participant source */}
-                            <div className="col-sm-12 mb-3  ml-2">
-
-
-                                {this.state.pageState != 'edit' ?
-                                    <div className="form-check form-check-inline">
-                                        <input className="form-check-input"
-                                            checked={this.state.participantSource == 'checklist'}
-                                            type="radio" value="checklist" onChange={() => this.handleParticipantSourceChange('checklist')}
-                                            name="attach_participants" id="checklist" />
-                                        <label className="form-check-label" htmlFor="checklist" >
-                                            Attach Checklist Sent to Laboratories
-                                        </label>
+                                    <div className="col-md-6 mb-3">
+                                        <label htmlFor="u_round" >Round Name *</label>
+                                        <input
+                                            value={this.state.round}
+                                            onChange={(event) => this.handleRoundChange(event.target.value)} type="text"
+                                            className="form-control" id="u_round" />
                                     </div>
-                                    : ''}
 
-                                {this.state.pageState != 'edit' ?
-                                    <div className="form-check form-check-inline">
-                                        <input className="form-check-input" type="radio"
-                                            checked={this.state.participantSource == 'participants'}
-                                            value="participants" onChange={() => this.handleParticipantSourceChange('participants')}
-                                            name="attach_participants" id="participants" />
-                                        <label className="form-check-label" htmlFor="participants" >
-                                            Select Laboratories
-                                        </label>
+                                    <div className="col-md-6 mb-3">
+                                        <label htmlFor="u_shipment_code" >Shipment Code *</label>
+                                        <input
+                                            value={this.state.shipmentCode}
+                                            onChange={(event) => this.handleShipmentCodeChange(event.target.value)} type="text"
+                                            className="form-control" id="u_shipment_code" />
                                     </div>
-                                    : ''}
 
-                                {participants}
+                                </div>
+
+
+                                <div className="form-row">
+                                    {/* add */}
+                                    <div className="col-md-6 mb-3">
+                                        <label htmlFor="u_result_due_date" >Result Due Date  *</label>
+                                        <input
+                                            value={this.state.resultDueDate}
+                                            onChange={(event) => this.handleResultDueDateChange(event.target.value)}
+                                            type="date" className="form-control" id="u_result_due_date" />
+                                    </div>
+
+                                    <div className="col-md-6 mb-3">
+                                        <label htmlFor="u_pass_mark" >Pass mark (%)*</label>
+
+                                        <input
+                                            min={0}
+                                            max={100}
+                                            value={this.state.passMark}
+                                            onChange={(event) => this.handlePassMarkChange(event.target.value)}
+                                            type="number" className="form-control" id="u_pass_mark" />
+                                    </div>
+
+                                </div>
+
+                                <div className="form-row">
+
+                                    <div className="col-sm-12 mb-3">
+                                        <label htmlFor="test_instructions" >Testing Instructions</label>
+                                        <textarea
+                                            value={this.state.testInstructions}
+                                            onChange={(event) => this.handleTestInstructionsChange(event.target.value)}
+                                            className="form-control" id="test_instructions" rows="3"></textarea>
+                                    </div>
+                                </div>
+
+                                <div className="form-row bg-white mb-3 pt-2 rounded hidden">
+                                    {/* choose participant source */}
+                                    <div className="col-sm-12 mb-3  ml-2">
+                                        {this.state.pageState != 'edit' ?
+                                            <div className="form-check form-check-inline">
+                                                <input className="form-check-input"
+                                                    checked={this.state.participantSource == 'checklist'}
+                                                    type="radio" value="checklist" onChange={() => this.handleParticipantSourceChange('checklist')}
+                                                    name="attach_participants" id="checklist" />
+                                                <label className="form-check-label" htmlFor="checklist" >
+                                                    Attach Checklist Sent to Laboratories
+                                                </label>
+                                            </div>
+                                            : ''}
+                                        {this.state.pageState != 'edit' ?
+                                            <div className="form-check form-check-inline">
+                                                <input className="form-check-input" type="radio"
+                                                    checked={this.state.participantSource == 'participants'}
+                                                    value="participants" onChange={() => this.handleParticipantSourceChange('participants')}
+                                                    name="attach_participants" id="participants" />
+                                                <label className="form-check-label" htmlFor="participants" >
+                                                    Select Laboratories
+                                                </label>
+                                            </div>
+                                            : ''}
+
+                                        {participants}
+
+                                    </div>
+                                    {/* End choose participant source */}
+                                </div>
+
+
+
+
+
+                                <div className="form-row bg-white p-2">
+                                    <div className="col-sm-7  ml-2">
+                                        <h5>Panel</h5>
+                                        <hr />
+                                        <div className="form-group w-100">
+                                            <label htmlFor="panel">Select a panel</label>
+                                            <select data-dropup-auto="false" data-live-search="true" className="form-control" id="panel" name="panel" onChange={(event) => this.handlePanelChange(event.target.value)}>
+                                                <option value="">Select a panel</option>
+                                                {this.state.panels.map((panel, index) => {
+                                                    return <option key={index} value={panel.id}>{panel.name}</option>
+                                                })}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                {this.state.panelDetails && <div className="form-row bg-white p-2" style={{ fontSize: '15px' }}>
+                                    <div className="col-sm-12  ml-2">
+                                        <h5>Panel details</h5>
+                                        <hr />
+                                    </div>
+                                    <div className="col-sm-12 p-4" style={{ backgroundColor: 'papayawhip', border: '0px solid white', borderRadius: '5px' }}>
+                                        <div className='row mb-3'>
+                                            <div className='col-sm-4'>
+                                                <label>Panel name</label>
+                                                <p>
+                                                    <a href={`/panel/${this.state.panelDetails.id}`}>{this.state.panelDetails?.name || "-"}</a>
+                                                </p>
+                                            </div>
+                                            <div className='col-sm-4'>
+                                                <label>Created at</label>
+                                                <p>{new Date(this.state.panelDetails?.created_at).toLocaleString() || "-"}</p>
+                                            </div>
+                                            <div className='col-sm-4'>
+                                                <label>Readiness Checklist</label>
+                                                <p>
+                                                    <a href={`/edit-readiness/${this.state.panelDetails?.readiness?.id}`}>{this.state.panelDetails?.readiness?.name || "-"}</a>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className='row mb-3'>
+                                            <div className='col-sm-2'>
+                                                <label>Lots</label>
+                                            </div>
+                                            <div className='col-sm-10'>
+                                                <table className='table table-condensed table-bordered' style={{ backgroundColor: 'cornsilk' }}>
+                                                    <thead>
+                                                        <tr>
+                                                            <th style={{ border: '1px solid #db8', textAlign: 'center' }}>Lot name</th>
+                                                            <th style={{ border: '1px solid #db8', textAlign: 'center' }}># Participants</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {this.state.panelDetails?.lots?.map((lot, index) => {
+                                                            return <tr key={index}>
+                                                                <td style={{ border: '1px solid #db8', textAlign: 'center' }}>
+                                                                    <a href={`/lots/edit/${lot.id}`}>{lot?.name || "-"}</a>
+                                                                </td>
+                                                                <td style={{ border: '1px solid #db8', textAlign: 'center' }}>
+                                                                    <a href={`/lots/${lot.id}/participants`}>{lot.participants.length || 0}</a>
+
+                                                                </td>
+                                                            </tr>
+                                                        })}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div className='row mb-3'>
+                                            <div className='col-sm-2'>
+                                                <label>Samples</label>
+                                            </div>
+                                            <div className='col-sm-10'>
+                                                <table className='table table-condensed table-bordered' style={{ backgroundColor: 'cornsilk' }}>
+                                                    <thead>
+                                                        <tr>
+                                                            <th style={{ border: '1px solid #db8', textAlign: 'center' }}>Sample name</th>
+                                                            <th style={{ border: '1px solid #db8', textAlign: 'center' }}>Reference result</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {this.state.panelDetails?.samples?.map((sample, index) => {
+                                                            return <tr key={index}>
+                                                                <td style={{ border: '1px solid #db8', textAlign: 'center' }}>{sample.name}</td>
+                                                                <td style={{ border: '1px solid #db8', textAlign: 'center' }}>{sample.reference_result || '-'}</td>
+                                                            </tr>
+                                                        })}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        {/* <table className="table unstrip table-bordered table-sm ">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Sample *</th>
+                                                <th scope="col">Reference result *</th>
+                                                <th scope="col">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            {this.state.tableRows.map((row) => {
+                                                if (row != undefined)
+                                                    return row;
+                                            })}
+                                            <tr>
+                                                <td>
+                                                    <a onClick={() => {
+                                                        this.addSampleRow(this.state.tableRows.length)
+                                                    }}>
+                                                        <ReactTooltip />
+                                                        <i data-tip="Add sample" style={{ "color": "blue" }} className="fas fa-plus-circle fa-2x"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table> */}
+                                    </div>
+                                </div>}
+
+                                <div className="form-group row mt-4">
+                                    <div className="col-sm-12 text-center">
+                                        <a href="#" onClick={() => this.saveShipment()} type="" className="d-inline m-2 btn btn-info m">
+
+                                            {this.props.pageState == 'edit' ? "Update Shipment" : "Ship Round"}
+
+                                        </a>
+                                        <a
+                                            onClick={() => {
+                                                this.props.toggleView('list');
+                                            }
+
+                                            }
+                                            className="d-inline m-2 btn btn-danger">Exit</a>
+                                    </div>
+                                </div>
 
                             </div>
-                            {/* End choose participant source */}
-
-
                         </div>
-
-
-                        <div className="form-row mt-2 bg-white rounded">
-                            <div className="col-sm-12  ml-2">
-
-                                <h5>Sample log</h5>
-                                <hr />
-                            </div>
-
-                        </div>
-
-                        <div className="form-row bg-white">
-
-                            <div className="col-sm-12">
-                                <table className="table unstrip table-bordered table-sm ">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Sample *</th>
-                                            <th scope="col">Reference result *</th>
-                                            <th scope="col">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-
-                                        {this.state.tableRows.map((row) => {
-                                            if (row != undefined)
-                                                return row;
-                                        })}
-                                        <tr>
-                                            <td>
-                                                <a onClick={() => {
-                                                    this.addSampleRow(this.state.tableRows.length)
-                                                }}>
-                                                    <ReactTooltip />
-                                                    <i data-tip="Add sample" style={{ "color": "blue" }} className="fas fa-plus-circle fa-2x"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-
-                                    </tbody>
-                                </table>
-                            </div>
-
-                        </div>
-
-                        <div className="form-group row mt-4">
-                            <div className="col-sm-12 text-center">
-                                <a href="#" onClick={() => this.saveShipment()} type="" className="d-inline m-2 btn btn-info m">
-
-                                    {this.props.pageState == 'edit' ? "Update Shipment" : "Ship Round"}
-
-                                </a>
-                                <a
-                                    onClick={() => {
-                                        this.props.toggleView('list');
-                                    }
-
-                                    }
-                                    className="d-inline m-2 btn btn-danger">Exit</a>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
 
-                < div className="modal fade" id="addShipmentModal" tabIndex="-1" role="dialog" aria-labelledby="addShipmentModalTitle" aria-hidden="true" >
+                <div className="modal fade" id="addShipmentModal" tabIndex="-1" role="dialog" aria-labelledby="addShipmentModalTitle" aria-hidden="true" >
                     <div className="modal-dialog modal-dialog-centered" role="document">
                         <div className="modal-content">
                             <div className="modal-header">

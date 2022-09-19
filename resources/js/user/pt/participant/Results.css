@@ -1,16 +1,18 @@
-table {
+table.table {
   font-family: arial, sans-serif;
   border-collapse: collapse;
   width: 100%;
-}
-
-td, th {
-  border: 1px solid #dddddd;
-  text-align: left;
   padding: 8px;
-  text-align: center;
+  text-align: left;
 }
 
-tr:nth-child(even) {
+.table.table-bordered td, .table.table-bordered th {
+  border: 1px solid #dddddd;
+}
+.table.table-condensed td, .table.table-bordered th {
+  padding: 4px;
+}
+
+.table.table-striped tr:nth-child(even) {
   background-color: #dddddd;
 }

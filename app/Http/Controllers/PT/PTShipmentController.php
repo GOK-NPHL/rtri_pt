@@ -127,21 +127,27 @@ class PTShipmentController extends Controller
                 'code' => $request->shipement['shipment_code'],
                 'end_date' => $request->shipement['result_due_date'],
                 'test_instructions' => $request->shipement['test_instructions'],
-                'readiness_id' => (empty($request->shipement['readiness_id']) ? null : $request->shipement['readiness_id'])
+                'ptpanel_id' => (empty($request->shipement['ptpanel_id']) ? null : $request->shipement['ptpanel_id'])
+                // 'readiness_id' => (empty($request->shipement['readiness_id']) ? null : $request->shipement['readiness_id'])
             ]);
 
             //save participants
-            $shipment->laboratories()->attach($participantsList);
+            // $shipment->laboratories()->attach($participantsList);
 
-            // Save questions
-            foreach ($request->shipement['samples'] as $sample) {
-                $ptSample = new PtSample();
-
-                $ptSample->name = $sample['name'];
-                $ptSample->reference_result = $sample['reference_result'];
-                $ptSample->ptshipment()->associate($shipment);
-                $ptSample->save();
+            // attach panel
+            if (!empty($request->shipement['ptpanel_id'])) {
+                $shipment->ptpanel()->attach($request->shipement['ptpanel_id']);
             }
+
+            // Save samples
+            // foreach ($request->shipement['samples'] as $sample) {
+            //     $ptSample = new PtSample();
+
+            //     $ptSample->name = $sample['name'];
+            //     $ptSample->reference_result = $sample['reference_result'];
+            //     $ptSample->ptshipment()->associate($shipment);
+            //     $ptSample->save();
+            // }
 
             // Save laboratiories
             // $readiness->laboratories()->attach($request->shipement['participants']);

@@ -25,9 +25,11 @@ class PtShipement extends Model
     }
 
     //panels
-    public function ptpanels()
+    public function ptpanel()
     {
-        return $this->hasMany('App\PtPanel');
+        // return $this->belongsTo(PtPanel::class);
+        $ptpanel = PtPanel::find($this->ptpanel_id);
+        return $ptpanel;
     }
 
 }

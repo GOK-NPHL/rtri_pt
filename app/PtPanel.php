@@ -28,13 +28,15 @@ class PtPanel extends Model
     // samples
     public function ptsamples()
     {
-        return $this->hasMany('App\PtSample');
+        $samples = $this->hasMany(PtSample::class, 'ptpanel_id')->get();
+        return $samples;
     }
 
     //lots
     public function lots()
     {
-        return $this->hasMany('App\Lot');
+        $lots = Lot::whereIn('id', $this->lots)->get();
+        return $lots;
     }
 
     //shipments

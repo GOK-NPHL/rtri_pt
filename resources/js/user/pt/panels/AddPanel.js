@@ -32,7 +32,7 @@ class AddPanels extends React.Component {
         (async () => {
             let response = await SavePanel({
                 ...this.state.payload,
-                ending_ids: this.state.payload.ending_ids.join(',')//JSON.stringify(this.state.payload.ending_ids),
+                lot_ids: this.state.payload.lot_ids.join(',')//JSON.stringify(this.state.payload.lot_ids),
             });
             // console.log('response', response);
             this.setState({
@@ -86,7 +86,7 @@ class AddPanels extends React.Component {
             this.setState({
                 samples: samples
             })
-        }else{
+        } else {
             console.log('sample ', name, ' not found');
         }
     }
@@ -111,8 +111,31 @@ class AddPanels extends React.Component {
         this.setState({
             tableRows: tableRows,
             samples: samples,
-            samplesNumber: this.state.samplesNumber + 1
+            samplesNumber: this.state.samplesNumber + 1,
+            payload: {
+                ...this.state.payload,
+                samples: samples
+            }
         });
+    }
+
+    savePanel() {
+        console.log('savePanel', this.state.payload);
+        (async () => {
+            let response = await SavePanel(this.state.payload);
+            // console.log('response', response);
+            this.setState({
+                message: response.status == 200 ? 'Panel saved successfully' : 'Error saving panel',
+                status: response.status
+            });
+            if (response.status === 200) {
+                this.setState({
+                    payload: null
+                });
+            }
+
+        })();
+
     }
     //////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////SAMPLE MANAGEMENT////////////////////////////////////////
@@ -133,7 +156,7 @@ class AddPanels extends React.Component {
         return (
             <div className='container'>
                 <div className='row'>
-                    <div className='col-md-3'>
+                    {/* <div className='col-md-3'>
                         <small>
                             <details open>
                                 <summary>this.state</summary>
@@ -143,8 +166,8 @@ class AddPanels extends React.Component {
                             </details>
                         </small>
                     </div>
-                    <div className='col-md-9'>
-                        {/* <div className='col-md-12'> */}
+                    <div className='col-md-9'> */}
+                    <div className='col-md-12'>
                         <div className='col-md-12' style={{ margin: '8px 2px' }}>
                             <a href='/panels'> &larr; Go back</a>
                         </div>
@@ -164,10 +187,6 @@ class AddPanels extends React.Component {
                                                     </div>
                                                 </div>
                                             </div>}
-                                            {/* <div className='alert alert-default-primary'>
-                                                <button type="button" className="close" data-dismiss="alert" aria-hidden="true">×</button>
-                                                This is used to randomize the selection of participants for a round. We will use the <b>ending IDs</b> below to pick from the participants.
-                                            </div> */}
                                         </div>
                                     </div>
                                     <div className="row">
@@ -188,22 +207,23 @@ class AddPanels extends React.Component {
                                                 </div>
                                                 <div className='col-md-12'>
                                                     <div className="form-group">
-                                                        <label htmlFor="description">Readiness</label>
+                                                        <label className='mt-3' htmlFor="description">Lots</label>
+                                                        &nbsp;<small>(Randomized participant groups)</small>
                                                         <DualListBox
                                                             canFilter
                                                             options={Array.from(this.state.lots).map(lot => {
                                                                 return {
                                                                     value: lot.id,
-                                                                    label: lot.name
+                                                                    label: lot.name + ' (Readiness: ' + lot.readiness_name + ', Participants: ' + lot.participant_count + ')'
                                                                 }
                                                             })}
-                                                            selected={this.state.payload && this.state.payload.lot_ids || []}
+                                                            selected={(this.state.payload?.lot_ids && this.state.payload?.lot_ids.length > 0) ? this.state.payload.lot_ids : []}
                                                             onChange={(selected) => {
                                                                 this.setState({
                                                                     lot_ids: selected,
                                                                     payload: {
                                                                         ...this.state.payload || {},
-                                                                        ending_ids: selected
+                                                                        lot_ids: selected
                                                                     }
                                                                 });
                                                             }}
@@ -216,6 +236,7 @@ class AddPanels extends React.Component {
                                                 {/* //////////////////////////////////////////// */}
                                                 <div className='col-md-12'>
                                                     <div className="form-row bg-white">
+                                                        <label className='mt-3'>Sample results</label>
                                                         <div className="col-sm-12">
                                                             <table className="table unstrip table-bordered table-sm ">
                                                                 <thead>
@@ -247,23 +268,6 @@ class AddPanels extends React.Component {
                                                         </div>
 
                                                     </div>
-
-                                                    <div className="form-group row mt-4">
-                                                        <div className="col-sm-12 text-center">
-                                                            <a href="#" onClick={() => this.saveShipment()} type="" className="d-inline m-2 btn btn-info m">
-
-                                                                {this.props.pageState == 'edit' ? "Update Shipment" : "Ship Round"}
-
-                                                            </a>
-                                                            <a
-                                                                onClick={() => {
-                                                                    this.props.toggleView('list');
-                                                                }
-
-                                                                }
-                                                                className="d-inline m-2 btn btn-danger">Exit</a>
-                                                        </div>
-                                                    </div>
                                                 </div>
                                                 {/* //////////////////////////////////////////// */}
                                                 {/* /////////////////SAMPLE STUFF/////////////// */}
@@ -272,10 +276,10 @@ class AddPanels extends React.Component {
 
 
 
-                                                <div className='col-md-12 mt-3'>
+                                                <div className='col-md-12 mt-3 text-center'>
                                                     <input type="submit" disabled={
-                                                        !this.state.payload?.name || !this.state.payload?.lot_ids || !this.state.payload?.ending_ids || (this.state.payload?.ending_ids.length < 2 || this.state.payload?.ending_ids.length > 2)
-                                                    } className="btn btn-primary" value='Save' onClick={(ev) => {
+                                                        !this.state.payload?.name || !this.state.payload?.lot_ids || this.state.payload?.lot_ids.length < 1 || !this.state?.payload?.samples || this.state?.payload?.samples.length < 1
+                                                    } className="btn btn-primary" value='Save Panel' onClick={(ev) => {
                                                         ev.preventDefault();
                                                         this.savePanel();
                                                     }} />

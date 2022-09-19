@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Laboratory;
 use App\Lot;
+use App\PtPanel;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -118,7 +119,23 @@ class LotController extends Controller
     public function deleteLot(Request $request)
     {
         $lot = Lot::where('id', $request->id)->first();
+        $lotid = $lot->id;
         if ($lot) {
+            // remove lot id from lots array in pt panels
+            $panels = PtPanel::where('deleted_at', null)->get();
+            foreach ($panels as $panel) {
+                $lots = $panel->lots;
+                if (in_array($lotid, $lots)) {
+                    $newlots = [];
+                    foreach ($lots as $lot) {
+                        if ($lot != $lotid) {
+                            $newlots[] = $lot;
+                        }
+                    }
+                    $panel->lots = $newlots;
+                    $panel->save();
+                }
+            }
             $lot->delete();
             return response()->json(['message' => 'Lot deleted.']);
         } else {
