@@ -69,8 +69,9 @@ class ListPanels extends React.Component {
             this.state.data.map((element, index) => {
                 tableElem.push(<tr key={index}>
                     <th scope="row">{index + 1}</th>
-                    <td>{element.name}</td>
-                    <td style={{display: 'flex', flexDirection: 'column'}}>{
+                    <td style={{verticalAlign: 'middle'}}>{element.name}</td>
+                    <td style={{verticalAlign: 'middle'}}>{element?.readiness?.name || ""}</td>
+                    <td style={{display: 'flex', flexDirection: 'column', verticalAlign: 'middle'}}>{
                         (element.lots && element.lots.length > 0) ?
                             element.lots.map(
                                 (l, x) => <span className='badge py-2' key={l.name + "_" + x}>
@@ -81,7 +82,7 @@ class ListPanels extends React.Component {
                     <td style={{verticalAlign: 'middle'}}>{element.created_at ? new Date(element.created_at).toLocaleString() : '-'}</td>
                     {
 
-                        <td>
+                        <td style={{verticalAlign: 'middle'}}>
                             <a
                                 onClick={
                                     () => {
@@ -147,11 +148,12 @@ class ListPanels extends React.Component {
                         className="form-control" placeholder="search panel"></input>
                 </div>
 
-                <table className="table table-striped table-sm  table-hover">
+                <table className="table table-striped table-bordered table-condensed table-hover">
                     <thead>
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Panel Name</th>
+                            <th scope="col">Readiness Checklist</th>
                             <th scope="col">Lots</th>
                             <th scope="col">Created on</th>
                             <th scope="col">Action</th>

@@ -104,7 +104,8 @@ class ListShipment extends React.Component {
                                     :
                                     <a
                                         onClick={() => {
-                                            this.props.page != 'report' ?
+                                            //// this.props.page != 'report' ? //// INVESTIGATE REASON FOR THIS
+                                            true ?
                                                 window.location.assign('get-shipment-responses/' + element.id) :
                                                 window.location.assign('get-shipment-report-responses/' + element.id)
                                         }}

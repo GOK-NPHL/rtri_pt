@@ -48,4 +48,12 @@ class Readiness extends Model
     {
         return $this->hasMany('App\ReadinessQuestion');
     }
+
+    //lots with this readiness
+    public function lots()
+    {
+        // return $this->hasMany('App\Lot');
+        $lots = Lot::where('readiness_id', $this->id);
+        return $lots;
+    }
 }

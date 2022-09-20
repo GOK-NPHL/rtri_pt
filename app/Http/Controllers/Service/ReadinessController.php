@@ -22,13 +22,12 @@ class ReadinessController extends Controller
         $user = Auth::user();
         try {
 
-            // $readinesses = Readiness::select(
-
             $readinesses =   DB::table("readinesses")->distinct()
                 ->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'readinesses.id')
                 ->join('laboratories', 'laboratory_readiness.laboratory_id', '=', 'laboratories.id')
                 ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
-                ->leftJoin('pt_shipements', 'readinesses.id', '=', 'pt_shipements.readiness_id')
+                ->leftJoin('pt_panels', 'readinesses.id', '=', 'pt_panels.readiness_id')
+                ->leftJoin('pt_shipements', 'pt_panels.id', '=', 'pt_shipements.ptpanel_id')
                 ->leftJoin('readiness_answers', 'readinesses.id', '=', 'readiness_answers.readiness_id')
                 // ->join('readiness_questions', 'readiness_questions.readiness_id', '=', 'readinesses.id')
                 ->where('users.id', $user->id)
@@ -45,6 +44,7 @@ class ReadinessController extends Controller
                     "readiness_answers.readiness_id as aswered_id",
                     "readinesses.created_at"
                 ]);
+
 
             return $readinesses;
         } catch (Exception $ex) {

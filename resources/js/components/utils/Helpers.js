@@ -13,7 +13,7 @@ export async function SaveSubmission(submission, ptFile) {
         const formData = new FormData();
         formData.append('file', ptFile);
         formData.append('submission', JSON.stringify(submission));
-        response = await axios.post(`${settings.serverBaseApi}/save_submission`, formData, {
+        let response = await axios.post(`${settings.serverBaseApi}/save_submission`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -576,8 +576,11 @@ export async function FetchDefaultReadinessQn() {
     }
 }
 
-export async function FetchReadiness() {
-
+export async function FetchReadiness(readiness_id) {
+    let url = `${settings.serverBaseApi}/get_readiness`;
+    if (readiness_id && readiness_id !== '') {
+        url = `${settings.serverBaseApi}/get_readiness/` + readiness_id;
+    }
     try {
         const response = await axios.get(`${settings.serverBaseApi}/get_readiness`);
         const responseData = response.data;
@@ -1074,10 +1077,10 @@ export async function FetchLot(lotId) {
     }
 }
 
-// by shipment
-export async function FetchLotsByShipment(shipmentId) {
+// by readiness
+export async function FetchLotsByReadiness(readinessId) {
     try {
-        const response = await axios.get(`${settings.serverBaseApi}/get_lot_by_shipment/${shipmentId}`);
+        const response = await axios.get(`${settings.serverBaseApi}/get_lots_by_readiness/${readinessId}`);
         const lots = response.data;
         return lots;
     } catch (err) {

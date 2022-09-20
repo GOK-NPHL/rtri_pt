@@ -52,7 +52,7 @@ Route::get('/get_lab_personel/{id}', [ParticipantController::class, 'getLabPerso
 Route::post('/create_lab_personel', [ParticipantController::class, 'createLabPersonel'])->name('create_lab_personel')->middleware('auth:admin');
 Route::post('/edit_lab_personel', [ParticipantController::class, 'editPersonel'])->name('edit_lab_personel')->middleware('auth:admin');
 
-Route::get('/get_readiness', [PTReadinessController::class, 'getReadiness'])->name('get_readiness');//->middleware('auth:admin');
+Route::get('/get_readiness', [PTReadinessController::class, 'getReadiness'])->name('get_readiness')->middleware('auth:admin');
 Route::get('/get_default_readiness_qns', [PTReadinessController::class, 'getDefaultReadinessQuestions'])->name('get_default_readiness_qns')->middleware('auth:admin');
 Route::get('/get_shipment_readiness', [PTReadinessController::class, 'getShipmentReadiness'])->name('get_shipment_readiness')->middleware('auth:admin');
 Route::post('/approve_readiness_answer', [PTReadinessController::class, 'approveReadinessAnswer'])->middleware('auth:admin');
@@ -148,7 +148,7 @@ Route::prefix('/access-management')->group(function (){
 // lots crud
 Route::get('/get_lots', [LotController::class, 'getLots']);
 Route::get('/get_lot/{id}', [LotController::class, 'getLot']);
-Route::get('/get_lot_by_shipment/{shipment_id}', [LotController::class, 'getLotByShipmentId']);
+Route::get('/get_lots_by_readiness/{readiness_id}', [LotController::class, 'getLotsByReadinessId']);
 Route::get('/get_lot/{id}/participants', [LotController::class, 'getLotParticipants']);
 Route::post('/lot', [LotController::class, 'createLot']);
 Route::put('/lot/{id}', [LotController::class, 'updateLot']);

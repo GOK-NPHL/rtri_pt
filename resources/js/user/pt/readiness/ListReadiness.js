@@ -138,7 +138,7 @@ class ListReadiness extends React.Component {
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Name/Title</th>
-                            <th scope="col">No. of participant(s)</th>
+                            <th scope="col">No. of participant(s) (labs)</th>
                             <th scope="col">Date Updated</th>
                             <th scope="col">Edited by</th>
                             <th scope="col">Action</th>

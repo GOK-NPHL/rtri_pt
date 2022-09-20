@@ -50,7 +50,6 @@ class LotController extends Controller
         $lots = Lot::where('deleted_at', null)->get();
         foreach ($lots as $lot) {
             $lot->participant_count = count($lot->participants());
-            // $lot->readiness = $lot->readiness();
             $lr = $lot->readiness();
             if($lr){
                 $lot->readiness_name = $lr->name;
@@ -63,10 +62,17 @@ class LotController extends Controller
         $lot = Lot::where('id', $request->id)->first();
         return response()->json($lot);
     }
-    public function getLotByShipmentId(Request $request)
+    public function getLotsByReadinessId(Request $request)
     {
-        $lot = Lot::where('shipment_id', $request->shipment_id)->first();
-        return response()->json($lot);
+        $lots = Lot::where('readiness_id', $request->readiness_id)->get();
+        foreach ($lots as $lot) {
+            $lot->participant_count = count($lot->participants());
+            $lr = $lot->readiness();
+            if($lr){
+                $lot->readiness_name = $lr->name;
+            }
+        }
+        return response()->json($lots);
     }
     public function getLotParticipants(Request $request)
     {

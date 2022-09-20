@@ -145,13 +145,10 @@ class PTShipmentController extends Controller
             //save participants
             // $shipment->laboratories()->attach($participantsList); /// REMOVE THIS
 
-            // attach panel
-            if ($panel && $shipment) {
-                $shipment->ptpanel()->attach($request->shipement['panel_id']);
-                //participants save
-                // $shipment->laboratories()->attach($panel->laboratories);
-                // $panel->laboratories()->attach($shipment->laboratories);
-            }
+            // attach panel //// NON-FUNCTIONAL
+            // if ($panel && $shipment) {
+            //     $shipment->ptpanel()->attach($request->shipement['panel_id']);
+            // }
 
             // Save laboratiories
             // $readiness->laboratories()->attach($request->shipement['participants']);
@@ -196,6 +193,7 @@ class PTShipmentController extends Controller
     public function getUserSamples()
     {
         $user = Auth::user();
+        $user_id = 1; // $user->id;
 
         try {
 
@@ -215,12 +213,16 @@ class PTShipmentController extends Controller
                 DB::raw("1 as readiness_approval_id")
 
             )
+                ////
+                ->leftJoin('pt_panels', 'readiness_id', '=', 'pt_panels.readiness_id')
+                ////
                 ->leftJoin('ptsubmissions', 'pt_shipements.id', '=', 'ptsubmissions.pt_shipements_id')
                 ->join('laboratory_pt_shipement', 'laboratory_pt_shipement.pt_shipement_id', '=', 'pt_shipements.id')
-                ->join('pt_samples', 'pt_samples.ptshipment_id', '=', 'pt_shipements.id')
+                //// ->join('pt_samples', 'pt_samples.ptshipment_id', '=', 'pt_shipements.id')
+                ->join('pt_samples', 'pt_samples.ptpanel_id', '=', 'pt_panels.id')
                 ->join('laboratories', 'laboratory_pt_shipement.laboratory_id', '=', 'laboratories.id')
                 ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
-                ->where('users.id', $user->id);
+                ->where('users.id', $user_id);
 
             $shipments2 = PtShipement::select( //when using readiness
                 "pt_shipements.id",
@@ -234,19 +236,25 @@ class PTShipmentController extends Controller
                 "pt_samples.name as sample_name",
                 "ptsubmissions.id as submission_id",
                 "readiness_answers.id as is_readiness_answered", //check if readiness for this shipment id filled
-                "pt_shipements.readiness_id as readiness_id",
+                //// "pt_shipements.readiness_id as readiness_id",
+                "pt_panels.readiness_id as readiness_id",
                 "readiness_approvals.id as readiness_approval_id"
 
             )
+                ////
+                ->leftJoin('pt_panels', 'readiness_id', '=', 'pt_panels.readiness_id')
+                ////
                 ->leftJoin('ptsubmissions', 'pt_shipements.id', '=', 'ptsubmissions.pt_shipements_id')
-                ->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'pt_shipements.readiness_id')
+                //// ->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'pt_shipements.readiness_id')
+                ->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'pt_panels.readiness_id')
                 ->leftJoin('readiness_answers',  'laboratory_readiness.readiness_id', '=',  'readiness_answers.readiness_id')
                 ->leftJoin('readiness_approvals', 'readiness_answers.laboratory_id', '=',  'readiness_approvals.lab_id')
-                ->join('pt_samples', 'pt_samples.ptshipment_id', '=', 'pt_shipements.id')
+                //// ->join('pt_samples', 'pt_samples.ptshipment_id', '=', 'pt_shipements.id')
+                ->join('pt_samples', 'pt_samples.ptpanel_id', '=', 'pt_panels.id')
                 ->join('laboratories', 'laboratory_readiness.laboratory_id', '=', 'laboratories.id')
                 ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
 
-                ->where('users.id', $user->id)
+                ->where('users.id', $user_id)
                 ->union($shipments)
                 // ->orderBy('pt_shipements.end_date')
                 ->get();
@@ -340,6 +348,7 @@ class PTShipmentController extends Controller
 
             $shipmentsResponses = DB::table("pt_shipements")->distinct()
                 ->join('ptsubmissions', 'ptsubmissions.pt_shipements_id', '=', 'pt_shipements.id')
+                ->join('pt_panels', 'pt_panels.id', '=', 'pt_shipements.ptpanel_id')
                 ->join('pt_submission_results', 'pt_submission_results.ptsubmission_id', '=', 'ptsubmissions.id')
                 ->join('laboratories', 'ptsubmissions.lab_id', '=', 'laboratories.id')
                 ->join('users', 'ptsubmissions.user_id', '=', 'users.id');
@@ -374,7 +383,8 @@ class PTShipmentController extends Controller
 
             //  one
             $shipmentsRefResult = DB::table("pt_shipements")->distinct()
-                ->join('pt_samples', 'pt_samples.ptshipment_id', '=', 'pt_shipements.id');
+                ->join('pt_panels', 'pt_panels.id', '=', 'pt_shipements.ptpanel_id')
+                ->join('pt_samples', 'pt_samples.ptpanel_id', '=', 'pt_panels.id');
 
             $shipmentsRefResult = $shipmentsRefResult->get([
                 "pt_samples.reference_result as reference_result",

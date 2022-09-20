@@ -38,7 +38,7 @@ class AuthServiceProvider extends ServiceProvider
                 return false;
             }
         });
-        
+
         Gate::define(SystemAuthorities::$authorities['view_qc_component'], function ($user) {
             $curUser = Auth::user();
             if ($curUser->has_qc_access == 1) {
@@ -54,7 +54,11 @@ class AuthServiceProvider extends ServiceProvider
             $lab_mgr_role = UserRole::where('slug', 'like', '%lab_admin%')->orWhere('slug', 'like', '%lab_manager%')->first()->id;
             // check if roles array in user table contains lab manager role
             // if (in_array($lab_mgr_role, json_decode($curUser->roles))) {
-            if (in_array($lab_mgr_role, $curUser->roles)) {
+            $useroles = $curUser->roles;
+            if (is_string($useroles)) {
+                $useroles = json_decode($useroles);
+            }
+            if (in_array($lab_mgr_role, $useroles)) {
                 return true;
             } else {
                 return false;
@@ -67,7 +71,11 @@ class AuthServiceProvider extends ServiceProvider
             $participant_role = UserRole::where('slug', 'like', '%participant%')->first()->id;
             // check if roles array in user table contains participant role
             // if (in_array($participant_role, json_decode($curUser->roles))) {
-            if (in_array($participant_role, $curUser->roles)) {
+            $useroles = $curUser->roles;
+            if (is_string($useroles)) {
+                $useroles = json_decode($useroles);
+            }
+            if (in_array($participant_role, $useroles)) {
                 return true;
             } else {
                 return false;
@@ -80,7 +88,11 @@ class AuthServiceProvider extends ServiceProvider
             $admin_role = UserRole::where('slug', 'administrator')->first()->id;
             // check if roles array in user table contains admin role
             // if (in_array($admin_role, json_decode($curUser->roles))) {
-            if (in_array($admin_role, $curUser->roles)) {
+            $useroles = $curUser->roles;
+            if (is_string($useroles)) {
+                $useroles = json_decode($useroles);
+            }
+            if (in_array($admin_role, $useroles)) {
                 return true;
             } else {
                 return false;
@@ -93,7 +105,11 @@ class AuthServiceProvider extends ServiceProvider
             $guest_role = UserRole::where('slug', 'guest')->first()->id;
             // check if roles array in user table contains guest role
             // if (in_array($guest_role, json_decode($curUser->roles))) {
-            if (in_array($guest_role, $curUser->roles)) {
+            $useroles = $curUser->roles;
+            if (is_string($useroles)) {
+                $useroles = json_decode($useroles);
+            }
+            if (in_array($guest_role, $useroles)) {
                 return true;
             } else {
                 return false;

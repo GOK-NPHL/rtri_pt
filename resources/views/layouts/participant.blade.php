@@ -59,6 +59,10 @@ use Illuminate\Support\Facades\Gate;
                     <a class="nav-link" style="color: white;" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
             </ul>
+            <div class="text-white" style="display: flex; flex-direction: column;">
+                <span>{{ Auth::user()->name ?? "" }}</span>
+                <span>{{ Auth::user()->lab()->lab_name ?? "" }}</span>
+            </div>
         </nav>
         <!-- /.navbar -->
 
@@ -76,7 +80,6 @@ use Illuminate\Support\Facades\Gate;
                     RTRI PT
                 </span>
             </a>
-
             <!-- Sidebar -->
             <div class="sidebar">
                 <!-- Sidebar user panel (optional) -->

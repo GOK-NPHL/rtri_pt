@@ -9,7 +9,7 @@ class PtPanel extends Model
     protected $fillable = [
         'name',
         // 'shipment_id',
-        // 'readiness_id',
+        'readiness_id',
         'lots',
         // 'created_by',
     ];

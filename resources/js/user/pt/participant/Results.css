@@ -6,6 +6,10 @@ table.table {
   text-align: left;
 }
 
+.table td, .table th {
+  border: none;
+}
+
 .table.table-bordered td, .table.table-bordered th {
   border: 1px solid #dddddd;
 }

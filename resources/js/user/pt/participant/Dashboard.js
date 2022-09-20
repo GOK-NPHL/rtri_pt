@@ -147,16 +147,15 @@ class Dashboard extends React.Component {
                     <td>{element.end_date}</td>
                     {
                         element.submission_id == null ? <td >
-                            <span style={{ "background-color": "green", "padding": "3px", "border-radius": "2px", "color": "white" }}>
-                                {Date.parse(element.end_date) > new Date() ?
-                                    element.is_readiness_answered == null ? 'Readiness needs filling' :
+                            {Date.parse(element.end_date) > new Date() ? 
+                            <span style={{fontSize: '14px', fontWeight: 500}} className={'badge badge-'+(element.is_readiness_answered == null ? 'danger' : element.readiness_approval_id == null ? 'warning' : 'info')}>
+                                {element.is_readiness_answered == null ? 'Readiness needs filling' :
                                         element.readiness_approval_id == null ?
                                             'Pending readiness approval'
                                             :
-                                            'Submit result'
-                                    :
-                                    ' Past due date'}
-                            </span>
+                                            'Submission ready'
+                                            }
+                            </span> : <span className='badge badge-danger'>Past due date</span>}
 
 
                         </td> :

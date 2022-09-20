@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import DualListBox from 'react-dual-listbox';
-import { SavePanel, FetchLots } from '../../../components/utils/Helpers';
+import { SavePanel, FetchLots, FetchReadiness, FetchLotsByReadiness } from '../../../components/utils/Helpers';
 import '../shipment/PtShipment.css';
 import { v4 as uuidv4 } from 'uuid';
 import ReactTooltip from 'react-tooltip';
@@ -14,6 +14,7 @@ class AddPanels extends React.Component {
         this.state = {
             payload: null,
             lots: [],
+            readinesses: [],
             samples: [],
             samplesNumber: 0,
             tableRows: [], //samples elements,
@@ -23,30 +24,9 @@ class AddPanels extends React.Component {
         this.savePanel = this.savePanel.bind(this);
         this.addSampleRow = this.addSampleRow.bind(this);
         this.deleteSampleRow = this.deleteSampleRow.bind(this);
+        this.handleReadinessChange = this.handleReadinessChange.bind(this);
         this.sampleReferenceResultChange = this.sampleReferenceResultChange.bind(this);
         this.sampleNameChange = this.sampleNameChange.bind(this);
-    }
-
-    savePanel() {
-        // console.log('savePanel', this.state.payload);
-        (async () => {
-            let response = await SavePanel({
-                ...this.state.payload,
-                lot_ids: this.state.payload.lot_ids.join(',')//JSON.stringify(this.state.payload.lot_ids),
-            });
-            // console.log('response', response);
-            this.setState({
-                message: response.status == 200 ? 'Panel updated successfully' : 'Error updating panel',
-                status: response.status
-            });
-            if (response.status === 200) {
-                this.setState({
-                    payload: null
-                });
-            }
-
-        })();
-
     }
 
 
@@ -119,6 +99,23 @@ class AddPanels extends React.Component {
         });
     }
 
+    handleReadinessChange(v) {
+        this.setState({
+            payload: {
+                ...this.state.payload || {},
+                readiness_id: parseInt(v)
+            }
+        });
+        
+        // fetch lots by shipment
+        (async () => {
+            let response = await FetchLotsByReadiness(v);
+            this.setState({
+                lots: response
+            });
+        })();
+    }
+
     savePanel() {
         console.log('savePanel', this.state.payload);
         (async () => {
@@ -142,10 +139,17 @@ class AddPanels extends React.Component {
     //////////////////////////////////>>>>>>>>>>>>>/////////////////////////////////////////////
 
     componentDidMount() {
+        // (async () => {
+        //     let response = await FetchLots();
+        //     this.setState({
+        //         lots: response
+        //     });
+        // })();
+
         (async () => {
-            let response = await FetchLots();
+            let response = await FetchReadiness();
             this.setState({
-                lots: response
+                readinesses: response
             });
         })();
     }
@@ -207,6 +211,20 @@ class AddPanels extends React.Component {
                                                 </div>
                                                 <div className='col-md-12'>
                                                     <div className="form-group">
+                                                        <label htmlFor="description">Readiness</label>
+                                                        <select className='form-control' id='readiness' 
+                                                onChange={(event) => this.handleReadinessChange(event.target.value)}>
+                                                            <option value=''>Select Readiness</option>
+                                                            {this.state.readinesses.length > 0 && this.state.readinesses.map((readiness, index) => {
+                                                                return (
+                                                                    <option key={index} value={readiness.id}>{readiness.name}</option>
+                                                                )
+                                                            })}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                {this.state?.payload?.readiness_id && (this.state.lots && this.state.lots.length>0) && <div className='col-md-12'>
+                                                    <div className="form-group">
                                                         <label className='mt-3' htmlFor="description">Lots</label>
                                                         &nbsp;<small>(Randomized participant groups)</small>
                                                         <DualListBox
@@ -229,7 +247,7 @@ class AddPanels extends React.Component {
                                                             }}
                                                         />
                                                     </div>
-                                                </div>
+                                                </div>}
 
                                                 {/* //////////////////<<<<<<<<<///////////////// */}
                                                 {/* /////////////////SAMPLE STUFF/////////////// */}

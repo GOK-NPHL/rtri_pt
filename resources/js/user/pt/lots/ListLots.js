@@ -71,7 +71,7 @@ class ListLots extends React.Component {
                     <th scope="row">{index + 1}</th>
                     <td>{element.name}</td>
                     <td>{element.ending_ids}</td>
-                    <td>{element?.participant_count || 0 }</td>
+                    <td className='text-center'>{element?.participant_count || 0 }</td>
                     <td>{element?.readiness_name || element.readiness_id}</td>
                     <td>{element.created_at ? new Date(element.created_at).toLocaleString() : '-'}</td>
                     {
@@ -152,7 +152,7 @@ class ListLots extends React.Component {
                         className="form-control" placeholder="search lot"></input>
                 </div>
 
-                <table className="table table-striped table-sm  table-hover">
+                <table className="table table-striped table-bordered table-condensed table-hover">
                     <thead>
                         <tr>
                             <th scope="col">#</th>

@@ -16,7 +16,7 @@ class CreatePtPanelsTable extends Migration
         Schema::create('pt_panels', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            // $table->integer('readiness_id');
+            $table->integer('readiness_id');
             $table->json('lots');
             $table->timestamps();
             $table->softDeletes();

@@ -216,20 +216,27 @@ class SubmitResults extends React.Component {
 
 
             (async () => {
-                let response;
                 if (this.props.selectedElementHasSubmmisions) {
-                    response = await UpdateSubmission(submission);
+                    let response = await UpdateSubmission(submission);
+                    this.setState({
+                        message: response?.data?.Message,
+                    });
+                    $('#messageModal').modal('toggle');
+                    if (response?.status == 200) {
+                        this.props.toggleView("list");
+                    }
                 } else {
-                    response = await SaveSubmission(submission, this.state.ptFile);
+                    let response = await SaveSubmission(submission, this.state.ptFile);
+                    this.setState({
+                        message: response?.data?.Message,
+                    });
+                    $('#messageModal').modal('toggle');
+                    if (response?.status == 200) {
+                        this.props.toggleView("list");
+                    }
                 }
 
-                this.setState({
-                    message: response.data.Message,
-                });
-                $('#messageModal').modal('toggle');
-                if (response.status == 200) {
-                    this.props.toggleView("list");
-                }
+
             })();
         }
     }
@@ -729,23 +736,17 @@ class SubmitResults extends React.Component {
                                 </div>
                             </div>
                             <div className="col-sm-12">
-                                <table>
+                                <table className='table table-bordered'>
                                     <thead>
                                         <tr>
-                                            <th>PT Sample ID</th>
-                                            <th colSpan={3}>
-                                                <table>
-                                                    <tbody>
-                                                        <tr><td>Visual results</td></tr>
-                                                        <tr style={{ "display": "block ruby" }}>
-                                                            <td>Control(C) Line</td>
-                                                            <td>Verification(V) Line</td>
-                                                            <td>Long term(LT) Line</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </th>
-                                            <th>Interpretation *</th>
+                                            <th style={{ verticalAlign: 'middle' }} rowSpan={2} className="text-center">PT Sample ID</th>
+                                            <th style={{ verticalAlign: 'middle' }} colSpan={3} className="text-center">Visual results</th>
+                                            <th style={{ verticalAlign: 'middle' }} rowSpan={2} className="text-center">Interpretation *</th>
+                                        </tr>
+                                        <tr>
+                                            <th style={{ verticalAlign: 'middle' }} className="text-center">Control line (C)</th>
+                                            <th style={{ verticalAlign: 'middle' }} className="text-center">Verification line (V)</th>
+                                            <th style={{ verticalAlign: 'middle' }} className="text-center">Long-term line (LT)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -771,7 +772,7 @@ class SubmitResults extends React.Component {
                                                             ? true : false
 
                                                     }
-                                                    value="c" type="checkbox" /></td>
+                                                    value="c" type="checkbox" /> Control line</td>
                                                 <td ><input onChange={(event) => this.visualResultsHandler(event, sample.sample_id)}
                                                     defaultChecked={
 
@@ -784,7 +785,7 @@ class SubmitResults extends React.Component {
 
                                                     }
 
-                                                    value="v" type="checkbox" /></td>
+                                                    value="v" type="checkbox" /> Verification line</td>
                                                 <td ><input onChange={(event) => this.visualResultsHandler(event, sample.sample_id)}
                                                     defaultChecked={
                                                         this.props.selectedElementHasSubmmisions
@@ -795,7 +796,7 @@ class SubmitResults extends React.Component {
                                                             ? true : false
                                                     }
 
-                                                    value="lt" type="checkbox" /></td>
+                                                    value="lt" type="checkbox" /> Long-term line</td>
                                                 <td onChange={(event) => this.ptInterpretation(event, sample.sample_id)}>
                                                     <div className="form-check form-check-inline">
                                                         <input className="form-check-input" type="radio" value="lt"

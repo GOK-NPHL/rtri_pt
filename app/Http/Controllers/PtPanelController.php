@@ -6,6 +6,7 @@ use App\Laboratory;
 use App\Lot;
 use App\PtPanel;
 use App\PtSample;
+use App\Readiness;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
@@ -57,6 +58,7 @@ class PtPanelController extends Controller
                 }
             }
             $panel->lots = $lotsArray;
+            $panel->readiness = Readiness::find($panel->readiness_id);
         }
         return response()->json($panels);
     }
@@ -88,7 +90,7 @@ class PtPanelController extends Controller
                         'participants' => $pcps,
                     ];
                     //readiness
-                    $panel->readiness = $lt->readiness() ?? null;
+                    $panel->readiness = Readiness::find($lt->readiness_id);
                 }
             }
             $panel->lots = $panelots;
@@ -105,6 +107,7 @@ class PtPanelController extends Controller
             }
             $panel = PtPanel::create([
                 'name' => $request->name,
+                'readiness_id' => $request->readiness_id,
                 'lots' => $request->lot_ids ?? $request->lots ?? [],
             ]);
             // Save samples
@@ -130,6 +133,7 @@ class PtPanelController extends Controller
         if ($panel) {
             
             $panel->name = $request->name;
+            $panel->readiness_id = $request->readiness_id;
             $panel->lots = $request->lot_ids ?? $request->lots ?? [];
             // Save samples
             foreach ($request->samples as $sample) {

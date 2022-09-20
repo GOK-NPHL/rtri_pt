@@ -64,6 +64,11 @@ class User extends Authenticatable
         return $this->belongsToMany('App\Group','user_group');
     }
 
+    public function lab(){
+        $lab = Laboratory::where('id',$this->laboratory_id)->first();
+        return $lab;
+    }
+
     // get roles
     // public function getRoles()
     // {

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import DualListBox from 'react-dual-listbox';
-import { UpdatePanel, FetchLots, FetchPanel } from '../../../components/utils/Helpers';
+import { UpdatePanel, FetchLots, FetchPanel, FetchReadiness, FetchLotsByReadiness } from '../../../components/utils/Helpers';
 import '../shipment/PtShipment.css';
 import { v4 as uuidv4 } from 'uuid';
 import { matchPath } from 'react-router';
@@ -16,6 +16,7 @@ class AddPanels extends React.Component {
             payload: null,
             lots: [],
             samples: [],
+            readinesses: [],
             samplesNumber: 0,
             tableRows: [], //samples elements,
             message: null,
@@ -24,6 +25,7 @@ class AddPanels extends React.Component {
         this.savePanel = this.savePanel.bind(this);
         this.addSampleRow = this.addSampleRow.bind(this);
         this.deleteSampleRow = this.deleteSampleRow.bind(this);
+        this.handleReadinessChange = this.handleReadinessChange.bind(this);
         this.sampleReferenceResultChange = this.sampleReferenceResultChange.bind(this);
         this.sampleNameChange = this.sampleNameChange.bind(this);
     }
@@ -37,14 +39,14 @@ class AddPanels extends React.Component {
         let tableRows = this.state.tableRows;
         let pl_samples_ds = this.state?.payload?.samples;
         // if there is a 'deleted' attribute, set it to true, otherwise remove the element
-        let pl_sample = pl_samples_ds.find(p=>p.index==index)
+        let pl_sample = pl_samples_ds.find(p => p.index == index)
         console.log('deleteSampleRow', index, pl_sample);
-        if(pl_sample && pl_sample?.deleted == 0 && pl_sample?.id){ // mark existing sample as deleted
+        if (pl_sample && pl_sample?.deleted == 0 && pl_sample?.id) { // mark existing sample as deleted
             pl_sample.deleted = 1;
             pl_sample.name = null;
             pl_sample.reference_result = null;
-        }else{
-            pl_samples_ds = pl_samples_ds.filter(p=>p.index!=index);
+        } else {
+            pl_samples_ds = pl_samples_ds.filter(p => p.index != index);
         }
         // delete pl_samples_ds[index];
         // delete tableRows[index];
@@ -60,7 +62,7 @@ class AddPanels extends React.Component {
     }
     sampleReferenceResultChange(index, refResult) {
         let pl_samples_nc = this.state?.payload?.samples;
-        let pl_sample = pl_samples_nc.find(p=>p.index==index)
+        let pl_sample = pl_samples_nc.find(p => p.index == index)
         if (!pl_sample || pl_sample == null || pl_sample == undefined) {
             console.log('sample ', index, ' not found');
             if (index > pl_samples_nc.length) {
@@ -68,7 +70,7 @@ class AddPanels extends React.Component {
             }
         } else {
             pl_sample.reference_result = refResult;
-            pl_samples_nc.filter(p=>p.index==index)[0] = pl_sample;
+            pl_samples_nc.filter(p => p.index == index)[0] = pl_sample;
             this.setState({
                 payload: {
                     ...this.state.payload,
@@ -79,7 +81,7 @@ class AddPanels extends React.Component {
     }
     sampleNameChange(index, name) {
         let pl_samples_nc = this.state?.payload?.samples;
-        let pl_sample = pl_samples_nc.find(p=>p.index==index)
+        let pl_sample = pl_samples_nc.find(p => p.index == index)
         if (!pl_sample || pl_sample == null || pl_sample == undefined) {
             console.log('sample ', index, ' not found');
             if (index > pl_samples_nc.length) {
@@ -87,7 +89,7 @@ class AddPanels extends React.Component {
             }
         } else {
             pl_sample.name = name;
-            pl_samples_nc.filter(p=>p.index==index)[0] = pl_sample;
+            pl_samples_nc.filter(p => p.index == index)[0] = pl_sample;
             this.setState({
                 payload: {
                     ...this.state.payload,
@@ -95,6 +97,22 @@ class AddPanels extends React.Component {
                 }
             })
         }
+    }
+    handleReadinessChange(v) {
+        this.setState({
+            payload: {
+                ...this.state.payload || {},
+                readiness_id: parseInt(v)
+            }
+        });
+
+        // fetch lots by shipment
+        (async () => {
+            let response = await FetchLotsByReadiness(v);
+            this.setState({
+                lots: response
+            });
+        })();
     }
     addSampleRow(index, val) {
         console.log('addSampleRow', index, val);
@@ -129,7 +147,7 @@ class AddPanels extends React.Component {
         });
     }
 
-    
+
 
     savePanel() {
         console.log('updatePanel', this.state.panelId, this.state.payload);
@@ -166,6 +184,7 @@ class AddPanels extends React.Component {
                 this.setState({
                     payload: {
                         name: response.name,
+                        readiness_id: response.readiness_id,
                         samples: Array.from(response.samples, (sp, sx) => {
                             return {
                                 id: sp.id,
@@ -178,6 +197,12 @@ class AddPanels extends React.Component {
                         lot_ids: Array.from(response.lots, l => l.id) || [],
                     }
                 });
+                (async () => {
+                    let rl = await FetchLotsByReadiness(response.readiness_id);
+                    this.setState({
+                        lots: rl
+                    });
+                })();
             }).then(() => {
                 this.setState({
                     tableRows: this.state.payload.samples.map((sp, index) => {
@@ -196,9 +221,9 @@ class AddPanels extends React.Component {
         })();
 
         (async () => {
-            let response = await FetchLots();
+            let response = await FetchReadiness();
             this.setState({
-                lots: response
+                readinesses: response
             });
         })();
     }
@@ -220,7 +245,7 @@ class AddPanels extends React.Component {
                         </small>
                     </div>
                     <div className='col-md-9'> */}
-                        <div className='col-md-12'>
+                    <div className='col-md-12'>
                         <div className='col-md-12' style={{ margin: '8px 2px' }}>
                             <a href='/panels'> &larr; Go back</a>
                         </div>
@@ -261,6 +286,29 @@ class AddPanels extends React.Component {
                                                 </div>
                                                 <div className='col-md-12'>
                                                     <div className="form-group">
+                                                        <label htmlFor="description">Readiness</label>
+                                                        <select className='form-control' id='readiness'
+                                                            value={this.state.payload?.readiness_id || ''}
+                                                            onChange={ev => {
+                                                                this.setState({
+                                                                    payload: {
+                                                                        ...this.state.payload || {},
+                                                                        readiness_id: parseInt(ev.target.value)
+                                                                    }
+                                                                });
+                                                            }}>
+                                                            <option value=''>Select Readiness</option>
+                                                            {this.state.readinesses.length > 0 && this.state.readinesses.map((readiness, index) => {
+                                                                return (
+                                                                    <option
+                                                                        key={index} value={readiness.id}>{readiness.name}</option>
+                                                                )
+                                                            })}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                {this.state?.payload?.readiness_id && (this.state.lots && this.state.lots.length > 0) && <div className='col-md-12'>
+                                                    <div className="form-group">
                                                         <label className='mt-3' htmlFor="description">Lots</label>
                                                         &nbsp;<small>(Randomized participant groups)</small>
                                                         <DualListBox
@@ -283,7 +331,7 @@ class AddPanels extends React.Component {
                                                             }}
                                                         />
                                                     </div>
-                                                </div>
+                                                </div>}
 
                                                 {/* //////////////////<<<<<<<<<///////////////// */}
                                                 {/* /////////////////SAMPLE STUFF/////////////// */}

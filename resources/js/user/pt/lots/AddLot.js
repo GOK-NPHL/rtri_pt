@@ -131,9 +131,10 @@ class AddLots extends React.Component {
                                                 <div className='col-md-12'>
                                                     <div className="form-group">
                                                         <div style={{ width: '100%', display: 'flex', flexDirection: 'row', marginBottom: '6px', gap: '5px' }}>
-                                                            <label className='control-label mb-0' htmlFor="description">Ending IDs (pick 2 random)</label>
-                                                            { this.state.payload && this.state.payload.ending_ids && this.state.payload.ending_ids.length > 2
-                                                            && <div><small className='alert alert-default-danger' style={{ padding: '1px 2px' }}>Please select only 2</small></div>}
+                                                            <label className='control-label mb-0' htmlFor="description">Ending IDs (pick up to 4 random)</label>
+                                                            { this.state.payload && this.state.payload.ending_ids 
+                                                            && this.state.payload.ending_ids.length > 4
+                                                            && <div><small className='alert alert-default-danger' style={{ padding: '1px 2px' }}>Please select up to 4</small></div>}
                                                         </div>
                                                         <div style={{ display: 'flex', gap: '15px', flexDirection: 'row' }}>
                                                             {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((item, index) => {
@@ -168,7 +169,9 @@ class AddLots extends React.Component {
                                                 </div>
                                                 <div className='col-md-12 mt-3'>
                                                     <input type="submit" disabled={
-                                                        !this.state.payload?.name || !this.state.payload?.readiness_id || !this.state.payload?.ending_ids || (this.state.payload?.ending_ids.length < 2 || this.state.payload?.ending_ids.length > 2)
+                                                        !this.state.payload?.name || !this.state.payload?.readiness_id || !this.state.payload?.ending_ids || (this.state.payload?.ending_ids.length < 2 
+                                                            || this.state.payload?.ending_ids.length > 4
+                                                            )
                                                     } className="btn btn-primary" value='Save' onClick={(ev) => {
                                                         ev.preventDefault();
                                                         this.saveLot();
