@@ -921,7 +921,6 @@ export async function FetchuserParams(id) {
 }
 
 export async function FetchAdminParams(id) {
-
     try {
         const response = await axios.get(`${settings.serverBaseApi}/get_admin_params/`);
         const responseData = response.data;
