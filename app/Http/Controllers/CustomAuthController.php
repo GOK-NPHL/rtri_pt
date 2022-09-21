@@ -33,6 +33,10 @@ class CustomAuthController extends Controller
     {
         return view('auth.participant_login');
     }
+    public function getParticipantSignupPage()
+    {
+        return view('auth.participant_signup');
+    }
 
     public function doLogin(Request $request)
     {

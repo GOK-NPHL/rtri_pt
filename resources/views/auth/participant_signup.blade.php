@@ -12,7 +12,7 @@
             color:white;">
                 <div>
 
-                    <h3 class="color:white;">Participant Signup - <span> RTRI Quality Control</span></h3>
+                    <h3 class="color:white;">Participant Signup - <span> RTRI PT</span></h3>
                 </div>
                 <form name="signupForm" id="signup_form" class="form-vertical" method="POST" action="{{ route('participant-signup') }}">
                     @csrf

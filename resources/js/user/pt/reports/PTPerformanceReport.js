@@ -276,16 +276,17 @@ class PTPerformanceReport extends React.Component {
                                                                 Department of Laboratory Services - NPHL<br />
                                                                 P.O. Box 20750-00200<br />
                                                                 Nairobi, Kenya<br />
+                                                                254722845874<br />
                                                             </p>
                                                         </td>
                                                         <td className='text-left '>
                                                             <p style={{ margin: 0, padding: '2px 7px' }}>
-                                                                Charity Maina<br />
-                                                                KNEQAS QA Manager<br />
+                                                                Christabel Awuor<br />
+                                                                HIV Serology<br />
                                                                 National HIV Reference Laboratory<br />
                                                                 P.O. Box 20750-00200<br />
                                                                 Nairobi, Kenya<br />
-                                                                Contact: 0721397766
+                                                                Contact: 254723777442
                                                             </p>
                                                         </td>
                                                     </tr>

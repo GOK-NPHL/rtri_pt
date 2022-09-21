@@ -12,7 +12,7 @@
             color:white;">
                 <div>
 
-                    <h2 class="color:white;">Login - <span> RTRI Quality Control</span></h2>
+                    <h2 class="color:white;">Login - <span> RTRI PT</span></h2>
                 </div>
                 <form name="loginForm" id="login_form" class="form-vertical" method="POST" action="{{ route('participant-login') }}">
                     @csrf
@@ -53,6 +53,7 @@
                                 {{ __('Remember Me') }}
                             </label>
                         </div>
+                        <a href="/participant-signup" style="color:white;">Sign up</a>
                         <!-- <a href="/auth/reset-password" style="font-size:0.8em;color:white;">Forgot Password?</a> -->
                         <!--<a href="/contact-us" style="">Don't have a login ? Click here to contact us</a>-->
                         @if (Route::has('password.request'))
