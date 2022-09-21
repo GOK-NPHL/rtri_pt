@@ -30,7 +30,10 @@ class ShipmentForm extends React.Component {
             pageState: '',
             panels: [],
             panelDetails: null,
-            panel_id: ''
+            panel_id: '',
+            panel_ids: [],
+            allPanelDetails: [],
+            tempanel: null,
         }
 
         this.handleRoundChange = this.handleRoundChange.bind(this);
@@ -104,17 +107,17 @@ class ShipmentForm extends React.Component {
                 });
             }
             else {
-                    this.setState({
-                        pageState: this.props.pageState,
-                        id: '',
-                        message: '',
-                        round: '',
-                        shipmentCode: '',
-                        resultDueDate: '',
-                        passMark: 100,
-                        testInstructions: '',
-                        panel_id: '',
-                    });
+                this.setState({
+                    pageState: this.props.pageState,
+                    id: '',
+                    message: '',
+                    round: '',
+                    shipmentCode: '',
+                    resultDueDate: '',
+                    passMark: 100,
+                    testInstructions: '',
+                    panel_id: '',
+                });
             }
         })();
     }
@@ -259,11 +262,14 @@ class ShipmentForm extends React.Component {
     handlePanelChange(panel) {
         if (panel) {
             this.setState({
-                panel_id: panel
+                panel_id: panel,
+                panel_ids: this.state.panel_ids.includes(panel) ? this.state.panel_ids : [...this.state.panel_ids, panel]
             });
             FetchPanel(panel).then((response) => {
                 this.setState({
-                    panelDetails: response
+                    panelDetails: response,
+                    // allPanelDetails: this.state.allPanelDetails.includes(response) ? this.state.allPanelDetails : [...this.state.allPanelDetails, response]
+                    allPanelDetails: [...this.state.allPanelDetails, response]
                 });
             });
         }
@@ -461,50 +467,79 @@ class ShipmentForm extends React.Component {
                                         <h5>Panel</h5>
                                         <hr />
                                         <div className="form-group w-100">
-                                            <label htmlFor="panel">Select a panel</label>
-                                            <select data-dropup-auto="false" data-live-search="true" className="form-control" id="panel" name="panel"
-                                                onChange={(event) => this.handlePanelChange(event.target.value)}
-                                                value={this.state?.panel_id || ''}>
-                                                <option value="">Select a panel</option>
-                                                {this.state.panels.map((panel, index) => {
-                                                    return <option key={index} value={panel.id}>{panel.name}</option>
-                                                })}
-                                            </select>
+                                            <label htmlFor="panel">Select a panel {this.state.tempanel}</label>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                <select data-dropup-auto="false" data-live-search="true" className="form-control" id="panel" name="panel"
+                                                    onChange={(event) => {
+                                                        this.setState({
+                                                            tempanel: event.target.value
+                                                        })
+                                                    }}
+                                                    // value={this.state?.panel_id || ''}>
+                                                    value={this.state?.tempanel || ''}>
+                                                    <option value="">Select a panel</option>
+                                                    {this.state.panels.map((panel, index) => {
+                                                        return <option key={index} value={panel.id}>{panel.name}</option>
+                                                    })}
+                                                </select>
+                                                <div className="form-group w-100 mb-0">
+                                                    <button className='btn btn-primary btn-sm' disabled={this.state.tempanel == null} onClick={()=>{
+                                                        if(this.state.tempanel){
+                                                            this.handlePanelChange(this.state.tempanel)
+                                                            this.setState({
+                                                                tempanel: ''
+                                                            })
+                                                        }
+                                                    }}>Add panel</button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
 
-                                {this.state.panelDetails && <div className="form-row bg-white p-2" style={{ fontSize: '15px' }}>
-                                    <div className="col-sm-12  ml-2">
+                                {this.state.allPanelDetails.length > 0 && <div className="row mt-2 mb-2">
+                                    <div className="col-sm-12 bg-white ml-2 pt-2 pb-2">
                                         <h5>Panel details</h5>
                                         <hr />
                                     </div>
+                                </div>}
+                                {this.state.allPanelDetails.length > 0 && this.state.allPanelDetails.map(panel => <div key={panel?.id+"_"+panel?.name} className="form-row bg-white p-2" style={{ fontSize: '15px' }}>
                                     <div className="col-sm-12 p-4" style={{ backgroundColor: 'papayawhip', border: '0px solid white', borderRadius: '5px' }}>
+                                        <div className='row mb-0'>
+                                            <div className='col-md-12 mb-3 p-0' style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
+                                                <span role={"button"} onClick={()=>{
+                                                    this.setState({
+                                                        panel_ids: this.state.panel_ids.filter(p=>p != panel.id),
+                                                        allPanelDetails: this.state.allPanelDetails.filter(p=>p.id != panel.id)
+                                                    })
+                                                }} className='fa-2x text-danger' style={{lineHeight: '0px', cursor: 'pointer'}}>&times;</span>
+                                            </div>
+                                        </div>
                                         <div className='row mb-3'>
                                             <div className='col-sm-4'>
                                                 <label>Panel name</label>
                                                 <p>
-                                                    <a href={`/panel/${this.state.panelDetails.id}`}>{this.state.panelDetails?.name || "-"}</a>
+                                                    <a href={`/panel/${panel.id}`}>{panel?.name || "-"}</a>
                                                 </p>
                                             </div>
                                             <div className='col-sm-4'>
                                                 <label>Created at</label>
-                                                <p>{new Date(this.state.panelDetails?.created_at).toLocaleString() || "-"}</p>
+                                                <p>{new Date(panel?.created_at).toLocaleString() || "-"}</p>
                                             </div>
                                             <div className='col-sm-4'>
                                                 <label>Readiness Checklist</label>
                                                 <p>
-                                                    <a href={`/edit-readiness/${this.state.panelDetails?.readiness?.id}`}>{this.state.panelDetails?.readiness?.name || "-"}</a>
+                                                    <a href={`/edit-readiness/${panel?.readiness?.id}`}>{panel?.readiness?.name || "-"}</a>
                                                 </p>
                                             </div>
                                         </div>
                                         <div className='row mb-3'>
-                                            <div className='col-sm-2'>
+                                            <div className='col-sm-1' style={{ display: 'flex', alignItems: 'center' }}>
                                                 <label>Lots</label>
                                             </div>
-                                            <div className='col-sm-10'>
-                                                <table className='table table-condensed table-bordered' style={{ backgroundColor: 'cornsilk' }}>
+                                            <div className='col-sm-11'>
+                                                <table className='table table-condensed table-bordered mb-2' style={{ backgroundColor: 'cornsilk' }}>
                                                     <thead>
                                                         <tr>
                                                             <th style={{ border: '1px solid #db8', textAlign: 'center' }}>Lot name</th>
@@ -512,7 +547,7 @@ class ShipmentForm extends React.Component {
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {this.state.panelDetails?.lots?.map((lot, index) => {
+                                                        {panel?.lots?.map((lot, index) => {
                                                             return <tr key={index}>
                                                                 <td style={{ border: '1px solid #db8', textAlign: 'center' }}>
                                                                     <a href={`/lots/edit/${lot.id}`}>{lot?.name || "-"}</a>
@@ -528,11 +563,11 @@ class ShipmentForm extends React.Component {
                                             </div>
                                         </div>
                                         <div className='row mb-3'>
-                                            <div className='col-sm-2'>
+                                            <div className='col-sm-1' style={{ display: 'flex', alignItems: 'center' }}>
                                                 <label>Samples</label>
                                             </div>
-                                            <div className='col-sm-10'>
-                                                <table className='table table-condensed table-bordered' style={{ backgroundColor: 'cornsilk' }}>
+                                            <div className='col-sm-11'>
+                                                <table className='table table-condensed table-bordered mb-2' style={{ backgroundColor: 'cornsilk' }}>
                                                     <thead>
                                                         <tr>
                                                             <th style={{ border: '1px solid #db8', textAlign: 'center' }}>Sample name</th>
@@ -551,7 +586,7 @@ class ShipmentForm extends React.Component {
                                             </div>
                                         </div>
                                     </div>
-                                </div>}
+                                </div>)}
 
                                 <div className="form-group row mt-4">
                                     <div className="col-sm-12 text-center">
