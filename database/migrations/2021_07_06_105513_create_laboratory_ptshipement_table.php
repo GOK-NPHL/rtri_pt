@@ -16,6 +16,7 @@ class CreateLaboratoryPtshipementTable extends Migration
         Schema::create('laboratory_pt_shipement', function (Blueprint $table) {
             $table->unsignedBigInteger('laboratory_id');
             $table->unsignedBigInteger('pt_shipement_id');
+            $table->unsignedBigInteger('pt_panel_id');
         });
     }
 

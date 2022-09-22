@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { v4 as uuidv4 } from 'uuid';
 import Pagination from "react-js-pagination";
-import { FetchShipments } from '../../../components/utils/Helpers';
+import { FetchShipments, DeleteShipment } from '../../../components/utils/Helpers';
 
 
 class ListShipment extends React.Component {
@@ -106,30 +106,53 @@ class ListShipment extends React.Component {
                                     <i className="fas fa-file-pdf"></i> Performance
                                 </a>
                                 :
-                                <a
-                                    onClick={() => {
-                                        //// this.props.page != 'report' ? //// INVESTIGATE REASON FOR THIS
-                                        true ?
-                                            window.location.assign('get-shipment-responses/' + element.id) :
-                                            window.location.assign('get-shipment-report-responses/' + element.id)
-                                    }}
-                                    style={{ 'marginRight': '5px' }}
-                                    data-toggle="tooltip" data-placement="top" title="View shipment responses"
-                                    className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm text-white">
-                                    <i className="fas fa-file"></i> View
-                                </a>
-                        }
-                        {
-                            this.props.page != 'report' ?
-                                <a href="#"
-                                    onClick={
-                                        () => {
-                                            this.props.toggleView('edit', element.id);
-                                        }
+                                <div style={{ display: 'flex wrap', alignItems: 'center', justifyContent: 'space-around', marginBottom: '3px', gap: '5px' }}>
+
+                                    {
+                                        this.props.page != 'report' ?
+                                            <a href="#"
+                                                onClick={
+                                                    () => {
+                                                        this.props.toggleView('edit', element.id);
+                                                    }
+                                                }
+                                                style={{ height: 'auto', margin: '3px' }}
+                                                className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm text-white">
+                                                <i className="fas fa-edit"></i> Edit
+                                            </a> : ''
                                     }
-                                    className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm text-white">
-                                    <i className="fas fa-edit"></i> Edit
-                                </a> : ''
+                                    <a
+                                        onClick={() => {
+                                            //// this.props.page != 'report' ? //// INVESTIGATE REASON FOR THIS
+                                            true ?
+                                                window.location.assign('get-shipment-responses/' + element.id) :
+                                                window.location.assign('get-shipment-report-responses/' + element.id)
+                                        }}
+                                        style={{ height: 'auto', margin: '3px' }}
+                                        data-toggle="tooltip" data-placement="top" title="View shipment responses"
+                                        className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm text-white">
+                                        <i className="fas fa-file"></i> View
+                                    </a>
+                                    <a
+                                        onClick={
+                                            (ev) => {
+                                                ev.preventDefault();
+                                                ev.stopPropagation();
+                                                window.confirm('Are you sure you wish to delete this item?') &&
+                                                    (async () => {
+                                                        let response = await DeleteShipment(element.id);
+                                                        if (response) {
+                                                            window.location.reload();
+                                                        }
+                                                    })();
+                                            }
+                                        }
+                                        style={{ height: 'auto', margin: '3px' }}
+                                        data-toggle="tooltip" data-placement="top" title="Delete Lot"
+                                        className="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm text-white">
+                                        <i className="fas fa-trash"></i> Delete
+                                    </a>
+                                </div>
                         }
 
 

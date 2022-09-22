@@ -327,7 +327,7 @@ class ShipmentForm extends React.Component {
             <React.Fragment>
 
                 <div className="row">
-                    <div className='col-md-3'>
+                    {/* <div className='col-md-3'>
                         <small>
                             <details open>
                                 <summary>this.state</summary>
@@ -337,8 +337,8 @@ class ShipmentForm extends React.Component {
                             </details>
                         </small>
                     </div>
-                    <div className='col-md-9'>
-                    {/* <div className='col-md-12'> */}
+                    <div className='col-md-9'> */}
+                    <div className='col-md-12'>
                         <div className="card" style={{ "backgroundColor": "#ecf0f1" }}>
                             <div className="card-body">
 

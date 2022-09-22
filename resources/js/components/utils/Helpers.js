@@ -652,6 +652,20 @@ export async function UpdateShipment(shipement) {
     }
 }
 
+export async function DeleteShipment(id) {
+    try {
+        const response = await axios({
+            method: 'delete',
+            url: `${settings.serverBaseApi}/delete_shipment/${id}`,
+        });
+        return response;
+    } catch (err) {
+        // Handle Error Here
+        console.log(err.response);
+        return err.response
+    }
+}
+
 export async function FetchShipments(userId, filterEmpty) {
 
     try {
