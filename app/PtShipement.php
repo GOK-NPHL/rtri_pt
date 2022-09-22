@@ -15,11 +15,15 @@ class PtShipement extends Model
         'test_instructions',
         'pass_mark',
         // 'readiness_id', // change to panel
-        'ptpanel_id',
+        'ptpanel_ids',
 
     ];
 
     protected $softDelete = true;
+
+    protected $casts = [
+        'ptpanel_ids' => 'array',
+    ];
 
     public function laboratories()
     {
@@ -27,11 +31,15 @@ class PtShipement extends Model
     }
 
     //panels
-    public function ptpanel()
+    public function ptpanels()
     {
         // return $this->belongsTo(PtPanel::class);
-        $ptpanel = PtPanel::find($this->ptpanel_id);
-        return $ptpanel;
+
+        // $ptpanel = PtPanel::find($this->ptpanel_id);
+        // return $ptpanel;
+
+        $ptpanels = PtPanel::whereIn('id', $this->ptpanel_ids)->get();
+        return $ptpanels;
     }
 
 }

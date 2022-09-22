@@ -23,14 +23,10 @@ class ShipmentForm extends React.Component {
             resultDueDate: '',
             passMark: 100,
             testInstructions: '',
-            participantSource: 'checklist',
             dualListptions: [],
             readinessChecklists: [],
-            selected: [],
             pageState: '',
             panels: [],
-            panelDetails: null,
-            panel_id: '',
             panel_ids: [],
             allPanelDetails: [],
             tempanel: null,
@@ -69,16 +65,23 @@ class ShipmentForm extends React.Component {
                     testInstructions: editData.shipment.test_instructions,
                     pageState: 'edit',
                 });
+
+                let all_panels = Array.from(editData.shipment.ptpanel_ids, x => x);
+                if(all_panels && all_panels.length > 0){
+                    all_panels.forEach((panel) => {
+                        FetchPanel(panel).then((response) => {
+                            this.setState({
+                                allPanelDetails: [...this.state.allPanelDetails, response]
+                            });
+                        });
+                    });
+                }
             }
         })();
     }
 
     componentDidUpdate(prevProps, prevState) {
-        // if (prevState.panelDetails != this.state.panelDetails) {
-        //     this.setState({
-        //         panelDetails: this.state.panelDetails
-        //     });
-        // }
+        
     }
 
     componentDidMount() {
@@ -99,12 +102,6 @@ class ShipmentForm extends React.Component {
         (async () => {
             if (this.props.pageState == 'edit') {
                 this.getShipementDataById(this.props.id);
-                FetchPanel(this.props.id).then((panel) => {
-                    this.setState({
-                        panelDetails: panel,
-                        panel_id: panel.id,
-                    });
-                });
             }
             else {
                 this.setState({
@@ -116,7 +113,7 @@ class ShipmentForm extends React.Component {
                     resultDueDate: '',
                     passMark: 100,
                     testInstructions: '',
-                    panel_id: '',
+                    panel_ids: []
                 });
             }
         })();
@@ -196,7 +193,7 @@ class ShipmentForm extends React.Component {
             (!this.state.resultDueDate || this.state.resultDueDate == '') ||
             (!this.state.shipmentCode || this.state.shipmentCode == '') ||
             (!this.state.round || this.state.round == '') ||
-            (!this.state.panel_id || this.state.panel_id == '')
+            (!this.state.panel_ids || this.state.panel_ids.length == 0)
 
         ) {
             let msg = [
@@ -205,7 +202,7 @@ class ShipmentForm extends React.Component {
                 <p>{(!this.state.resultDueDate || this.state.resultDueDate == '') ? <strong>Result Due Date field</strong> : ''}</p>,
                 <p>{(!this.state.shipmentCode || this.state.shipmentCode == '') ? <strong>Shipement code field</strong> : ''}</p>,
                 <p>{(!this.state.round || this.state.round == '') ? <strong>Round Name field</strong> : ''}</p>,
-                <p>{(!this.state.panel_id || this.state.panel_id == '') ? <strong>Panel field</strong> : ''}</p>,
+                <p>{(!this.state.panel_ids || this.state.panel_ids.length == 0) ? <strong>Panels field</strong> : ''}</p>,
             ]
 
             this.setState({
@@ -225,7 +222,8 @@ class ShipmentForm extends React.Component {
                 shipement['result_due_date'] = this.state.resultDueDate;
                 shipement['shipment_code'] = this.state.shipmentCode;
                 shipement['round'] = this.state.round;
-                shipement['panel_id'] = this.state.panel_id;
+                // shipement['panel_id'] = this.state.panel_id;
+                shipement['panel_ids'] = this.state.panel_ids;
                 shipement['test_instructions'] = this.state.testInstructions;
 
                 if (this.state.pageState == 'edit') {
@@ -242,11 +240,9 @@ class ShipmentForm extends React.Component {
                             resultDueDate: '',
                             shipmentCode: '',
                             round: '',
-                            selected: [],
-                            panel_id: '',
+                            panel_ids: [],
                             testInstructions: '',
-                            panelDetails: null,
-                            panels: [],
+                            allPanelDetails: [],
                         });
                     } else {
                         this.setState({
@@ -262,14 +258,12 @@ class ShipmentForm extends React.Component {
     handlePanelChange(panel) {
         if (panel) {
             this.setState({
-                panel_id: panel,
+                // panel_id: panel,
                 panel_ids: this.state.panel_ids.includes(panel) ? this.state.panel_ids : [...this.state.panel_ids, panel]
             });
             FetchPanel(panel).then((response) => {
                 this.setState({
-                    panelDetails: response,
-                    // allPanelDetails: this.state.allPanelDetails.includes(response) ? this.state.allPanelDetails : [...this.state.allPanelDetails, response]
-                    allPanelDetails: [...this.state.allPanelDetails, response]
+                    allPanelDetails: this.state.allPanelDetails.includes(response) ? this.state.allPanelDetails : [...this.state.allPanelDetails, response]
                 });
             });
         }
@@ -295,62 +289,6 @@ class ShipmentForm extends React.Component {
                 checklists.push(<option key={checklist.id} value={checklist.id}>{checklist.name}</option>);
             });
         }
-
-        let labSelect = <div>No checklist defined
-            {/* . Readiness: {this.state.readinessId} */}
-        </div>;
-        if (this.state.pageState == 'edit' && this.state.readinessId && this.state.readinessId != '' && this.state.readinessId != null) {
-            console.log('this.state.readinessId: ', this.state.readinessId);
-            console.log('this.state.readinessChecklists: ', this.state.readinessChecklists);
-            labSelect = <div> {this.state.readinessId}{JSON.stringify(this.state.readinessChecklists) || '~'} </div>
-        }
-        if (this.state.readinessChecklists.length != 0) {
-            labSelect = <select
-                id="u_readinessId"
-                value={this.state.readinessId}
-                onChange={(event) => this.handleChecklistChange(event.target.value)} type="text"
-                data-dropup-auto="false"
-                data-live-search="true"
-                // className="selectpicker form-control dropup">
-                className="form-control"
-            >
-                <option >Select checklist...</option>
-                {checklists}
-            </select>;
-        }
-
-        let participantList = <div key={uuidv4()} className="mt-3"
-            style={{
-                "display": this.state.participantSource == 'participants' ? '' : "none",
-                "width": "80%"
-            }} >
-            <p style={{ "fontWeight": "700" }}>Choose participants:</p>
-            <DualListBox
-                canFilter
-                options={dualListValues}
-                selected={this.state.selected}
-                onChange={this.dualListOnChange}
-            />
-        </div>
-
-        let checklistParticipant = <div key={uuidv4()} className="mt-3"
-            style={{
-                "display": this.state.participantSource == 'checklist' ? '' : "none",
-                "width": "50%"
-            }}>
-            <label htmlFor="u_readinessId" >Select Checklist *</label>
-            {labSelect}
-        </div>
-
-        let participants = [participantList, checklistParticipant];
-        if (this.state.pageState == 'edit') {
-            if (this.state.participantSource == 'participants') {
-                participants = [participantList];
-            } else if (this.state.participantSource == 'checklist') {
-                participants = [checklistParticipant];
-            }
-        }
-        //  pageState: 'edit', participantSource: editData.shipment.readiness_id == null ? 'participants' : 'checklist'
 
         return (
             <React.Fragment>
@@ -425,41 +363,6 @@ class ShipmentForm extends React.Component {
                                             className="form-control" id="test_instructions" rows="3"></textarea>
                                     </div>
                                 </div>
-
-                                <div className="form-row bg-white mb-3 pt-2 rounded hidden">
-                                    {/* choose participant source */}
-                                    <div className="col-sm-12 mb-3  ml-2">
-                                        {this.state.pageState != 'edit' ?
-                                            <div className="form-check form-check-inline">
-                                                <input className="form-check-input"
-                                                    checked={this.state.participantSource == 'checklist'}
-                                                    type="radio" value="checklist" onChange={() => this.handleParticipantSourceChange('checklist')}
-                                                    name="attach_participants" id="checklist" />
-                                                <label className="form-check-label" htmlFor="checklist" >
-                                                    Attach Checklist Sent to Laboratories
-                                                </label>
-                                            </div>
-                                            : ''}
-                                        {this.state.pageState != 'edit' ?
-                                            <div className="form-check form-check-inline">
-                                                <input className="form-check-input" type="radio"
-                                                    checked={this.state.participantSource == 'participants'}
-                                                    value="participants" onChange={() => this.handleParticipantSourceChange('participants')}
-                                                    name="attach_participants" id="participants" />
-                                                <label className="form-check-label" htmlFor="participants" >
-                                                    Select Laboratories
-                                                </label>
-                                            </div>
-                                            : ''}
-
-                                        {participants}
-
-                                    </div>
-                                    {/* End choose participant source */}
-                                </div>
-
-
-
 
 
                                 <div className="form-row bg-white p-2">
@@ -575,7 +478,7 @@ class ShipmentForm extends React.Component {
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {this.state.panelDetails?.samples?.map((sample, index) => {
+                                                        {panel?.samples?.map((sample, index) => {
                                                             return <tr key={index}>
                                                                 <td style={{ border: '1px solid #db8', textAlign: 'center' }}>{sample.name}</td>
                                                                 <td style={{ border: '1px solid #db8', textAlign: 'center' }}>{sample.reference_result || '-'}</td>

@@ -47,7 +47,6 @@ class ListShipment extends React.Component {
     }
 
     handlePageChange(pageNumber) {
-        console.log(`active page is ${pageNumber}`);
         let pgNumber = pageNumber * 10 + 1;
         this.setState({
             startTableData: pgNumber - 11,
@@ -81,57 +80,60 @@ class ListShipment extends React.Component {
             this.state.data.map((element, index) => {
                 tableElem.push(<tr key={index}>
                     <th scope="row">{index + 1}</th>
-                    <td className='text-center'>{element.round_name}</td>
-                    <td className='text-center'>{element.code || element.shipment_code}</td>
-                    <td className='text-center'>{element.pass_mark}</td>
-                    <td className='text-center'>{element?.panel?.name}</td>
-                    <td className='text-center'>{element?.panel?.participant_count || 0}</td>
-                    <td className='text-center'>{new Date(element.updated_at).toLocaleString('en-GB')}</td>
-                    {
-
-                        <td>
-                            {
-                                this.props.isParticipant ?
-                                    <a
-                                        onClick={() => {
-                                            window.location.assign('/get-participant-shipment-response-performance/' + element.id)
-                                        }}
-                                        data-toggle="tooltip" data-placement="top" title="View performance report"
-                                        style={{ 'marginRight': '5px' }}
-                                        className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm text-white">
-                                        <i className="fas fa-file-pdf"></i> Performance
-                                    </a>
-                                    :
-                                    <a
-                                        onClick={() => {
-                                            //// this.props.page != 'report' ? //// INVESTIGATE REASON FOR THIS
-                                            true ?
-                                                window.location.assign('get-shipment-responses/' + element.id) :
-                                                window.location.assign('get-shipment-report-responses/' + element.id)
-                                        }}
-                                        style={{ 'marginRight': '5px' }}
-                                        data-toggle="tooltip" data-placement="top" title="View shipment responses"
-                                        className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm text-white">
-                                        <i className="fas fa-file"></i> View
-                                    </a>
-                            }
-                            {
-                                this.props.page != 'report' ?
-                                    <a href="#"
-                                        onClick={
-                                            () => {
-                                                console.log(element);
-                                                this.props.toggleView('edit', element.id);
-                                            }
+                    <td style={{ verticalAlign: 'middle' }} className='text-center'>{element.round_name}</td>
+                    <td style={{ verticalAlign: 'middle' }} className='text-center'>{element.code || element.shipment_code}</td>
+                    <td style={{ verticalAlign: 'middle' }} className='text-center'>{element.pass_mark}</td>
+                    <td style={{ verticalAlign: 'middle' }} className='text-center'>
+                        {element?.panels?.map((panel, index) => (
+                            <div className='d-block' key={panel.id + "_" + index}>
+                                <span className='text-center' style={{ fontWeight: 'normal', fontSize: '0.88em', lineHeight: '1.7' }}>
+                                    {panel?.name}&nbsp; &nbsp;({panel?.participant_count || 0} participants)
+                                </span>
+                            </div>
+                        ))}
+                    </td>
+                    <td style={{ verticalAlign: 'middle' }} className='text-center'>{new Date(element.updated_at).toLocaleString('en-GB')}</td>
+                    <td style={{ verticalAlign: 'middle' }}>
+                        {
+                            this.props.isParticipant ?
+                                <a
+                                    onClick={() => {
+                                        window.location.assign('/get-participant-shipment-response-performance/' + element.id)
+                                    }}
+                                    data-toggle="tooltip" data-placement="top" title="View performance report"
+                                    style={{ 'marginRight': '5px' }}
+                                    className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm text-white">
+                                    <i className="fas fa-file-pdf"></i> Performance
+                                </a>
+                                :
+                                <a
+                                    onClick={() => {
+                                        //// this.props.page != 'report' ? //// INVESTIGATE REASON FOR THIS
+                                        true ?
+                                            window.location.assign('get-shipment-responses/' + element.id) :
+                                            window.location.assign('get-shipment-report-responses/' + element.id)
+                                    }}
+                                    style={{ 'marginRight': '5px' }}
+                                    data-toggle="tooltip" data-placement="top" title="View shipment responses"
+                                    className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm text-white">
+                                    <i className="fas fa-file"></i> View
+                                </a>
+                        }
+                        {
+                            this.props.page != 'report' ?
+                                <a href="#"
+                                    onClick={
+                                        () => {
+                                            this.props.toggleView('edit', element.id);
                                         }
-                                        className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm text-white">
-                                        <i className="fas fa-edit"></i> Edit
-                                    </a> : ''
-                            }
+                                    }
+                                    className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm text-white">
+                                    <i className="fas fa-edit"></i> Edit
+                                </a> : ''
+                        }
 
 
-                        </td>
-                    }
+                    </td>
 
                 </tr>
                 );
@@ -152,7 +154,6 @@ class ListShipment extends React.Component {
                 <div className="form-group mb-2">
                     <input type="text"
                         onChange={(event) => {
-                            console.log(this.state.allTableElements);
                             let currElementsTableEl = this.state.allTableElements.filter(elemnt =>
                                 elemnt['props']['children'][1]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
                                 elemnt['props']['children'][2]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase())
@@ -169,8 +170,7 @@ class ListShipment extends React.Component {
                             <th scope="col">Round Name</th>
                             <th scope="col">Shipement Code</th>
                             <th scope="col">Pass Mark</th>
-                            <th scope="col">Panel</th>
-                            <th scope="col">Participant Count</th>
+                            <th scope="col">Panels (&amp; Participant Count)</th>
                             <th scope="col">Last Update</th>
                             <th scope="col">Action</th>
                         </tr>

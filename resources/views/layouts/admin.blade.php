@@ -83,7 +83,7 @@ use Illuminate\Support\Facades\Gate;
                                 </div>
                             </li>
 
-                            <li class="nav-item dropdown">
+                            <!-- <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Access Management
                                 </a>
@@ -91,9 +91,9 @@ use Illuminate\Support\Facades\Gate;
                                     <a class="dropdown-item" href="{{route('manage-permissions')}}">Permissions</a>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="{{route('manage-roles')}}">Access Roles</a>
-                                    <!-- <a class="dropdown-item" href="{{route('manage-groups')}}">User groups</a> -->
+                                    <a class="dropdown-item hidden" href="{{route('manage-groups')}}">User groups</a>
                                 </div>
-                            </li>
+                            </li> -->
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Laboratories
