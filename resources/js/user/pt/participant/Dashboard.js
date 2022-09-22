@@ -45,8 +45,7 @@ class Dashboard extends React.Component {
         (async () => {
             let response = await FetchUserSamples();
             let readiness = await FetchReadnessSurvey();
-            console.log("readiness")
-            console.log(readiness)
+            console.log("subs", response)
             this.setState({
                 data: response,
                 readiness: readiness
@@ -103,20 +102,20 @@ class Dashboard extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevState.page !== this.state.page) {
-            (async () => {
-                let response = await FetchUserSamples();
-                this.setState({
-                    allTableElements: [],
-                    allSubmittedTableElements: [],
-                    allReadinessTableElements: [],
-                    currElementsTableEl: [],
-                    currSubmittedElementsTableEl: [],
-                    currReadinessElementsTableEl: [],
-                    data: response,
-                })
-            })();
-        }
+        // if (prevState.page !== this.state.page) {
+        //     (async () => {
+        //         let response = await FetchUserSamples();
+        //         this.setState({
+        //             allTableElements: [],
+        //             allSubmittedTableElements: [],
+        //             allReadinessTableElements: [],
+        //             currElementsTableEl: [],
+        //             currSubmittedElementsTableEl: [],
+        //             currReadinessElementsTableEl: [],
+        //             data: response,
+        //         })
+        //     })();
+        // }
     }
 
     render() {
@@ -195,8 +194,8 @@ class Dashboard extends React.Component {
                     </td>}
                 </tr>;
 
-                datRow = <tr key={index++}><td><small><pre>{JSON.stringify(element,null,1)}</pre></small></td></tr>;
-                
+                // datRow = <tr key={index++}><td><small><pre>{JSON.stringify(element, null, 1)}</pre></small></td></tr>;
+
                 if (element.submission_id == null) {
                     tableElem.push(datRow);
                 } else {
@@ -317,11 +316,55 @@ class Dashboard extends React.Component {
                         {this.state.currSubmittedElementsTableEl.length > 0 ?
                             this.state.currSubmittedElementsTableEl.slice(this.state.startSubmittedTableData, this.state.endeSubmittedTableData) :
                             <tr>
-                                <td colSpan={5}>
+                                <td colSpan={5} className="text-center alert alert-default-warning">
                                     No submissions done
                                 </td>
                             </tr>
                         }
+                        {/* {this.state.data && this.state.data.length > 0 ? this.state.data.filter(s=>s.submission).map((ship, index) => {
+                            <tr key={ship.id}>
+                                <td colSpan={5}>{JSON.stringify(ship, null, 2)}</td>
+                                <td>{index + 1}</td>
+                                <td>{ship.round_name}</td>
+                                <td>{ship.code}</td>
+                                <td>{ship.end_date}</td>
+                                <td>
+                                    {ship.submission_id ?
+                                        <button
+                                            onClick={() => {
+                                                this.setState({
+                                                    selectedElement: ship,
+                                                    selectedElementHasSubmmisions: true,
+                                                    page: 'edit'
+                                                });
+                                            }} type="button" className="btn btn-success">
+                                            {Date.parse(ship.end_date) > new Date() ? <i className="far fa-edit"></i> : <i className="fas fa-eye"></i>}
+                                            {Date.parse(ship.end_date) > new Date() ? 'Edit' : 'View only'}
+                                        </button> : <button
+                                            onClick={() => {
+                                                if (ship.is_readiness_answered == null) {
+                                                    window.location.assign('get-readiness-form/' + ship.readiness_id)
+                                                } else {
+                                                    this.setState({
+                                                        selectedElement: ship,
+                                                        selectedElementHasSubmmisions: false,
+                                                        page: 'edit'
+                                                    });
+                                                }
+                                            }}
+                                            type="button"
+                                            className="btn btn-success">
+                                            {Date.parse(ship.end_date) > new Date() ? <i className="fas fa-paper-plane"></i> : <i className="fas fa-eye"></i>}
+                                            {Date.parse(ship.end_date) > new Date() ?
+                                                ship.is_readiness_answered == null ?
+                                                    ' Fill readiness' : ship.readiness_approval_id == null ? ' View only' : ' Submit' : 'View only'}
+                                        </button>
+                                    }
+                                </td> 
+                            </tr>
+                        }) : <tr>
+                            <td colSpan={5} className="text-center"> No submissions found </td>
+                        </tr>}*/}
                     </tbody>
                 </table>
 
@@ -363,7 +406,6 @@ class Dashboard extends React.Component {
                             <th scope="col">End Date</th>
                             <th scope="col">Status</th>
                             <th scope="col">Action</th>
-
                         </tr>
                     </thead>
                     <tbody>
@@ -371,11 +413,56 @@ class Dashboard extends React.Component {
                             this.state.currElementsTableEl.length > 0 ?
                                 this.state.currElementsTableEl.slice(this.state.startTableData, this.state.endeTableData) :
                                 <tr>
-                                    <td colSpan={6}>
+                                    <td colSpan={5} className="text-center alert alert-default-warning">
                                         No pending samples to fill
                                     </td>
                                 </tr>
                         }
+                        {/* {this.state.data && this.state.data.length > 0 ? this.state.data.filter(s=>s.submission == null).map((ship, index) => {
+                            <tr key={ship.id}>
+                                <td colSpan={5}>{JSON.stringify(ship, null, 2)}</td>
+
+                                <td>{index + 1}</td>
+                                <td>{ship.round_name}</td>
+                                <td>{ship.code}</td>
+                                <td>{ship.end_date}</td>
+                                <td>
+                                    {ship.submission_id ?
+                                        <button
+                                            onClick={() => {
+                                                this.setState({
+                                                    selectedElement: ship,
+                                                    selectedElementHasSubmmisions: true,
+                                                    page: 'edit'
+                                                });
+                                            }} type="button" className="btn btn-success">
+                                            {Date.parse(ship.end_date) > new Date() ? <i className="far fa-edit"></i> : <i className="fas fa-eye"></i>}
+                                            {Date.parse(ship.end_date) > new Date() ? 'Edit' : 'View only'}
+                                        </button> : <button
+                                            onClick={() => {
+                                                if (ship.is_readiness_answered == null) {
+                                                    window.location.assign('get-readiness-form/' + ship.readiness_id)
+                                                } else {
+                                                    this.setState({
+                                                        selectedElement: ship,
+                                                        selectedElementHasSubmmisions: false,
+                                                        page: 'edit'
+                                                    });
+                                                }
+                                            }}
+                                            type="button"
+                                            className="btn btn-success">
+                                            {Date.parse(ship.end_date) > new Date() ? <i className="fas fa-paper-plane"></i> : <i className="fas fa-eye"></i>}
+                                            {Date.parse(ship.end_date) > new Date() ?
+                                                ship.is_readiness_answered == null ?
+                                                    ' Fill readiness' : ship.readiness_approval_id == null ? ' View only' : ' Submit' : 'View only'}
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }) : <tr>
+                            <td colSpan={5} className="text-center"> No pending submissions at the moment </td>
+                        </tr>} */}
                     </tbody>
 
                 </table>

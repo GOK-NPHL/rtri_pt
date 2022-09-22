@@ -60,7 +60,7 @@ use Illuminate\Support\Facades\Gate;
                 </li>
             </ul>
             <div class="text-white" style="display: flex; flex-direction: column;">
-                <span>{{ Auth::user()->name ?? "" }}</span>
+                <span title="{{ Auth::user()->email ?? '' }}">{{ Auth::user()->name ?? "" }}</span>
                 <span>{{ Auth::user()->lab()->lab_name ?? "" }}</span>
             </div>
         </nav>

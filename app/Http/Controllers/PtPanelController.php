@@ -156,23 +156,28 @@ class PtPanelController extends Controller
             $panel->name = $request->name;
             $panel->readiness_id = $request->readiness_id;
             $panel->lots = $request->lot_ids ?? $request->lots ?? [];
-            // Save samples
-            foreach ($request->samples as $sample) {
-                $ptSample = PtSample::where('id', $sample['id'])->first();
-                if ($ptSample) {
-                    if ($sample['deleted'] == 1) {
-                        $ptSample->delete();
+            // Save samples if any
+            if ($request->samples && count($request->samples) > 0) {
+                foreach ($request->samples as $sample) {
+                    // check if sample id is set
+                    if (isset($sample['id'])) {
+                        $ptSample = PtSample::where('id', $sample['id'])->first();
+                        if ($ptSample) {
+                            if ($sample['deleted'] == 1) {
+                                $ptSample->delete();
+                            } else {
+                                $ptSample->name = $sample['name'];
+                                $ptSample->reference_result = $sample['reference_result'];
+                                $ptSample->save();
+                            }
+                        }
                     } else {
+                        $ptSample = new PtSample();
                         $ptSample->name = $sample['name'];
                         $ptSample->reference_result = $sample['reference_result'];
+                        $ptSample->ptpanel()->associate($panel);
                         $ptSample->save();
                     }
-                } else {
-                    $ptSample = new PtSample();
-                    $ptSample->name = $sample['name'];
-                    $ptSample->reference_result = $sample['reference_result'];
-                    $ptSample->ptpanel()->associate($panel);
-                    $ptSample->save();
                 }
             }
             $panel->save();

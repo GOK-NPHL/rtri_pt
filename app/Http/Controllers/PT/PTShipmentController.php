@@ -8,8 +8,12 @@ use App\Lot;
 use App\PtPanel;
 use App\PtSample;
 use App\PtShipement;
+use App\ptsubmission;
 use App\Readiness;
+use App\ReadinessAnswer;
+use App\ReadinessApproval;
 use App\ReadinessQuestion;
+use App\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -124,13 +128,15 @@ class PTShipmentController extends Controller
                     $participants = $panel->participants();
                     if ($participants && count($participants) > 0) {
                         foreach ($participants as $participant) {
-                            $userlab = $participant->lab();
-                            // save to laboratory_pt_shipment table
-                            DB::table('laboratory_pt_shipement')->insert([
-                                'laboratory_id' => $userlab->id, //$participant['id'],
-                                'pt_shipement_id' => $shipment['id'],
-                                'pt_panel_id' => $panel_id,
-                            ]);
+                            $useracc = User::find($participant['id']);
+                            if ($useracc) {
+                                // save to laboratory_pt_shipment table
+                                DB::table('laboratory_pt_shipement')->insert([
+                                    'laboratory_id' => $useracc->lab()->id,
+                                    'pt_shipement_id' => $shipment['id'],
+                                    'pt_panel_id' => $panel_id,
+                                ]);
+                            }
                         }
                     }
                 }
@@ -202,35 +208,73 @@ class PTShipmentController extends Controller
             // join with lots (name, participants()) on panels.lots includes lots.id
             // where shipment.start_date <= today and shipment.end_date >= today and shipment.participants includes user_id
 
+            // shoud return the following json: 
+            /* [
+                {
+                    "id": 4,
+                    "pt_shipements_id": 4,
+                    "round_name": "Round A",
+                    "code": "R-01",
+                    "start_date": null,
+                    "end_date": "2022-09-28",
+                    "test_instructions": "Discover a whole host of new companies explictly approved by me",
+                    "sample_id": 1,
+                    "sample_name": "SAMPLE A",
+                    "submission_id": null,
+                    "is_readiness_answered": 1,
+                    "readiness_id": null,
+                    "readiness_approval_id": 1
+                }
+            ] */
+
             $data = array();
 
             $shipments = PtShipement::all();
             foreach ($shipments as $shipment) {
-                $readiness = Readiness::find($shipment->readiness_id);
-                if ($readiness) {
-                    $shipment->readiness = $readiness;
-                }
+                // $readiness = Readiness::find($shipment->readiness_id);
+                // if ($readiness) {
+                //     $shipment->readiness = $readiness;
+                // }
+
                 $panels = PtPanel::whereIn('id', $shipment->ptpanel_ids)->get();
                 if ($panels) {
+                    foreach ($panels as $pnl) {
+                        $pnl->samples = $pnl->ptsamples();
+                    }
                     $shipment->panels = $panels;
                     foreach ($panels as $panel) {
                         // filter where participants includes user_id
                         $participants = $panel->participants();
-                        $shipment->participants = $participants;
                         if ($participants && count($participants) > 0) {
                             foreach ($participants as $participant) {
                                 if ($participant['id'] == $user_id) {
-                                    $samples = $panel->ptsamples();
-                                    if ($samples) {
-                                        $panel->samples = $samples;
+                                    $useracc = User::find($participant['id']);
+                                    if ($useracc) {
+                                        // find if the readiness assigned to the lab has been answered
+                                        $readinessAnswer = ReadinessAnswer::where('laboratory_id', $useracc->lab()->id)->where('readiness_id', $shipment->readiness_id)->first();
+                                        if ($readinessAnswer) {
+                                            $shipment->is_readiness_answered = 1;
+                                            $shipment->readiness_approval_id = ReadinessApproval::where('lab_id', $useracc->lab()->id)->where('readiness_id', $shipment->readiness_id)->first()->id ?? null;
+                                        } else {
+                                            $shipment->is_readiness_answered = 0;
+                                            $shipment->readiness_approval_id = null;
+                                        }
+                                        // samples
+                                        $samples = $panel->ptsamples();
+                                        if ($samples) {
+                                            $panel->samples = $samples;
+                                        }
+                                        // submissions
+                                        $submission = ptsubmission::where('pt_shipements_id', $shipment->id)->where('lab_id', $useracc->lab()->id)->where('user_id', $user_id)->first();
+                                        $shipment->submission = $submission->id ?? null;
                                     }
                                     // push to data
-                                    array_push($data, [
-                                        'shipment' => $shipment,
-                                        'panel' => $panel,
-                                        'participant' => $participant,
-                                        'user' => $user_id,
-                                    ]);
+                                    $data[] = $shipment;
+                                    // array_push($data, [
+                                        // 'shipment' => $shipment,
+                                        // 'panel' => $panel,
+                                        // 'user' => $user_id,
+                                    // ]);
                                 }
                             }
                         }
