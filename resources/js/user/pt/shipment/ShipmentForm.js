@@ -1,5 +1,5 @@
 import React from 'react';
-import { FetchPanel, FetchPanels, FetchParticipantList, SaveShipment, FetchShipmentReadiness as FetchReadiness, FetchShipmentById, UpdateShipment } from '../../../components/utils/Helpers';
+import { FetchPanel, FetchPanels, FetchParticipantList, SaveShipment, FetchShipmentReadiness, FetchShipmentById, UpdateShipment, FetchPanelsByReadinessId } from '../../../components/utils/Helpers';
 import { v4 as uuidv4 } from 'uuid';
 import DualListBox from 'react-dual-listbox';
 import './PtShipment.css';
@@ -14,6 +14,7 @@ class ShipmentForm extends React.Component {
         super(props);
         this.state = {
             submissions: [],
+            readinesses: [],
             isSubmitResult: false,
             dtObject: null,
             id: '',
@@ -23,14 +24,13 @@ class ShipmentForm extends React.Component {
             resultDueDate: '',
             passMark: 100,
             testInstructions: '',
-            participantSource: 'checklist',
             dualListptions: [],
             readinessChecklists: [],
-            selected: [],
             pageState: '',
             panels: [],
-            panelDetails: null,
-            panel_id: ''
+            panel_ids: [],
+            allPanelDetails: [],
+            tempanel: null,
         }
 
         this.handleRoundChange = this.handleRoundChange.bind(this);
@@ -61,60 +61,71 @@ class ShipmentForm extends React.Component {
                     id: id,
                     round: editData.shipment.round_name,
                     shipmentCode: editData.shipment.code,
+                    readiness_id: editData.shipment.readiness_id,
                     resultDueDate: editData.shipment.end_date,
                     passMark: editData.shipment.pass_mark,
                     testInstructions: editData.shipment.test_instructions,
                     pageState: 'edit',
+                });
+
+                let all_panels = Array.from(editData.shipment.ptpanel_ids, x => x);
+                if (all_panels && all_panels.length > 0) {
+                    all_panels.forEach((panel) => {
+                        FetchPanel(panel).then((response) => {
+                            console.log('panel::::', response);
+                            this.setState({
+                                panel_ids: [...this.state.panel_ids, panel],
+                                allPanelDetails: [...this.state.allPanelDetails, response]
+                            });
+                        });
+                    });
+                }
+
+                FetchPanelsByReadinessId(editData.shipment.readiness_id).then((response) => {
+                    if (response.status == 500) {
+                        this.setState({
+                            message: response.data.Message,
+                        });
+                        $('#addShipmentModal').modal('toggle');
+                    } else {
+                        this.setState({
+                            panels: response
+                        });
+                    }
                 });
             }
         })();
     }
 
     componentDidUpdate(prevProps, prevState) {
-        // if (prevState.panelDetails != this.state.panelDetails) {
-        //     this.setState({
-        //         panelDetails: this.state.panelDetails
-        //     });
-        // }
+
     }
 
     componentDidMount() {
         (async () => {
-            let panels = await FetchPanels();
-            if (panels.status == 500) {
-                this.setState({
-                    message: panels.data.Message,
-                });
-                $('#addShipmentModal').modal('toggle');
-            } else {
-                this.setState({
-                    panels: panels
-                });
-            }
+            let response = await FetchShipmentReadiness(1);
+            this.setState({
+                readinesses: response
+            });
         })();
 
         (async () => {
             if (this.props.pageState == 'edit') {
                 this.getShipementDataById(this.props.id);
-                FetchPanel(this.props.id).then((panel) => {
-                    this.setState({
-                        panelDetails: panel,
-                        panel_id: panel.id,
-                    });
-                });
             }
             else {
-                    this.setState({
-                        pageState: this.props.pageState,
-                        id: '',
-                        message: '',
-                        round: '',
-                        shipmentCode: '',
-                        resultDueDate: '',
-                        passMark: 100,
-                        testInstructions: '',
-                        panel_id: '',
-                    });
+                this.setState({
+                    pageState: this.props.pageState,
+                    id: '',
+                    message: '',
+                    round: '',
+                    shipmentCode: '',
+                    resultDueDate: '',
+                    passMark: 100,
+                    testInstructions: '',
+                    panel_ids: [],
+                    readiness_id: '',
+                });
             }
         })();
     }
@@ -124,7 +135,19 @@ class ShipmentForm extends React.Component {
     }
 
     handleChecklistChange(readinessId) {
-        this.setState({ readinessId: readinessId });
+        this.setState({ readiness_id: readinessId });
+        FetchPanelsByReadinessId(readinessId).then((response) => {
+            if (response.status == 500) {
+                this.setState({
+                    message: response.data.Message,
+                });
+                $('#addShipmentModal').modal('toggle');
+            } else {
+                this.setState({
+                    panels: response
+                });
+            }
+        });
     }
 
     handleParticipantSourceChange(participantSource) {
@@ -193,7 +216,8 @@ class ShipmentForm extends React.Component {
             (!this.state.resultDueDate || this.state.resultDueDate == '') ||
             (!this.state.shipmentCode || this.state.shipmentCode == '') ||
             (!this.state.round || this.state.round == '') ||
-            (!this.state.panel_id || this.state.panel_id == '')
+            (!this.state.readiness_id || this.state.readiness_id == '') ||
+            (!this.state.panel_ids || this.state.panel_ids.length == 0)
 
         ) {
             let msg = [
@@ -202,7 +226,8 @@ class ShipmentForm extends React.Component {
                 <p>{(!this.state.resultDueDate || this.state.resultDueDate == '') ? <strong>Result Due Date field</strong> : ''}</p>,
                 <p>{(!this.state.shipmentCode || this.state.shipmentCode == '') ? <strong>Shipement code field</strong> : ''}</p>,
                 <p>{(!this.state.round || this.state.round == '') ? <strong>Round Name field</strong> : ''}</p>,
-                <p>{(!this.state.panel_id || this.state.panel_id == '') ? <strong>Panel field</strong> : ''}</p>,
+                <p>{(!this.state.readiness_id || this.state.readiness_id == '') ? <strong>Readiness checklist field</strong> : ''}</p>,
+                <p>{(!this.state.panel_ids || this.state.panel_ids.length == 0) ? <strong>Panels field</strong> : ''}</p>,
             ]
 
             this.setState({
@@ -222,7 +247,9 @@ class ShipmentForm extends React.Component {
                 shipement['result_due_date'] = this.state.resultDueDate;
                 shipement['shipment_code'] = this.state.shipmentCode;
                 shipement['round'] = this.state.round;
-                shipement['panel_id'] = this.state.panel_id;
+                // shipement['panel_id'] = this.state.panel_id;
+                shipement['panel_ids'] = this.state.panel_ids;
+                shipement['readiness_id'] = this.state.readiness_id;
                 shipement['test_instructions'] = this.state.testInstructions;
 
                 if (this.state.pageState == 'edit') {
@@ -239,11 +266,9 @@ class ShipmentForm extends React.Component {
                             resultDueDate: '',
                             shipmentCode: '',
                             round: '',
-                            selected: [],
-                            panel_id: '',
+                            panel_ids: [],
                             testInstructions: '',
-                            panelDetails: null,
-                            panels: [],
+                            allPanelDetails: [],
                         });
                     } else {
                         this.setState({
@@ -259,12 +284,20 @@ class ShipmentForm extends React.Component {
     handlePanelChange(panel) {
         if (panel) {
             this.setState({
-                panel_id: panel
+                // panel_id: panel,
+                panel_ids: this.state.panel_ids.includes(panel) ? this.state.panel_ids : [...this.state.panel_ids, panel]
             });
             FetchPanel(panel).then((response) => {
-                this.setState({
-                    panelDetails: response
-                });
+                if (!Array.from(this.state.allPanelDetails, p => p.name).includes(response.name) & !Array.from(this.state.allPanelDetails, p => p.id).includes(response.id)) {
+                    this.setState({
+                        allPanelDetails: this.state.allPanelDetails.includes(response) ? this.state.allPanelDetails : [...this.state.allPanelDetails, response]
+                    });
+                } else {
+                    this.setState({
+                        message: "Panel already added",
+                    });
+                    $('#addShipmentModal').modal('toggle');
+                }
             });
         }
     }
@@ -289,62 +322,6 @@ class ShipmentForm extends React.Component {
                 checklists.push(<option key={checklist.id} value={checklist.id}>{checklist.name}</option>);
             });
         }
-
-        let labSelect = <div>No checklist defined
-            {/* . Readiness: {this.state.readinessId} */}
-        </div>;
-        if (this.state.pageState == 'edit' && this.state.readinessId && this.state.readinessId != '' && this.state.readinessId != null) {
-            console.log('this.state.readinessId: ', this.state.readinessId);
-            console.log('this.state.readinessChecklists: ', this.state.readinessChecklists);
-            labSelect = <div> {this.state.readinessId}{JSON.stringify(this.state.readinessChecklists) || '~'} </div>
-        }
-        if (this.state.readinessChecklists.length != 0) {
-            labSelect = <select
-                id="u_readinessId"
-                value={this.state.readinessId}
-                onChange={(event) => this.handleChecklistChange(event.target.value)} type="text"
-                data-dropup-auto="false"
-                data-live-search="true"
-                // className="selectpicker form-control dropup">
-                className="form-control"
-            >
-                <option >Select checklist...</option>
-                {checklists}
-            </select>;
-        }
-
-        let participantList = <div key={uuidv4()} className="mt-3"
-            style={{
-                "display": this.state.participantSource == 'participants' ? '' : "none",
-                "width": "80%"
-            }} >
-            <p style={{ "fontWeight": "700" }}>Choose participants:</p>
-            <DualListBox
-                canFilter
-                options={dualListValues}
-                selected={this.state.selected}
-                onChange={this.dualListOnChange}
-            />
-        </div>
-
-        let checklistParticipant = <div key={uuidv4()} className="mt-3"
-            style={{
-                "display": this.state.participantSource == 'checklist' ? '' : "none",
-                "width": "50%"
-            }}>
-            <label htmlFor="u_readinessId" >Select Checklist *</label>
-            {labSelect}
-        </div>
-
-        let participants = [participantList, checklistParticipant];
-        if (this.state.pageState == 'edit') {
-            if (this.state.participantSource == 'participants') {
-                participants = [participantList];
-            } else if (this.state.participantSource == 'checklist') {
-                participants = [checklistParticipant];
-            }
-        }
-        //  pageState: 'edit', participantSource: editData.shipment.readiness_id == null ? 'participants' : 'checklist'
 
         return (
             <React.Fragment>
@@ -420,91 +397,106 @@ class ShipmentForm extends React.Component {
                                     </div>
                                 </div>
 
-                                <div className="form-row bg-white mb-3 pt-2 rounded hidden">
-                                    {/* choose participant source */}
-                                    <div className="col-sm-12 mb-3  ml-2">
-                                        {this.state.pageState != 'edit' ?
-                                            <div className="form-check form-check-inline">
-                                                <input className="form-check-input"
-                                                    checked={this.state.participantSource == 'checklist'}
-                                                    type="radio" value="checklist" onChange={() => this.handleParticipantSourceChange('checklist')}
-                                                    name="attach_participants" id="checklist" />
-                                                <label className="form-check-label" htmlFor="checklist" >
-                                                    Attach Checklist Sent to Laboratories
-                                                </label>
-                                            </div>
-                                            : ''}
-                                        {this.state.pageState != 'edit' ?
-                                            <div className="form-check form-check-inline">
-                                                <input className="form-check-input" type="radio"
-                                                    checked={this.state.participantSource == 'participants'}
-                                                    value="participants" onChange={() => this.handleParticipantSourceChange('participants')}
-                                                    name="attach_participants" id="participants" />
-                                                <label className="form-check-label" htmlFor="participants" >
-                                                    Select Laboratories
-                                                </label>
-                                            </div>
-                                            : ''}
-
-                                        {participants}
-
-                                    </div>
-                                    {/* End choose participant source */}
-                                </div>
-
-
-
-
-
-                                <div className="form-row bg-white p-2">
-                                    <div className="col-sm-7  ml-2">
-                                        <h5>Panel</h5>
-                                        <hr />
-                                        <div className="form-group w-100">
-                                            <label htmlFor="panel">Select a panel</label>
-                                            <select data-dropup-auto="false" data-live-search="true" className="form-control" id="panel" name="panel"
-                                                onChange={(event) => this.handlePanelChange(event.target.value)}
-                                                value={this.state?.panel_id || ''}>
-                                                <option value="">Select a panel</option>
-                                                {this.state.panels.map((panel, index) => {
-                                                    return <option key={index} value={panel.id}>{panel.name}</option>
+                                {/* READINESS */}
+                                <div className="form-row">
+                                    <div className='col-md-12'>
+                                        <div className="form-group">
+                                            <label htmlFor="description">Readiness</label>
+                                            <select className='form-control' id='readiness'
+                                                value={this.state.readiness_id || ''} onChange={ev => {
+                                                    this.handleChecklistChange(ev.target.value)
+                                                }}>
+                                                <option value=''>Select Readiness</option>
+                                                {this.state.readinesses.length > 0 && this.state.readinesses.map((readiness, index) => {
+                                                    return (
+                                                        <option key={index} value={readiness.id}>{readiness.name}</option>
+                                                    )
                                                 })}
                                             </select>
                                         </div>
                                     </div>
                                 </div>
+                                {/* READINESS */}
 
 
-                                {this.state.panelDetails && <div className="form-row bg-white p-2" style={{ fontSize: '15px' }}>
-                                    <div className="col-sm-12  ml-2">
+                                {this.state.readiness_id && <div className="form-row bg-white p-2">
+                                    <div className="col-sm-7  ml-2">
+                                        <h5>Panel</h5>
+                                        <hr />
+                                        <div className="form-group w-100">
+                                            <label htmlFor="panel">Select a panel {this.state.tempanel}</label>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                <select data-dropup-auto="false" data-live-search="true" className="form-control" id="panel" name="panel"
+                                                    onChange={(event) => {
+                                                        this.setState({
+                                                            tempanel: event.target.value
+                                                        })
+                                                    }}
+                                                    // value={this.state?.panel_id || ''}>
+                                                    value={this.state?.tempanel || ''}>
+                                                    <option value="">Select a panel</option>
+                                                    {this.state.panels.map((panel, index) => {
+                                                        return <option key={index} value={panel.id}>{panel.name}</option>
+                                                    })}
+                                                </select>
+                                                <div className="form-group w-100 mb-0">
+                                                    <button className='btn btn-primary btn-sm' disabled={this.state.tempanel == null} onClick={() => {
+                                                        if (this.state.tempanel) {
+                                                            this.handlePanelChange(this.state.tempanel)
+                                                            this.setState({
+                                                                tempanel: ''
+                                                            })
+                                                        }
+                                                    }}>Add panel</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>}
+
+
+                                {(this.props.pageState == 'edit' || this.state.allPanelDetails.length > 0) && <div className="row mt-2 mb-2">
+                                    <div className="col-sm-12 bg-white ml-2 pt-2 pb-2">
                                         <h5>Panel details</h5>
                                         <hr />
                                     </div>
+                                </div>}
+                                {this.state.allPanelDetails.length > 0 && this.state.allPanelDetails.map(panel => <div key={panel?.id + "_" + panel?.name} className="form-row bg-white p-2" style={{ fontSize: '15px' }}>
                                     <div className="col-sm-12 p-4" style={{ backgroundColor: 'papayawhip', border: '0px solid white', borderRadius: '5px' }}>
+                                        <div className='row mb-0'>
+                                            <div className='col-md-12 mb-3 p-0' style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                                <span role={"button"} onClick={() => {
+                                                    this.setState({
+                                                        panel_ids: this.state.panel_ids.filter(p => p != panel.id),
+                                                        allPanelDetails: this.state.allPanelDetails.filter(p => p.id != panel.id)
+                                                    })
+                                                }} className='fa-2x text-danger' style={{ lineHeight: '0px', cursor: 'pointer' }}>&times;</span>
+                                            </div>
+                                        </div>
                                         <div className='row mb-3'>
                                             <div className='col-sm-4'>
                                                 <label>Panel name</label>
                                                 <p>
-                                                    <a href={`/panel/${this.state.panelDetails.id}`}>{this.state.panelDetails?.name || "-"}</a>
+                                                    <a href={`/panel/${panel.id}`}>{panel?.name || "-"}</a>
                                                 </p>
                                             </div>
                                             <div className='col-sm-4'>
                                                 <label>Created at</label>
-                                                <p>{new Date(this.state.panelDetails?.created_at).toLocaleString() || "-"}</p>
+                                                <p>{new Date(panel?.created_at).toLocaleString() || "-"}</p>
                                             </div>
                                             <div className='col-sm-4'>
                                                 <label>Readiness Checklist</label>
                                                 <p>
-                                                    <a href={`/edit-readiness/${this.state.panelDetails?.readiness?.id}`}>{this.state.panelDetails?.readiness?.name || "-"}</a>
+                                                    <a href={`/edit-readiness/${panel?.readiness?.id}`}>{panel?.readiness?.name || "-"}</a>
                                                 </p>
                                             </div>
                                         </div>
                                         <div className='row mb-3'>
-                                            <div className='col-sm-2'>
+                                            <div className='col-sm-1' style={{ display: 'flex', alignItems: 'center' }}>
                                                 <label>Lots</label>
                                             </div>
-                                            <div className='col-sm-10'>
-                                                <table className='table table-condensed table-bordered' style={{ backgroundColor: 'cornsilk' }}>
+                                            <div className='col-sm-11'>
+                                                <table className='table table-condensed table-bordered mb-2' style={{ backgroundColor: 'cornsilk' }}>
                                                     <thead>
                                                         <tr>
                                                             <th style={{ border: '1px solid #db8', textAlign: 'center' }}>Lot name</th>
@@ -512,7 +504,7 @@ class ShipmentForm extends React.Component {
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {this.state.panelDetails?.lots?.map((lot, index) => {
+                                                        {panel?.lots?.map((lot, index) => {
                                                             return <tr key={index}>
                                                                 <td style={{ border: '1px solid #db8', textAlign: 'center' }}>
                                                                     <a href={`/lots/edit/${lot.id}`}>{lot?.name || "-"}</a>
@@ -528,11 +520,11 @@ class ShipmentForm extends React.Component {
                                             </div>
                                         </div>
                                         <div className='row mb-3'>
-                                            <div className='col-sm-2'>
+                                            <div className='col-sm-1' style={{ display: 'flex', alignItems: 'center' }}>
                                                 <label>Samples</label>
                                             </div>
-                                            <div className='col-sm-10'>
-                                                <table className='table table-condensed table-bordered' style={{ backgroundColor: 'cornsilk' }}>
+                                            <div className='col-sm-11'>
+                                                <table className='table table-condensed table-bordered mb-2' style={{ backgroundColor: 'cornsilk' }}>
                                                     <thead>
                                                         <tr>
                                                             <th style={{ border: '1px solid #db8', textAlign: 'center' }}>Sample name</th>
@@ -540,7 +532,7 @@ class ShipmentForm extends React.Component {
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {this.state.panelDetails?.samples?.map((sample, index) => {
+                                                        {panel?.samples?.map((sample, index) => {
                                                             return <tr key={index}>
                                                                 <td style={{ border: '1px solid #db8', textAlign: 'center' }}>{sample.name}</td>
                                                                 <td style={{ border: '1px solid #db8', textAlign: 'center' }}>{sample.reference_result || '-'}</td>
@@ -551,7 +543,7 @@ class ShipmentForm extends React.Component {
                                             </div>
                                         </div>
                                     </div>
-                                </div>}
+                                </div>)}
 
                                 <div className="form-group row mt-4">
                                     <div className="col-sm-12 text-center">

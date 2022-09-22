@@ -145,86 +145,45 @@ class Dashboard extends React.Component {
                     <td>{element.round_name}</td>
                     <td>{element.code}</td>
                     <td>{element.end_date}</td>
-                    {
-                        element.submission_id == null ? <td >
-                            {Date.parse(element.end_date) > new Date() ? 
-                            <span style={{fontSize: '14px', fontWeight: 500}} className={'badge badge-'+(element.is_readiness_answered == null ? 'danger' : element.readiness_approval_id == null ? 'warning' : 'info')}>
-                                {element.is_readiness_answered == null ? 'Readiness needs filling' :
-                                        element.readiness_approval_id == null ?
-                                            'Pending readiness approval'
-                                            :
-                                            'Submission ready'
-                                            }
+                    {element.submission_id == null ? <td >
+                        {Date.parse(element.end_date) > new Date() ?
+                            <span style={{ fontSize: '14px', fontWeight: 500 }} className={'badge badge-' + (element.is_readiness_answered == null ? 'danger' : element.readiness_approval_id == null ? 'warning' : 'info')}>
+                                {element.is_readiness_answered == null ? 'Readiness needs filling' : element.readiness_approval_id == null ? 'Pending readiness approval' : 'Submission ready'}
                             </span> : <span className='badge badge-danger'>Past due date</span>}
-
-
-                        </td> :
-                            ''
-                    }
-                    {
-
-                        <td>
-
-                            {
-
-                                element.submission_id ?
-
-                                    <button
-                                        onClick={() => {
-                                            this.setState({
-                                                selectedElement: element,
-                                                selectedElementHasSubmmisions: true,
-                                                page: 'edit'
-                                            });
-                                        }}
-                                        type="button"
-                                        className="btn btn-success">
-                                        {
-                                            Date.parse(element.end_date) > new Date() ? <i className="far fa-edit"></i>
-                                                : <i className="fas fa-eye"></i>
-                                        }
-                                        {
-                                            Date.parse(element.end_date) > new Date() ?
-                                                ' Edit'
-                                                :
-                                                ' View only'
-                                        }
-                                    </button>
-                                    :
-                                    <button
-                                        onClick={() => {
-                                            if (element.is_readiness_answered == null) {
-                                                window.location.assign('get-readiness-form/' + element.readiness_id)
-                                            } else {
-                                                this.setState({
-                                                    selectedElement: element,
-                                                    selectedElementHasSubmmisions: false,
-                                                    page: 'edit'
-                                                });
-                                            }
-
-
-                                        }}
-
-                                        type="button"
-                                        className="btn btn-success">
-
-                                        {
-                                            Date.parse(element.end_date) > new Date() ? <i className="fas fa-paper-plane"></i>
-                                                : <i className="fas fa-eye"></i>
-                                        }
-                                        {Date.parse(element.end_date) > new Date() ?
-                                            element.is_readiness_answered == null ?
-                                                ' Fill readiness'
-                                                :
-                                                element.readiness_approval_id == null ? ' View only' : ' Submit'
-
-                                            :
-                                            ' View only'}
-                                    </button>
-
-                            }
-                            {/* <a
+                    </td> : ''}
+                    {<td>
+                        {element.submission_id ?
+                            <button
+                                onClick={() => {
+                                    this.setState({
+                                        selectedElement: element,
+                                        selectedElementHasSubmmisions: true,
+                                        page: 'edit'
+                                    });
+                                }} type="button" className="btn btn-success">
+                                {Date.parse(element.end_date) > new Date() ? <i className="far fa-edit"></i> : <i className="fas fa-eye"></i>}
+                                {Date.parse(element.end_date) > new Date() ? 'Edit' : 'View only'}
+                            </button> : <button
+                                onClick={() => {
+                                    if (element.is_readiness_answered == null) {
+                                        window.location.assign('get-readiness-form/' + element.readiness_id)
+                                    } else {
+                                        this.setState({
+                                            selectedElement: element,
+                                            selectedElementHasSubmmisions: false,
+                                            page: 'edit'
+                                        });
+                                    }
+                                }}
+                                type="button"
+                                className="btn btn-success">
+                                {Date.parse(element.end_date) > new Date() ? <i className="fas fa-paper-plane"></i> : <i className="fas fa-eye"></i>}
+                                {Date.parse(element.end_date) > new Date() ?
+                                    element.is_readiness_answered == null ?
+                                        ' Fill readiness' : element.readiness_approval_id == null ? ' View only' : ' Submit' : 'View only'}
+                            </button>
+                        }
+                        {/* <a
                                 onClick={() => {
                                     this.setState({
                                         selectedElement: element
@@ -233,11 +192,11 @@ class Dashboard extends React.Component {
                                 }} className="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm">
                                 <i className="fas fa-user-times"></i>
                             </a> */}
-
-                        </td>
-                    }
-
+                    </td>}
                 </tr>;
+
+                datRow = <tr key={index++}><td><small><pre>{JSON.stringify(element,null,1)}</pre></small></td></tr>;
+                
                 if (element.submission_id == null) {
                     tableElem.push(datRow);
                 } else {
@@ -272,6 +231,14 @@ class Dashboard extends React.Component {
 
             <div className="col-sm-12">
                 <hr />
+                {/* <small>
+                    <details open>
+                        <summary>this.state</summary>
+                        <pre>
+                            {JSON.stringify(this.state.data, null, 2)}
+                        </pre>
+                    </details>
+                </small> */}
             </div>
 
             <div className="form-check form-check-inline  mt-2">
@@ -304,19 +271,19 @@ class Dashboard extends React.Component {
             {/* Readiness */}
             {/* check if user is lab manager in Gate */}
             {this.state.userPermissions && Object.keys(this.state.userPermissions).includes('lab_manager') && this.state.userPermissions.lab_manager === true &&
-            <div className="form-check form-check-inline pl-2 mt-2">
-                <input
-                    onClick={() => {
-                        this.setState({
-                            listingName: 'Readiness Survey List',
-                            listing: 'readiness',
-                        })
-                    }}
-                    defaultChecked={this.state.listing == 'readiness'} className="form-check-input"
-                    type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3" />
-                <label className="form-check-label" htmlFor="inlineRadio3">View readiness</label>
-            </div>}
-            
+                <div className="form-check form-check-inline pl-2 mt-2">
+                    <input
+                        onClick={() => {
+                            this.setState({
+                                listingName: 'Readiness Survey List',
+                                listing: 'readiness',
+                            })
+                        }}
+                        defaultChecked={this.state.listing == 'readiness'} className="form-check-input"
+                        type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3" />
+                    <label className="form-check-label" htmlFor="inlineRadio3">View readiness</label>
+                </div>}
+
         </div>
 
         let submittedPageContent = <div id='user_table' className='row'>
@@ -356,8 +323,8 @@ class Dashboard extends React.Component {
                             </tr>
                         }
                     </tbody>
-
                 </table>
+
                 <br />
                 <DashTable
                     activePage={this.state.activeSubmittedPage}

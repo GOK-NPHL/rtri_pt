@@ -25,15 +25,18 @@ class PTShipmentController extends Controller
         try {
             $shipments = PtShipement::where('deleted_at', null)->get();
             foreach ($shipments as $shipment) {
-                // get panels
-                $panel = PtPanel::find($shipment->ptpanel_id);
-                if ($panel) {
-                    $shipment->panel = [
-                        'id' => $panel->id,
-                        'name' => $panel->name,
-                        'participant_count' => count($panel->participants()),
-                    ];
+                $pnls = [];
+                foreach ($shipment->ptpanel_ids as $panel_id) {
+                    $panel = PtPanel::find($panel_id);
+                    if ($panel) {
+                        $pnls[] = [
+                            'id' => $panel->id,
+                            'name' => $panel->name,
+                            'participant_count' => count($panel->participants()) ?? 0,
+                        ];
+                    }
                 }
+                $shipment->panels = $pnls;
             }
             return $shipments;
         } catch (Exception $ex) {
@@ -48,62 +51,41 @@ class PTShipmentController extends Controller
         try {
             $labIds = [];
             $shipment = PtShipement::find($request->id);
-            if($shipment){
-                $panel = PtPanel::find($shipment->ptpanel_id)->first();
+            if ($shipment) {
+                $panels = PtPanel::whereIn('id', $shipment->ptpanel_ids)->get();
                 /////
-                if($panel){
-                    $panel->participants = [];
-                    $panelots = [];
-                    foreach ($panel->lots() as $lot) {
-                        $lt = $lot;
-                        if ($lt) {
-                            $panelots[] = $lt;
-                            //readiness
-                            $rdn = $lt->readiness();
-                            $panel->readiness = $rdn ?? null;
-                            // labs
-                            $labids = DB::table('laboratory_readiness')->where('readiness_id', $rdn->id)->get();
-                            foreach ($labids as $labid) {
-                                $labIds[] = $labid->laboratory_id;
+                if ($panels && count($panels) > 0) {
+                    foreach ($panels as $panel) {
+                        $panel->participants = [];
+                        $panelots = [];
+                        foreach ($panel->lots() as $lot) {
+                            $lt = $lot;
+                            if ($lt) {
+                                $panelots[] = $lt;
+                                //readiness
+                                $rdn = $lt->readiness();
+                                $panel->readiness = $rdn ?? null;
+                                // labs
+                                $labids = DB::table('laboratory_readiness')->where('readiness_id', $rdn->id)->get();
+                                foreach ($labids as $labid) {
+                                    $labIds[] = $labid->laboratory_id;
+                                }
                             }
                         }
+                        $panel->lots = $panelots;
+                        $panel->samples = $panel->ptsamples() ?? [];
                     }
-                    $panel->lots = $panelots;
-                    $panel->samples = $panel->ptsamples() ?? [];
                 }
-                /////
-                //get participants
-                // if (empty($shipment->readiness_id)) {
-                //     $labs = PtShipement::select(
-                //         "laboratory_pt_shipement.laboratory_id"
-                //     )->join('laboratory_pt_shipement', 'laboratory_pt_shipement.pt_shipement_id', '=', 'pt_shipements.id')
-                //         ->where('id', $request->id)
-                //         ->get();
-                //     $labIds = [];
-                //     foreach ($labs as $lab) {
-                //         $labIds[] = $lab->laboratory_id;
-                //     }
-                // }
-    
-                //get samples
-                // $ptSamples = PtSample::select(
-                //     "pt_samples.id",
-                //     "name",
-                //     "reference_result"
-                // )->join('pt_shipements', 'pt_shipements.id', '=', 'pt_samples.ptshipment_id')
-                //     ->where('pt_shipements.id', $request->id)
-                //     ->get();
-    
+
                 $payload = [];
                 $payload['shipment'] = $shipment;
                 $payload['labs'] = $labIds;
                 $payload['panel'] = $panel;
                 $payload['samples'] = $panel->samples;
                 return $payload;
-            }else{
+            } else {
                 return response()->json(['Message' => 'Could not find shipment'], 404);
             }
-    
         } catch (Exception $ex) {
             return response()->json(['Message' => 'Could fetch shipment: ' . $ex->getMessage()], 500);
         }
@@ -112,46 +94,47 @@ class PTShipmentController extends Controller
 
     public function saveShipment(Request $request)
     {
-        try {
 
+        try {
             $shipments = PtShipement::where('round_name', $request->shipement['round'])->get();
             if (count($shipments) > 0) {
                 return response()->json(['Message' => 'Error during creating shipment. A round with this name already exists '], 500);
             }
 
-            if (empty($request->shipement['panel_id']) && count($request->shipement['selected']) == 0) {
+            if (empty($request->shipement['panel_ids']) && count($request->shipement['panel_ids']) == 0) {
                 return response()->json(['Message' => 'Please select a panel for this shipment '], 500);
             }
-
-            // $participantsList = [];
-
-            // if (empty($request->shipement['readiness_id'] == true)) {
-
-            //     $participantsList = $request->shipement['selected'];
-            // }
-
+            if (empty($request->shipement['readiness_id']) && count($request->shipement['readiness_id']) == 0) {
+                return response()->json(['Message' => 'Please select a readiness checklist for this shipment '], 500);
+            }
             $shipment = PtShipement::create([
                 'pass_mark' => $request->shipement['pass_mark'],
                 'round_name' => $request->shipement['round'],
                 'code' => $request->shipement['shipment_code'],
                 'end_date' => $request->shipement['result_due_date'],
                 'test_instructions' => $request->shipement['test_instructions'],
-                'ptpanel_id' => (empty($request->shipement['panel_id']) ? null : $request->shipement['panel_id'])
-                // 'readiness_id' => (empty($request->shipement['readiness_id']) ? null : $request->shipement['readiness_id'])
+                'readiness_id' => $request->shipement['readiness_id'],
+                'ptpanel_ids' => $request->shipement['panel_ids'] ?? $request->shipement['panels'] ?? [],
             ]);
 
-            $panel = PtPanel::find($request->shipement['panel_id']);
-
-            //save participants
-            // $shipment->laboratories()->attach($participantsList); /// REMOVE THIS
-
-            // attach panel //// NON-FUNCTIONAL
-            // if ($panel && $shipment) {
-            //     $shipment->ptpanel()->attach($request->shipement['panel_id']);
-            // }
-
-            // Save laboratiories
-            // $readiness->laboratories()->attach($request->shipement['participants']);
+            // save participants
+            foreach ($request->shipement['panel_ids'] as $panel_id) {
+                $panel = PtPanel::find($panel_id);
+                if ($panel) {
+                    $participants = $panel->participants();
+                    if ($participants && count($participants) > 0) {
+                        foreach ($participants as $participant) {
+                            $userlab = $participant->lab();
+                            // save to laboratory_pt_shipment table
+                            DB::table('laboratory_pt_shipement')->insert([
+                                'laboratory_id' => $userlab->id, //$participant['id'],
+                                'pt_shipement_id' => $shipment['id'],
+                                'pt_panel_id' => $panel_id,
+                            ]);
+                        }
+                    }
+                }
+            }
             return response()->json(['Message' => 'Created successfully'], 200);
         } catch (Exception $ex) {
             return response()->json(['Message' => 'Could not save the checklist ' . $ex->getMessage()], 500);
@@ -175,8 +158,9 @@ class PTShipmentController extends Controller
             $shipments->round_name = $request->shipement['round'];
             $shipments->code = $request->shipement['shipment_code'];
             $shipments->end_date = $request->shipement['result_due_date'];
+            $shipments->readiness_id = $request->shipement['readiness_id'];
             $shipments->test_instructions = $request->shipement['test_instructions'];
-            $shipments->ptpanel_id = $request->shipement['panel_id'] ?? $request->shipement['ptpanel_id'];
+            $shipments->ptpanel_ids = $request->shipement['panel_ids'] ?? $request->shipement['ptpanel_ids'];
 
             $shipments->save();
 
@@ -190,112 +174,190 @@ class PTShipmentController extends Controller
         }
     }
 
+    public function deleteShipment(Request $request)
+    {
+        try {
+            $shipment = PtShipement::find($request->id);
+            if ($shipment) {
+                $shipment->delete();
+                return response()->json(['Message' => 'Deleted successfully'], 200);
+            } else {
+                return response()->json(['Message' => 'Could not find the shipment'], 404);
+            }
+        } catch (Exception $ex) {
+            return response()->json(['Message' => 'Could not delete the shipment ' . $ex->getMessage()], 500);
+        }
+    }
+
     public function getUserSamples()
     {
         $user = Auth::user();
-        $user_id = 1; // $user->id;
+        $user_id = $user->id;
 
         try {
+            // get shipments (id, round_name, code, start_date), 
+            // join shipments with readiness (id, name) on shipment.readiness_id = readiness.id, 
+            // join with panels (name, participants) on shipment.panel_ids includes panels.id, 
+            // join with samples (name, reference_result) on panels.samples includes samples.id
+            // join with lots (name, participants()) on panels.lots includes lots.id
+            // where shipment.start_date <= today and shipment.end_date >= today and shipment.participants includes user_id
 
-            $shipments = PtShipement::select( //when using labs
-                "pt_shipements.id",
-                "pt_shipements.id as pt_shipements_id",
-                "pt_shipements.round_name",
-                "pt_shipements.code",
-                "pt_shipements.start_date",
-                "pt_shipements.end_date",
-                "pt_shipements.test_instructions",
-                "pt_samples.id as sample_id",
-                "pt_samples.name as sample_name",
-                "ptsubmissions.id as submission_id",
-                DB::raw("1 as is_readiness_answered"),
-                DB::raw("null as readiness_id"),
-                DB::raw("1 as readiness_approval_id")
+            $data = array();
 
-            )
-                ////
-                ->leftJoin('pt_panels', 'readiness_id', '=', 'pt_panels.readiness_id')
-                ////
-                ->leftJoin('ptsubmissions', 'pt_shipements.id', '=', 'ptsubmissions.pt_shipements_id')
-                ->join('laboratory_pt_shipement', 'laboratory_pt_shipement.pt_shipement_id', '=', 'pt_shipements.id')
-                //// ->join('pt_samples', 'pt_samples.ptshipment_id', '=', 'pt_shipements.id')
-                ->join('pt_samples', 'pt_samples.ptpanel_id', '=', 'pt_panels.id')
-                ->join('laboratories', 'laboratory_pt_shipement.laboratory_id', '=', 'laboratories.id')
-                ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
-                ->where('users.id', $user_id);
-
-            $shipments2 = PtShipement::select( //when using readiness
-                "pt_shipements.id",
-                "pt_shipements.id as pt_shipements_id",
-                "pt_shipements.round_name",
-                "pt_shipements.code",
-                "pt_shipements.start_date",
-                "pt_shipements.end_date",
-                "pt_shipements.test_instructions",
-                "pt_samples.id as sample_id",
-                "pt_samples.name as sample_name",
-                "ptsubmissions.id as submission_id",
-                "readiness_answers.id as is_readiness_answered", //check if readiness for this shipment id filled
-                //// "pt_shipements.readiness_id as readiness_id",
-                "pt_panels.readiness_id as readiness_id",
-                "readiness_approvals.id as readiness_approval_id"
-
-            )
-                ////
-                ->leftJoin('pt_panels', 'readiness_id', '=', 'pt_panels.readiness_id')
-                ////
-                ->leftJoin('ptsubmissions', 'pt_shipements.id', '=', 'ptsubmissions.pt_shipements_id')
-                //// ->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'pt_shipements.readiness_id')
-                ->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'pt_panels.readiness_id')
-                ->leftJoin('readiness_answers',  'laboratory_readiness.readiness_id', '=',  'readiness_answers.readiness_id')
-                ->leftJoin('readiness_approvals', 'readiness_answers.laboratory_id', '=',  'readiness_approvals.lab_id')
-                //// ->join('pt_samples', 'pt_samples.ptshipment_id', '=', 'pt_shipements.id')
-                ->join('pt_samples', 'pt_samples.ptpanel_id', '=', 'pt_panels.id')
-                ->join('laboratories', 'laboratory_readiness.laboratory_id', '=', 'laboratories.id')
-                ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
-
-                ->where('users.id', $user_id)
-                ->union($shipments)
-                // ->orderBy('pt_shipements.end_date')
-                ->get();
-
-            $payload = [];
-            $sampleIds = [];
-
-            foreach ($shipments2 as $lab) {
-
-                if ($lab->round_name == "round 20") {
-                    // Log::info($lab);
+            $shipments = PtShipement::all();
+            foreach ($shipments as $shipment) {
+                $readiness = Readiness::find($shipment->readiness_id);
+                if ($readiness) {
+                    $shipment->readiness = $readiness;
                 }
-                if (array_key_exists($lab->id, $payload)) {
-                    if (!array_key_exists($lab->sample_id, $sampleIds)) {
-                        $payload[$lab->id]['samples'][] = ['sample_name' => $lab->sample_name, 'sample_id' => $lab->sample_id];
-                        $sampleIds[$lab->sample_id] = 1;
-                    }
-                } else {
-
-                    if (!array_key_exists($lab->sample_id, $sampleIds)) {
-                        $sampleIds[$lab->sample_id] = 1;
-                        $payload[$lab->id] = [];
-                        $payload[$lab->id]['samples'] = [];
-                        $payload[$lab->id]['samples'][] = ['sample_name' => $lab->sample_name, 'sample_id' => $lab->sample_id];
-
-                        $payload[$lab->id]['test_instructions'] = $lab->test_instructions;
-                        $payload[$lab->id]['id'] = $lab->id;
-                        $payload[$lab->id]['pt_shipements_id'] = $lab->pt_shipements_id;
-                        $payload[$lab->id]['start_date'] = $lab->start_date;
-                        $payload[$lab->id]['code'] = $lab->code;
-                        $payload[$lab->id]['end_date'] = $lab->end_date;
-                        $payload[$lab->id]['round_name'] = $lab->round_name;
-                        $payload[$lab->id]['submission_id'] = $lab->submission_id;
-                        $payload[$lab->id]['is_readiness_answered'] = $lab->is_readiness_answered;
-                        $payload[$lab->id]['readiness_id'] = $lab->readiness_id;
-                        $payload[$lab->id]['readiness_approval_id'] = $lab->readiness_approval_id;
+                $panels = PtPanel::whereIn('id', $shipment->ptpanel_ids)->get();
+                if ($panels) {
+                    $shipment->panels = $panels;
+                    foreach ($panels as $panel) {
+                        // filter where participants includes user_id
+                        $participants = $panel->participants();
+                        $shipment->participants = $participants;
+                        if ($participants && count($participants) > 0) {
+                            foreach ($participants as $participant) {
+                                if ($participant['id'] == $user_id) {
+                                    $samples = $panel->ptsamples();
+                                    if ($samples) {
+                                        $panel->samples = $samples;
+                                    }
+                                    // push to data
+                                    array_push($data, [
+                                        'shipment' => $shipment,
+                                        'panel' => $panel,
+                                        'participant' => $participant,
+                                        'user' => $user_id,
+                                    ]);
+                                }
+                            }
+                        }
                     }
                 }
             }
+            // $data['shipments'] = $shipments;
 
-            return $payload;
+            return $data;
+
+
+
+
+
+
+
+
+
+
+
+            // $shipments = PtShipement::select( //when using labs
+            //     "pt_shipements.id",
+            //     "pt_shipements.id as pt_shipements_id",
+            //     "pt_shipements.round_name",
+            //     "pt_shipements.code",
+            //     "pt_shipements.start_date",
+            //     "pt_shipements.end_date",
+            //     "pt_shipements.test_instructions",
+            //     "pt_samples.id as sample_id",
+            //     "pt_samples.name as sample_name",
+            //     "ptsubmissions.id as submission_id",
+            //     DB::raw("1 as is_readiness_answered"),
+            //     DB::raw("null as readiness_id"),
+            //     DB::raw("1 as readiness_approval_id")
+
+            // )
+            //     ////
+            //     ->leftJoin('pt_panels', 'pt_panels.readiness_id', '=', 'pt_panels.readiness_id')
+            //     ////
+            //     ->leftJoin('ptsubmissions', 'pt_shipements.id', '=', 'ptsubmissions.pt_shipements_id')
+            //     ->join('laboratory_pt_shipement', 'laboratory_pt_shipement.pt_shipement_id', '=', 'pt_shipements.id')
+            //     //// ->join('pt_samples', 'pt_samples.ptshipment_id', '=', 'pt_shipements.id')
+            //     ->join('pt_samples', 'pt_samples.ptpanel_id', '=', 'pt_panels.id')
+            //     ->join('laboratories', 'laboratory_pt_shipement.laboratory_id', '=', 'laboratories.id')
+            //     ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
+            //     ->where('users.id', $user_id);
+
+            // $shipments2 = PtShipement::select( //when using readiness
+            //     "pt_shipements.id",
+            //     "pt_shipements.id as pt_shipements_id",
+            //     "pt_shipements.round_name",
+            //     "pt_shipements.code",
+            //     "pt_shipements.start_date",
+            //     "pt_shipements.end_date",
+            //     "pt_shipements.test_instructions",
+            //     //// "pt_shipements.readiness_id as readiness_id",
+
+            //     "pt_panels.readiness_id as readiness_id",
+
+            //     "pt_samples.id as sample_id",
+            //     "pt_samples.name as sample_name",
+
+            //     "ptsubmissions.id as submission_id",
+
+            //     "readiness_answers.id as is_readiness_answered", //check if readiness for this shipment id filled
+            //     "readiness_approvals.id as readiness_approval_id"
+
+            // )
+            //     ////
+            //     ->leftJoin('pt_panels', 'pt_panels.readiness_id', '=', 'pt_panels.readiness_id')
+            //     //// ->join('pt_panels', 'pt_panels.id', 'in', 'pt_shipements.ptpanel_ids')
+            //     ////
+            //     ->leftJoin('ptsubmissions', 'pt_shipements.id', '=', 'ptsubmissions.pt_shipements_id')
+            //     //// ->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'pt_shipements.readiness_id')
+            //     ->join('laboratory_readiness', 'laboratory_readiness.readiness_id', '=', 'pt_panels.readiness_id')
+            //     ->leftJoin('readiness_answers',  'laboratory_readiness.readiness_id', '=',  'readiness_answers.readiness_id')
+            //     ->leftJoin('readiness_approvals', 'readiness_answers.laboratory_id', '=',  'readiness_approvals.lab_id')
+            //     //// ->join('pt_samples', 'pt_samples.ptshipment_id', '=', 'pt_shipements.id')
+
+            //     ->join('pt_samples', 'pt_samples.ptpanel_id', '=', 'pt_panels.id')
+            //     ->join('laboratories', 'laboratory_readiness.laboratory_id', '=', 'laboratories.id')
+            //     ->join('users', 'users.laboratory_id', '=', 'laboratories.id')
+
+            //     ->where('users.id', $user_id)
+            //     ->union($shipments)
+            //     // ->orderBy('pt_shipements.end_date')
+            //     ->get();
+
+            // $payload = [];
+            // $sampleIds = [];
+
+            // foreach ($shipments2 as $lab) {
+
+            //     if ($lab->round_name == "round 20") {
+            //         // Log::info($lab);
+            //     }
+            //     if (array_key_exists($lab->id, $payload)) {
+            //         if (!array_key_exists($lab->sample_id, $sampleIds)) {
+            //             $payload[$lab->id]['samples'][] = ['sample_name' => $lab->sample_name, 'sample_id' => $lab->sample_id];
+            //             $sampleIds[$lab->sample_id] = 1;
+            //         }
+            //     } else {
+
+            //         if (!array_key_exists($lab->sample_id, $sampleIds)) {
+            //             $sampleIds[$lab->sample_id] = 1;
+            //             $payload[$lab->id] = [];
+            //             $payload[$lab->id]['samples'] = [];
+            //             $payload[$lab->id]['samples'][] = ['sample_name' => $lab->sample_name, 'sample_id' => $lab->sample_id];
+
+            //             $payload[$lab->id]['test_instructions'] = $lab->test_instructions;
+            //             $payload[$lab->id]['id'] = $lab->id;
+            //             $payload[$lab->id]['pt_shipements_id'] = $lab->pt_shipements_id;
+            //             $payload[$lab->id]['start_date'] = $lab->start_date;
+            //             $payload[$lab->id]['code'] = $lab->code;
+            //             $payload[$lab->id]['end_date'] = $lab->end_date;
+            //             $payload[$lab->id]['round_name'] = $lab->round_name;
+            //             $payload[$lab->id]['submission_id'] = $lab->submission_id;
+            //             $payload[$lab->id]['is_readiness_answered'] = $lab->is_readiness_answered;
+            //             $payload[$lab->id]['readiness_id'] = $lab->readiness_id;
+            //             $payload[$lab->id]['readiness_approval_id'] = $lab->readiness_approval_id;
+            //         }
+            //     }
+            // }
+
+            // return $payload;
+        } catch (Exception $ex) {
+            return response()->json(['Message' => 'Could not fetch the samples ' . $ex->getMessage()], 500);
         } catch (Exception $ex) {
             Log::error($ex);
             return response()->json(['Message' => 'Could fetch samples: ' . $ex->getMessage()], 500);
@@ -348,7 +410,7 @@ class PTShipmentController extends Controller
 
             $shipmentsResponses = DB::table("pt_shipements")->distinct()
                 ->join('ptsubmissions', 'ptsubmissions.pt_shipements_id', '=', 'pt_shipements.id')
-                ->join('pt_panels', 'pt_panels.id', '=', 'pt_shipements.ptpanel_id')
+                ->join('pt_panels', 'pt_panels.readiness_id', '=', 'pt_shipements.readiness_id')
                 ->join('pt_submission_results', 'pt_submission_results.ptsubmission_id', '=', 'ptsubmissions.id')
                 ->join('laboratories', 'ptsubmissions.lab_id', '=', 'laboratories.id')
                 ->join('users', 'ptsubmissions.user_id', '=', 'users.id');
@@ -383,7 +445,7 @@ class PTShipmentController extends Controller
 
             //  one
             $shipmentsRefResult = DB::table("pt_shipements")->distinct()
-                ->join('pt_panels', 'pt_panels.id', '=', 'pt_shipements.ptpanel_id')
+                ->join('pt_panels', 'pt_panels.readiness_id', '=', 'pt_shipements.readiness_id')
                 ->join('pt_samples', 'pt_samples.ptpanel_id', '=', 'pt_panels.id');
 
             $shipmentsRefResult = $shipmentsRefResult->get([

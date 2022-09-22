@@ -652,6 +652,20 @@ export async function UpdateShipment(shipement) {
     }
 }
 
+export async function DeleteShipment(id) {
+    try {
+        const response = await axios({
+            method: 'delete',
+            url: `${settings.serverBaseApi}/delete_shipment/${id}`,
+        });
+        return response;
+    } catch (err) {
+        // Handle Error Here
+        console.log(err.response);
+        return err.response
+    }
+}
+
 export async function FetchShipments(userId, filterEmpty) {
 
     try {
@@ -1143,6 +1157,15 @@ export async function DeleteLot(id) {
 export async function FetchPanels() {
     try {
         const response = await axios.get(`${settings.serverBaseApi}/get_panels`);
+        const panels = response.data;
+        return panels;
+    } catch (err) {
+        return err.response
+    }
+}
+export async function FetchPanelsByReadinessId(readinessId) {
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_panels_by_readiness/${readinessId}`);
         const panels = response.data;
         return panels;
     } catch (err) {
