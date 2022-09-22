@@ -14,7 +14,7 @@ class PtShipement extends Model
         'end_date',
         'test_instructions',
         'pass_mark',
-        // 'readiness_id', // change to panel
+        'readiness_id', // change to panel
         'ptpanel_ids',
 
     ];

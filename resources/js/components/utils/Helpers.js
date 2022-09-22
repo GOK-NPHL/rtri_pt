@@ -1149,6 +1149,15 @@ export async function FetchPanels() {
         return err.response
     }
 }
+export async function FetchPanelsByReadinessId(readinessId) {
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_panels_by_readiness/${readinessId}`);
+        const panels = response.data;
+        return panels;
+    } catch (err) {
+        return err.response
+    }
+}
 
 //one
 export async function FetchPanel(panelId) {

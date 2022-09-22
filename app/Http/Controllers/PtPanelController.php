@@ -62,10 +62,31 @@ class PtPanelController extends Controller
         }
         return response()->json($panels);
     }
+    public function getPanelsByReadiness(Request $request)
+    {
+        $panels = PtPanel::where('readiness_id', $request->readiness_id, 'deleted_at', null)->get();
+        foreach ($panels as $panel) {
+            // get lots
+            $lots = $panel->lots;
+            $lotsArray = [];
+            foreach ($lots as $lot) {
+                $lt = Lot::find($lot);
+                if ($lt) {
+                    $lotsArray[] = [
+                        'name' => $lt->name,
+                        'participants' => count($lt->participants()),
+                    ];
+                }
+            }
+            $panel->lots = $lotsArray;
+            $panel->readiness = Readiness::find($panel->readiness_id);
+        }
+        return response()->json($panels);
+    }
     public function getPanel(Request $request)
     {
         $panel = PtPanel::where('id', $request->id)->first();
-        if($panel){
+        if ($panel) {
             $panel->participants = [];
             $panelots = [];
             foreach ($panel->lots() as $lot) {
@@ -131,7 +152,7 @@ class PtPanelController extends Controller
         $panel = PtPanel::where('id', $request->id)->first();
         //////////
         if ($panel) {
-            
+
             $panel->name = $request->name;
             $panel->readiness_id = $request->readiness_id;
             $panel->lots = $request->lot_ids ?? $request->lots ?? [];

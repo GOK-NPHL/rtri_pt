@@ -1,5 +1,5 @@
 import React from 'react';
-import { FetchPanel, FetchPanels, FetchParticipantList, SaveShipment, FetchShipmentReadiness as FetchReadiness, FetchShipmentById, UpdateShipment } from '../../../components/utils/Helpers';
+import { FetchPanel, FetchPanels, FetchParticipantList, SaveShipment, FetchShipmentReadiness, FetchShipmentById, UpdateShipment, FetchPanelsByReadinessId } from '../../../components/utils/Helpers';
 import { v4 as uuidv4 } from 'uuid';
 import DualListBox from 'react-dual-listbox';
 import './PtShipment.css';
@@ -14,6 +14,7 @@ class ShipmentForm extends React.Component {
         super(props);
         this.state = {
             submissions: [],
+            readinesses: [],
             isSubmitResult: false,
             dtObject: null,
             id: '',
@@ -60,6 +61,7 @@ class ShipmentForm extends React.Component {
                     id: id,
                     round: editData.shipment.round_name,
                     shipmentCode: editData.shipment.code,
+                    readiness_id: editData.shipment.readiness_id,
                     resultDueDate: editData.shipment.end_date,
                     passMark: editData.shipment.pass_mark,
                     testInstructions: editData.shipment.test_instructions,
@@ -67,36 +69,44 @@ class ShipmentForm extends React.Component {
                 });
 
                 let all_panels = Array.from(editData.shipment.ptpanel_ids, x => x);
-                if(all_panels && all_panels.length > 0){
+                if (all_panels && all_panels.length > 0) {
                     all_panels.forEach((panel) => {
                         FetchPanel(panel).then((response) => {
+                            console.log('panel::::', response);
                             this.setState({
+                                panel_ids: [...this.state.panel_ids, panel],
                                 allPanelDetails: [...this.state.allPanelDetails, response]
                             });
                         });
                     });
                 }
+
+                FetchPanelsByReadinessId(editData.shipment.readiness_id).then((response) => {
+                    if (response.status == 500) {
+                        this.setState({
+                            message: response.data.Message,
+                        });
+                        $('#addShipmentModal').modal('toggle');
+                    } else {
+                        this.setState({
+                            panels: response
+                        });
+                    }
+                });
             }
         })();
     }
 
     componentDidUpdate(prevProps, prevState) {
-        
+
     }
 
     componentDidMount() {
         (async () => {
-            let panels = await FetchPanels();
-            if (panels.status == 500) {
-                this.setState({
-                    message: panels.data.Message,
-                });
-                $('#addShipmentModal').modal('toggle');
-            } else {
-                this.setState({
-                    panels: panels
-                });
-            }
+            let response = await FetchShipmentReadiness(1);
+            this.setState({
+                readinesses: response
+            });
         })();
 
         (async () => {
@@ -113,7 +123,8 @@ class ShipmentForm extends React.Component {
                     resultDueDate: '',
                     passMark: 100,
                     testInstructions: '',
-                    panel_ids: []
+                    panel_ids: [],
+                    readiness_id: '',
                 });
             }
         })();
@@ -124,7 +135,19 @@ class ShipmentForm extends React.Component {
     }
 
     handleChecklistChange(readinessId) {
-        this.setState({ readinessId: readinessId });
+        this.setState({ readiness_id: readinessId });
+        FetchPanelsByReadinessId(readinessId).then((response) => {
+            if (response.status == 500) {
+                this.setState({
+                    message: response.data.Message,
+                });
+                $('#addShipmentModal').modal('toggle');
+            } else {
+                this.setState({
+                    panels: response
+                });
+            }
+        });
     }
 
     handleParticipantSourceChange(participantSource) {
@@ -193,6 +216,7 @@ class ShipmentForm extends React.Component {
             (!this.state.resultDueDate || this.state.resultDueDate == '') ||
             (!this.state.shipmentCode || this.state.shipmentCode == '') ||
             (!this.state.round || this.state.round == '') ||
+            (!this.state.readiness_id || this.state.readiness_id == '') ||
             (!this.state.panel_ids || this.state.panel_ids.length == 0)
 
         ) {
@@ -202,6 +226,7 @@ class ShipmentForm extends React.Component {
                 <p>{(!this.state.resultDueDate || this.state.resultDueDate == '') ? <strong>Result Due Date field</strong> : ''}</p>,
                 <p>{(!this.state.shipmentCode || this.state.shipmentCode == '') ? <strong>Shipement code field</strong> : ''}</p>,
                 <p>{(!this.state.round || this.state.round == '') ? <strong>Round Name field</strong> : ''}</p>,
+                <p>{(!this.state.readiness_id || this.state.readiness_id == '') ? <strong>Readiness checklist field</strong> : ''}</p>,
                 <p>{(!this.state.panel_ids || this.state.panel_ids.length == 0) ? <strong>Panels field</strong> : ''}</p>,
             ]
 
@@ -224,6 +249,7 @@ class ShipmentForm extends React.Component {
                 shipement['round'] = this.state.round;
                 // shipement['panel_id'] = this.state.panel_id;
                 shipement['panel_ids'] = this.state.panel_ids;
+                shipement['readiness_id'] = this.state.readiness_id;
                 shipement['test_instructions'] = this.state.testInstructions;
 
                 if (this.state.pageState == 'edit') {
@@ -262,9 +288,16 @@ class ShipmentForm extends React.Component {
                 panel_ids: this.state.panel_ids.includes(panel) ? this.state.panel_ids : [...this.state.panel_ids, panel]
             });
             FetchPanel(panel).then((response) => {
-                this.setState({
-                    allPanelDetails: this.state.allPanelDetails.includes(response) ? this.state.allPanelDetails : [...this.state.allPanelDetails, response]
-                });
+                if (!Array.from(this.state.allPanelDetails, p => p.name).includes(response.name) & !Array.from(this.state.allPanelDetails, p => p.id).includes(response.id)) {
+                    this.setState({
+                        allPanelDetails: this.state.allPanelDetails.includes(response) ? this.state.allPanelDetails : [...this.state.allPanelDetails, response]
+                    });
+                } else {
+                    this.setState({
+                        message: "Panel already added",
+                    });
+                    $('#addShipmentModal').modal('toggle');
+                }
             });
         }
     }
@@ -294,7 +327,7 @@ class ShipmentForm extends React.Component {
             <React.Fragment>
 
                 <div className="row">
-                    {/* <div className='col-md-3'>
+                    <div className='col-md-3'>
                         <small>
                             <details open>
                                 <summary>this.state</summary>
@@ -304,8 +337,8 @@ class ShipmentForm extends React.Component {
                             </details>
                         </small>
                     </div>
-                    <div className='col-md-9'> */}
-                    <div className='col-md-12'>
+                    <div className='col-md-9'>
+                    {/* <div className='col-md-12'> */}
                         <div className="card" style={{ "backgroundColor": "#ecf0f1" }}>
                             <div className="card-body">
 
@@ -364,8 +397,29 @@ class ShipmentForm extends React.Component {
                                     </div>
                                 </div>
 
+                                {/* READINESS */}
+                                <div className="form-row">
+                                    <div className='col-md-12'>
+                                        <div className="form-group">
+                                            <label htmlFor="description">Readiness</label>
+                                            <select className='form-control' id='readiness'
+                                                value={this.state.readiness_id || ''} onChange={ev => {
+                                                    this.handleChecklistChange(ev.target.value)
+                                                }}>
+                                                <option value=''>Select Readiness</option>
+                                                {this.state.readinesses.length > 0 && this.state.readinesses.map((readiness, index) => {
+                                                    return (
+                                                        <option key={index} value={readiness.id}>{readiness.name}</option>
+                                                    )
+                                                })}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* READINESS */}
 
-                                <div className="form-row bg-white p-2">
+
+                                {this.state.readiness_id && <div className="form-row bg-white p-2">
                                     <div className="col-sm-7  ml-2">
                                         <h5>Panel</h5>
                                         <hr />
@@ -386,8 +440,8 @@ class ShipmentForm extends React.Component {
                                                     })}
                                                 </select>
                                                 <div className="form-group w-100 mb-0">
-                                                    <button className='btn btn-primary btn-sm' disabled={this.state.tempanel == null} onClick={()=>{
-                                                        if(this.state.tempanel){
+                                                    <button className='btn btn-primary btn-sm' disabled={this.state.tempanel == null} onClick={() => {
+                                                        if (this.state.tempanel) {
                                                             this.handlePanelChange(this.state.tempanel)
                                                             this.setState({
                                                                 tempanel: ''
@@ -398,25 +452,25 @@ class ShipmentForm extends React.Component {
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div>}
 
 
-                                {this.state.allPanelDetails.length > 0 && <div className="row mt-2 mb-2">
+                                {(this.props.pageState == 'edit' || this.state.allPanelDetails.length > 0) && <div className="row mt-2 mb-2">
                                     <div className="col-sm-12 bg-white ml-2 pt-2 pb-2">
                                         <h5>Panel details</h5>
                                         <hr />
                                     </div>
                                 </div>}
-                                {this.state.allPanelDetails.length > 0 && this.state.allPanelDetails.map(panel => <div key={panel?.id+"_"+panel?.name} className="form-row bg-white p-2" style={{ fontSize: '15px' }}>
+                                {this.state.allPanelDetails.length > 0 && this.state.allPanelDetails.map(panel => <div key={panel?.id + "_" + panel?.name} className="form-row bg-white p-2" style={{ fontSize: '15px' }}>
                                     <div className="col-sm-12 p-4" style={{ backgroundColor: 'papayawhip', border: '0px solid white', borderRadius: '5px' }}>
                                         <div className='row mb-0'>
-                                            <div className='col-md-12 mb-3 p-0' style={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
-                                                <span role={"button"} onClick={()=>{
+                                            <div className='col-md-12 mb-3 p-0' style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                                                <span role={"button"} onClick={() => {
                                                     this.setState({
-                                                        panel_ids: this.state.panel_ids.filter(p=>p != panel.id),
-                                                        allPanelDetails: this.state.allPanelDetails.filter(p=>p.id != panel.id)
+                                                        panel_ids: this.state.panel_ids.filter(p => p != panel.id),
+                                                        allPanelDetails: this.state.allPanelDetails.filter(p => p.id != panel.id)
                                                     })
-                                                }} className='fa-2x text-danger' style={{lineHeight: '0px', cursor: 'pointer'}}>&times;</span>
+                                                }} className='fa-2x text-danger' style={{ lineHeight: '0px', cursor: 'pointer' }}>&times;</span>
                                             </div>
                                         </div>
                                         <div className='row mb-3'>

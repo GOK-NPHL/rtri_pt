@@ -93,16 +93,16 @@ Route::get('/get_user_id', [CommonsController::class, 'getUserId']);
 Route::get('/get_user_params', [CommonsController::class, 'getUserParticulars']);
 Route::get('/get_admin_params', [AdminAuthController::class, 'getAdminParticulars']);
 
-Route::get('resources/files_all',['as'=>'resources.files', 'uses'=>'ResourceFilesController@getAllFiles']);
-Route::get('resources/files_public',['as'=>'resources.files_public', 'uses'=>'ResourceFilesController@getPublicFiles']);
-Route::get('resources/files_private',['as'=>'resources.files_private', 'uses'=>'ResourceFilesController@getPrivateFiles']);
-Route::delete('resources/files/{id}',['as'=>'resources.delete', 'uses'=>'ResourceFilesController@destroy']);
-Route::get('resources/files/download/{id}',['as'=>'resources.download', 'uses'=>'ResourceFilesController@download']);
-Route::post('resources/files',['as'=>'resources.store', 'uses'=>'ResourceFilesController@store']);
+Route::get('resources/files_all', ['as' => 'resources.files', 'uses' => 'ResourceFilesController@getAllFiles']);
+Route::get('resources/files_public', ['as' => 'resources.files_public', 'uses' => 'ResourceFilesController@getPublicFiles']);
+Route::get('resources/files_private', ['as' => 'resources.files_private', 'uses' => 'ResourceFilesController@getPrivateFiles']);
+Route::delete('resources/files/{id}', ['as' => 'resources.delete', 'uses' => 'ResourceFilesController@destroy']);
+Route::get('resources/files/download/{id}', ['as' => 'resources.download', 'uses' => 'ResourceFilesController@download']);
+Route::post('resources/files', ['as' => 'resources.store', 'uses' => 'ResourceFilesController@store']);
 
 
 ////RBAC
-Route::prefix('/access-management')->group(function (){
+Route::prefix('/access-management')->group(function () {
     Route::get('/permissions', [AuthAccessController::class, 'getPermissions']);
     Route::get('/user-permissions', [AuthAccessController::class, 'getUserPermissions']);
     Route::get('/permission/{id}', [AuthAccessController::class, 'getPermission']);
@@ -141,7 +141,6 @@ Route::prefix('/access-management')->group(function (){
     Route::post('/users', [AuthAccessController::class, 'createUser']);
     Route::put('/user/{id}', [AuthAccessController::class, 'updateUser']);
     Route::delete('/user/{id}', [AuthAccessController::class, 'deleteUser']);
-
 });
 //////
 
@@ -156,6 +155,7 @@ Route::delete('/lot/{id}', [LotController::class, 'deleteLot']);
 
 // panels crud
 Route::get('/get_panels', [PtPanelController::class, 'getPanels']);
+Route::get('/get_panels_by_readiness/{readiness_id}', [PtPanelController::class, 'getPanelsByReadiness']);
 Route::get('/get_panel/{id}', [PtPanelController::class, 'getPanel']);
 Route::post('/panel', [PtPanelController::class, 'createPanel']);
 Route::put('/panel/{id}', [PtPanelController::class, 'updatePanel']);
