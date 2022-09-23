@@ -241,7 +241,7 @@ class PTShipmentController extends Controller
                     foreach ($panels as $pnl) {
                         $pnl->samples = $pnl->ptsamples();
                     }
-                    $shipment->panels = $panels;
+                    // $shipment->panels = $panels;
                     foreach ($panels as $panel) {
                         // filter where participants includes user_id
                         $participants = $panel->participants();
@@ -262,7 +262,15 @@ class PTShipmentController extends Controller
                                         // samples
                                         $samples = $panel->ptsamples();
                                         if ($samples) {
-                                            $panel->samples = $samples;
+                                            $shipsamples = array();
+                                            foreach ($samples as $sample) {
+                                                $shipsamples[] = [
+                                                    'sample_id' => $sample['id'],
+                                                    'sample_name' => $sample['name'],
+                                                    'panel' => $panel->id,
+                                                ];
+                                            }
+                                            $shipment->samples = $shipsamples;
                                         }
                                         // submissions
                                         $submission = ptsubmission::where('pt_shipements_id', $shipment->id)->where('lab_id', $useracc->lab()->id)->where('user_id', $user_id)->first();
@@ -270,11 +278,6 @@ class PTShipmentController extends Controller
                                     }
                                     // push to data
                                     $data[] = $shipment;
-                                    // array_push($data, [
-                                        // 'shipment' => $shipment,
-                                        // 'panel' => $panel,
-                                        // 'user' => $user_id,
-                                    // ]);
                                 }
                             }
                         }

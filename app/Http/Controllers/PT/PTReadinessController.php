@@ -145,6 +145,7 @@ class PTReadinessController extends Controller
                 "readinesses.name",
                 "readinesses.updated_at as last_update",
                 "readinesses.ask_default_qn",
+                "readinesses.end_date",
                 "admins.name as created_by",
                 DB::raw('count(*) as participant_count')
             )->join('admins', 'admins.id', '=', 'readinesses.admin_id')
