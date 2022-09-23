@@ -88,7 +88,7 @@ Route::get('/get_shipment_responses/{id}', [PTShipmentController::class, 'getShi
 
 Route::get('/get_sample_response_result/{id}', [PTShipmentController::class, 'getUserSampleResponseResult'])->middleware('auth:admin');
 
-Route::get('/get_shipment_response_report/{id}/{is_part}', [PTShipmentController::class, 'getShipmentResponseReport']);
+Route::get('/get_shipment_response_report/{id}/{is_part}', [PTShipmentController::class, 'getShipmentResponseReport'])->middleware('auth');
 
 Route::get('/get_user_id', [CommonsController::class, 'getUserId']);
 Route::get('/get_user_params', [CommonsController::class, 'getUserParticulars']);

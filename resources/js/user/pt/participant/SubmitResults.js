@@ -212,7 +212,7 @@ class SubmitResults extends React.Component {
             submission["sampleType"] = this.state.sampleType;
             submission["ptShipementId"] = this.props.shipment.id;
             submission["samples"] = this.state.samples;
-            submission["ptPanelId"] = this.state.samples[0]?.panel || null;
+            submission["ptPanelId"] = this.props.shipment.pt_panel_id || this.state.samples[0]?.panel || null;
             submission["id"] = this.state.submissionId;
             // submission["file"] = this.state.ptFile;
 
@@ -477,7 +477,7 @@ class SubmitResults extends React.Component {
                             :
                             ''}
                     </div>
-                    <div className='col-md-12'>
+                    {/* <div className='col-md-12'>
                         <small>
                             <details>
                                 <summary>this.state</summary>
@@ -496,7 +496,7 @@ class SubmitResults extends React.Component {
                                 </pre>
                             </details>
                         </small>
-                    </div>
+                    </div> */}
 
                     <div className="col-sm-12 pl-4 pr-4">
                         {/* lab basic info */}

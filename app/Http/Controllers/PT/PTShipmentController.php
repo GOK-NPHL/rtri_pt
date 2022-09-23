@@ -289,6 +289,7 @@ class PTShipmentController extends Controller
                                             }
                                             $shipment->samples = $shipsamples;
                                         }
+                                        $shipment->pt_panel_id = $panel->id;
                                         // submissions
                                         $submission = ptsubmission::where('pt_shipements_id', $shipment->id)->where('lab_id', $useracc->lab()->id)->where('user_id', $user_id)->first();
                                         $shipment->submission = $submission->id ?? null;

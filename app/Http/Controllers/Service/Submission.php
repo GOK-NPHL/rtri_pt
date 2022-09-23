@@ -31,7 +31,7 @@ class Submission extends Controller
     {
         try {
             $submission = json_decode($request->input('submission'), true);
-            // Log::info(json_encode($submission));
+            Log::info(json_encode($submission));
             if (!$submission) {
                 return response()->json([
                     'status' => 'error',

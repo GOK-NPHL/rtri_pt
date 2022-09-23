@@ -63,6 +63,7 @@ class PTPerformanceReport extends React.Component {
                         rptCode: response['metadata'][0].code,
                         shipmentDate: response['metadata'][0].shipment_date,
                         specimenReceiptDate: response['metadata'][0].kit_date_received,
+                        passMark: response['metadata'][0].pass_mark,
                         kitLotNumber: response['metadata'][0].pt_lot_no,
                         labName: response['metadata'][0].lab_name,
                         resultSubmissionDate: response['metadata'][0].update_submission_date,
@@ -122,7 +123,7 @@ class PTPerformanceReport extends React.Component {
             } else {
                 isPassOverallScore = false;
             }
-            console.log('scoring', data.sample_name, '('+data.result_interpretation+' == '+data.reference_result+')', ' result: ', isPass);
+            // console.log('scoring', data.sample_name, '('+data.result_interpretation+' == '+data.reference_result+')', ' result: ', isPass);
             ///////// SCORING ///////////
             results.push(<tr className='' key={uuidv4()} style={{ textTransform: 'uppercase' }}>
                 <td style={tdtyle}>{data.sample_name}</td>
@@ -208,8 +209,8 @@ class PTPerformanceReport extends React.Component {
                                     <tr>
                                         <td style={paragraphStyle} colSpan={totalTableLength}>
                                             <strong>Expert comment:</strong> Thank you for participating in KNEQAS HIV Recency PT.
-                                            Your overall performance: Your EQA performance is <strong>{Math.round((passedScore / totalSamples) * 100)}&#37; {isPassOverallScore ? 'ACCEPATBLE' : 'UNACCEPATBE'}</strong>. The
-                                            expected performance outcome was 100% whereby, each sample has an equal score.
+                                            Your overall performance: Your EQA performance is <strong>{Math.round((passedScore / totalSamples) * (this.state.passMark || 100))}&#37; {isPassOverallScore ? 'ACCEPATBLE' : 'UNACCEPATBE'}</strong>. The
+                                            expected performance outcome was {this.state?.passMark || 100}% whereby, each sample has an equal score.
 
                                         </td>
                                     </tr>
@@ -240,7 +241,7 @@ class PTPerformanceReport extends React.Component {
                                     <tr style={paragraphStyle} >
                                         <td colSpan={4} style={{ "textAlign": "left", "marginBottom": "0px" }} >
                                             <strong>Documentation of Report Review:</strong>
-                                            We the undersigned, have read and reviewed the above HIV Recency performance evaluation report. If the final score is less than 100% we have downloaded the root cause analysis and corrective actions forms from ePT, completed, and attached them to this report. Performance report and any attachments must be filed and retained as documentation.
+                                            We the undersigned, have read and reviewed the above HIV Recency performance evaluation report. If the final score is less than {this.state?.passMark || 100}% we have downloaded the root cause analysis and corrective actions forms from ePT, completed, and attached them to this report. Performance report and any attachments must be filed and retained as documentation.
                                         </td>
                                     </tr>
 
