@@ -140,18 +140,18 @@ class Dashboard extends React.Component {
 
 
                 let datRow = <tr key={index++}>
-                    <th scope="row">{element.submission_id == null ? unsubmittedIndex++ : submittedIndex++}</th>
+                    <th scope="row">{element.submission == null ? unsubmittedIndex++ : submittedIndex++}</th>
                     <td>{element.round_name}</td>
                     <td>{element.code}</td>
                     <td>{element.end_date}</td>
-                    {element.submission_id == null ? <td >
+                    {element.submission == null ? <td >
                         {Date.parse(element.end_date) > new Date() ?
                             <span style={{ fontSize: '14px', fontWeight: 500 }} className={'badge badge-' + (element.is_readiness_answered == null ? 'danger' : element.readiness_approval_id == null ? 'warning' : 'info')}>
                                 {element.is_readiness_answered == null ? 'Readiness needs filling' : element.readiness_approval_id == null ? 'Pending readiness approval' : 'Submission ready'}
                             </span> : <span className='badge badge-danger'>Past due date</span>}
                     </td> : ''}
                     {<td>
-                        {element.submission_id ?
+                        {element.submission ?
                             <button
                                 onClick={() => {
                                     this.setState({
@@ -196,7 +196,7 @@ class Dashboard extends React.Component {
 
                 // datRow = <tr key={index++}><td><small><pre>{JSON.stringify(element, null, 1)}</pre></small></td></tr>;
 
-                if (element.submission_id == null) {
+                if (element.submission == null) {
                     tableElem.push(datRow);
                 } else {
                     submittedTableElem.push(datRow);
@@ -321,50 +321,6 @@ class Dashboard extends React.Component {
                                 </td>
                             </tr>
                         }
-                        {/* {this.state.data && this.state.data.length > 0 ? this.state.data.filter(s=>s.submission).map((ship, index) => {
-                            <tr key={ship.id}>
-                                <td colSpan={5}>{JSON.stringify(ship, null, 2)}</td>
-                                <td>{index + 1}</td>
-                                <td>{ship.round_name}</td>
-                                <td>{ship.code}</td>
-                                <td>{ship.end_date}</td>
-                                <td>
-                                    {ship.submission_id ?
-                                        <button
-                                            onClick={() => {
-                                                this.setState({
-                                                    selectedElement: ship,
-                                                    selectedElementHasSubmmisions: true,
-                                                    page: 'edit'
-                                                });
-                                            }} type="button" className="btn btn-success">
-                                            {Date.parse(ship.end_date) > new Date() ? <i className="far fa-edit"></i> : <i className="fas fa-eye"></i>}
-                                            {Date.parse(ship.end_date) > new Date() ? 'Edit' : 'View only'}
-                                        </button> : <button
-                                            onClick={() => {
-                                                if (ship.is_readiness_answered == null) {
-                                                    window.location.assign('get-readiness-form/' + ship.readiness_id)
-                                                } else {
-                                                    this.setState({
-                                                        selectedElement: ship,
-                                                        selectedElementHasSubmmisions: false,
-                                                        page: 'edit'
-                                                    });
-                                                }
-                                            }}
-                                            type="button"
-                                            className="btn btn-success">
-                                            {Date.parse(ship.end_date) > new Date() ? <i className="fas fa-paper-plane"></i> : <i className="fas fa-eye"></i>}
-                                            {Date.parse(ship.end_date) > new Date() ?
-                                                ship.is_readiness_answered == null ?
-                                                    ' Fill readiness' : ship.readiness_approval_id == null ? ' View only' : ' Submit' : 'View only'}
-                                        </button>
-                                    }
-                                </td> 
-                            </tr>
-                        }) : <tr>
-                            <td colSpan={5} className="text-center"> No submissions found </td>
-                        </tr>}*/}
                     </tbody>
                 </table>
 
@@ -378,7 +334,7 @@ class Dashboard extends React.Component {
 
         </div>;
 
-        //submission_id
+        //submission
         let unSubmittedContent = <div id='user_submitted_content_table' className='row'>
 
 
@@ -418,51 +374,6 @@ class Dashboard extends React.Component {
                                     </td>
                                 </tr>
                         }
-                        {/* {this.state.data && this.state.data.length > 0 ? this.state.data.filter(s=>s.submission == null).map((ship, index) => {
-                            <tr key={ship.id}>
-                                <td colSpan={5}>{JSON.stringify(ship, null, 2)}</td>
-
-                                <td>{index + 1}</td>
-                                <td>{ship.round_name}</td>
-                                <td>{ship.code}</td>
-                                <td>{ship.end_date}</td>
-                                <td>
-                                    {ship.submission_id ?
-                                        <button
-                                            onClick={() => {
-                                                this.setState({
-                                                    selectedElement: ship,
-                                                    selectedElementHasSubmmisions: true,
-                                                    page: 'edit'
-                                                });
-                                            }} type="button" className="btn btn-success">
-                                            {Date.parse(ship.end_date) > new Date() ? <i className="far fa-edit"></i> : <i className="fas fa-eye"></i>}
-                                            {Date.parse(ship.end_date) > new Date() ? 'Edit' : 'View only'}
-                                        </button> : <button
-                                            onClick={() => {
-                                                if (ship.is_readiness_answered == null) {
-                                                    window.location.assign('get-readiness-form/' + ship.readiness_id)
-                                                } else {
-                                                    this.setState({
-                                                        selectedElement: ship,
-                                                        selectedElementHasSubmmisions: false,
-                                                        page: 'edit'
-                                                    });
-                                                }
-                                            }}
-                                            type="button"
-                                            className="btn btn-success">
-                                            {Date.parse(ship.end_date) > new Date() ? <i className="fas fa-paper-plane"></i> : <i className="fas fa-eye"></i>}
-                                            {Date.parse(ship.end_date) > new Date() ?
-                                                ship.is_readiness_answered == null ?
-                                                    ' Fill readiness' : ship.readiness_approval_id == null ? ' View only' : ' Submit' : 'View only'}
-                                        </button>
-                                    }
-                                </td>
-                            </tr>
-                        }) : <tr>
-                            <td colSpan={5} className="text-center"> No pending submissions at the moment </td>
-                        </tr>} */}
                     </tbody>
 
                 </table>
