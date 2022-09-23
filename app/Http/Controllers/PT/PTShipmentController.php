@@ -27,22 +27,39 @@ class PTShipmentController extends Controller
     {
 
         try {
+            $data = array();
             $shipments = PtShipement::where('deleted_at', null)->get();
-            foreach ($shipments as $shipment) {
-                $pnls = [];
-                foreach ($shipment->ptpanel_ids as $panel_id) {
-                    $panel = PtPanel::find($panel_id);
-                    if ($panel) {
-                        $pnls[] = [
-                            'id' => $panel->id,
-                            'name' => $panel->name,
-                            'participant_count' => count($panel->participants()) ?? 0,
-                        ];
+            $user = User::where('id', $request->userId)->first();
+            if($user){
+                foreach ($shipments as $shipment) {
+                    // check if there is a submission for this shipment by this user
+                    $submission = ptsubmission::where('pt_shipements_id', $shipment->id)->where('user_id', $request->userId)->first();
+                    if ($submission) {
+                        Log::info('Submission '.$submission->id.' found for shipment ' . $shipment->id . ' and user ' . $request->userId);
+                        // filter shipments that have been submitted by this user
+                        if($submission->pt_shipements_id == $shipment->id){
+                            $pnls = [];
+                            foreach ($shipment->ptpanel_ids as $panel_id) {
+                                $panel = PtPanel::find($panel_id);
+                                if ($panel) {
+                                    $pnls[] = [
+                                        'id' => $panel->id,
+                                        'name' => $panel->name,
+                                        'participant_count' => count($panel->participants()) ?? 0,
+                                    ];
+                                }
+                            }
+                            $shipment->panels = $pnls;
+                            $data[] = $shipment;
+                        }
                     }
                 }
-                $shipment->panels = $pnls;
+                if($request->filterEmpty){
+                    return $data;
+                }else{
+                    return $shipments;
+                }
             }
-            return $shipments;
         } catch (Exception $ex) {
             return response()->json(['Message' => 'Could fetch readiness list: ' . $ex->getMessage()], 500);
         }

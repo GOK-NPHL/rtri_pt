@@ -83,7 +83,7 @@ class ListShipment extends React.Component {
                     <td style={{ verticalAlign: 'middle' }} className='text-center'>{element.round_name}</td>
                     <td style={{ verticalAlign: 'middle' }} className='text-center'>{element.code || element.shipment_code}</td>
                     <td style={{ verticalAlign: 'middle' }} className='text-center'>{element.pass_mark}</td>
-                    <td style={{ verticalAlign: 'middle' }} className='text-center'>
+                    {!this.props.isParticipant && <td style={{ verticalAlign: 'middle' }} className='text-center'>
                         {element?.panels?.map((panel, index) => (
                             <div className='d-block' key={panel.id + "_" + index}>
                                 <span className='text-center' style={{ fontWeight: 'normal', fontSize: '0.88em', lineHeight: '1.7' }}>
@@ -91,7 +91,7 @@ class ListShipment extends React.Component {
                                 </span>
                             </div>
                         ))}
-                    </td>
+                    </td>}
                     <td style={{ verticalAlign: 'middle' }} className='text-center'>{new Date(element.updated_at).toLocaleString('en-GB')}</td>
                     <td style={{ verticalAlign: 'middle' }}>
                         {
@@ -193,7 +193,7 @@ class ListShipment extends React.Component {
                             <th scope="col">Round Name</th>
                             <th scope="col">Shipement Code</th>
                             <th scope="col">Pass Mark</th>
-                            <th scope="col">Panels (&amp; Participant Count)</th>
+                            {!this.props.isParticipant && <th scope="col">Panels (&amp; Participant Count)</th>}
                             <th scope="col">Last Update</th>
                             <th scope="col">Action</th>
                         </tr>
