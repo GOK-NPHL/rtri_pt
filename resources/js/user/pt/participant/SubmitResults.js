@@ -75,7 +75,7 @@ class SubmitResults extends React.Component {
             let edittableSubmission = null;
             let userDemographics = await FetchCurrentParticipantDemographics();
             if (this.props.selectedElementHasSubmmisions) {
-                edittableSubmission = await FetchSubmission(this.props.shipment.submission_id);
+                edittableSubmission = await FetchSubmission(this.props.shipment.submission);
             }
             let samples = {};
 
@@ -117,6 +117,7 @@ class SubmitResults extends React.Component {
                     nameOfTest: edittableSubmission['data']['name_of_test'],
                     ptLotNumber: edittableSubmission['data']['pt_lot_no'],
                     testingDate: edittableSubmission['data']['testing_date'],
+                    edit_pt_file: edittableSubmission['data']['file'] || {},
                     sampleType: edittableSubmission['data']['sample_type'],
                     labId: edittableSubmission['data']['lab_id'],
                     userId: edittableSubmission['data']['user_id'],
@@ -124,8 +125,9 @@ class SubmitResults extends React.Component {
                     isPtDone: edittableSubmission['data']['pt_tested'] == 1 ? true : false,
 
                     userDemographics: userDemographics,
-                    otherComments: edittableSubmission['data']['not_test_reason'] ? edittableSubmission['data']['not_test_reason'] : '',
-                    notTestedReason: edittableSubmission['data']['other_not_tested_reason'] ? edittableSubmission['data']['other_not_tested_reason'] : 'Issue with sample',
+                    notTestedReason: edittableSubmission['data']['not_test_reason'] ? edittableSubmission['data']['not_test_reason'] : '',
+                    otherNotTestedReason: edittableSubmission['data']['other_not_tested_reason'] ? edittableSubmission['data']['other_not_tested_reason'] : 'Issue with sample',
+                    otherComments: edittableSubmission['data']['other_not_tested_reason'] ? edittableSubmission['data']['other_not_tested_reason'] : '',
                     pt_shipements_id: this.props.shipment.pt_shipements_id,
                     submissionId: edittableSubmission['data']['id'],
                     test_instructions: edittableSubmission['data']['test_instructions'],
@@ -203,12 +205,14 @@ class SubmitResults extends React.Component {
             submission["isPTTested"] = this.state.isPtDone;
             submission["testJustification"] = this.state.testJustification;
             submission["ptNotTestedReason"] = !this.state.isPtDone ? this.state.notTestedReason : "";
-            submission["ptNotTestedOtherReason"] = !this.state.isPtDone ? this.state.otherComments : "";
+            submission["ptNotTestedOtherReason"] = this.state.notTestedReason || (!this.state.isPtDone ? this.state.otherComments : "");
+            submission["otherComments"] = this.state.otherComments || this.state.notTestedReason;
             submission["labId"] = this.state.labId;
             submission["userId"] = this.state.userId;
             submission["sampleType"] = this.state.sampleType;
-            submission["ptShipementId"] = this.props.shipment.pt_shipements_id;
+            submission["ptShipementId"] = this.props.shipment.id;
             submission["samples"] = this.state.samples;
+            submission["ptPanelId"] = this.state.samples[0]?.panel || null;
             submission["id"] = this.state.submissionId;
             // submission["file"] = this.state.ptFile;
 
@@ -455,26 +459,43 @@ class SubmitResults extends React.Component {
             <>
                 <div className="row">
 
-                    <div className="col-sm-12 float-left">
-                        <h1>
+                    <div className='w-100' style={{ display: 'flex wrap', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <h1 className='w-100'>
                             RTRI PT Submission form
-                            {
-                                Date.parse(this.state.endDate) > new Date() ?
-                                    this.props.shipment.readiness_approval_id == null ?
-                                        <span style={{ "color": "red" }}> Waiting for readiness approval</span>
-                                        :
-                                        ''
-                                    :
-                                    ''
-                            }
                         </h1>
+                        {Date.parse(this.state.endDate) > new Date() ?
+                            this.props.shipment.readiness_approval_id == null ?
+                                <div className='w-100 alert alert-warning py-2 mt-2 text-center'> Waiting for readiness approval</div>
+                                : ''
+                            : ''
+                        }
                         <hr />
                     </div>
                     <div className="col-sm-12 float-left">
                         {new Date() > Date.parse(this.state.endDate) ?
-                            <h3 style={{ "color": "red" }} className="col-sm-12">Past Due date. Submission diabled</h3>
+                            <h3 style={{ "color": "red" }} className="col-sm-12">Past Due date. Submission disabled</h3>
                             :
                             ''}
+                    </div>
+                    <div className='col-md-12'>
+                        <small>
+                            <details>
+                                <summary>this.state</summary>
+                                <pre>
+                                    {JSON.stringify(this.state, null, 2)}
+                                </pre>
+                            </details>
+                        </small>
+                    </div>
+                    <div className='col-md-12'>
+                        <small>
+                            <details>
+                                <summary>this.props.shipment</summary>
+                                <pre>
+                                    {JSON.stringify(this.props.shipment, null, 2)}
+                                </pre>
+                            </details>
+                        </small>
                     </div>
 
                     <div className="col-sm-12 pl-4 pr-4">
@@ -710,7 +731,7 @@ class SubmitResults extends React.Component {
                             </div>
                             <div className="form-group">
                                 <label htmlFor="otherCommentsTxtbox">Other comments</label>
-                                <textarea value={this.state.otherComments} onChange={() => this.otherCommentsHandler(event)} className="form-control" id="otherCommentsTxtbox" rows="3"></textarea>
+                                <textarea defaultValue={this.state.otherComments} onChange={() => this.otherCommentsHandler(event)} className="form-control" id="otherCommentsTxtbox" rows="3"></textarea>
                             </div>
                         </form>
                         {/* End why test not done */}
@@ -723,16 +744,16 @@ class SubmitResults extends React.Component {
                         <div className="row ml-5 mr-5">
                             <div className="col-md-12">
                                 <div className="form-group">
-                                    <label htmlFor="file_">Scanned PT form:</label>
-                                    <input type="file" className="form-control" id="file_" name="file_" placeholder="Please select a file" onChange={(f) => {
+                                    <label htmlFor="file_">Scanned PT form: {(this.state.edit_pt_file && Object.keys(this.state.edit_pt_file).length > 0) ? <a href={window.location.origin + '/api/resources/files/download/' + this.state.edit_pt_file?.id} target="_blank" download={this.state.edit_pt_file?.name}>{"File_" + this.state.edit_pt_file?.id}</a> : ""}</label>
+                                    <input type="file" className="form-control" id="file_" name="file_" title="Please select a file" onChange={(f) => {
                                         this.setState({
                                             ptFile: f.target.files[0]
                                         })
                                     }} />
                                 </div>
                                 <div className="form-group">
-                                    <label htmlFor="otherCommentsTxtbox">Other comments</label>
-                                    <textarea value={this.state.otherComments} onChange={() => this.otherCommentsHandler(event)} className="form-control" id="otherCommentsTxtbox" rows="3"></textarea>
+                                    <label htmlFor="otherCommentsTxtbox2">Other comments</label>
+                                    <textarea defaultValue={this.state.otherComments} onChange={() => this.otherCommentsHandler(event)} className="form-control" id="otherCommentsTxtbox2" rows="3"></textarea>
                                 </div>
                             </div>
                             <div className="col-sm-12">

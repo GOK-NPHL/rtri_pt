@@ -31,6 +31,7 @@ class Submission extends Controller
     {
         try {
             $submission = json_decode($request->input('submission'), true);
+            // Log::info(json_encode($submission));
             if (!$submission) {
                 return response()->json([
                     'status' => 'error',
@@ -88,12 +89,13 @@ class Submission extends Controller
                         "test_justification" => $submission["testJustification"],
                         "pt_tested" => $submission["isPTTested"],
                         "not_test_reason" => $submission["ptNotTestedReason"],
-                        "other_not_tested_reason" => $submission["ptNotTestedOtherReason"],
+                        "other_not_tested_reason" => $submission["otherComments"] ? $submission["otherComments"] : $submission["ptNotTestedOtherReason"],
                         "pt_shipements_id" => $submission["ptShipementId"],
+                        "pt_panel_id" => $submission["ptPanelId"],
                         "pt_submission_file_id" => $file_id,
                     ]);
 
-                    Log::info('-----------------------Submission : '.json_encode($submissionModel));
+                    // Log::info('-----------------------Submission : '.json_encode($submissionModel));
         
                     $submissionModel->save();
                     $submissionId = $submissionModel->id;
@@ -141,7 +143,7 @@ class Submission extends Controller
     {
 
         $user = Auth::user();
-        try {
+        // try {
 
             $submission = SubmissionModel::select(
                 'ptsubmissions.id',
@@ -158,8 +160,10 @@ class Submission extends Controller
                 'ptsubmissions.tester_name',
                 'ptsubmissions.test_justification',
                 'ptsubmissions.pt_tested',
+                'ptsubmissions.pt_panel_id',
                 'ptsubmissions.not_test_reason',
                 'ptsubmissions.other_not_tested_reason',
+                'ptsubmissions.pt_submission_file_id',
                 'laboratories.email',
                 'ptsubmissions.lab_id',
                 'laboratories.lab_name',
@@ -172,6 +176,9 @@ class Submission extends Controller
                 ->where('ptsubmissions.id', '=', $request->id)
                 ->get();
 
+            if($submission->count() > 0){
+                $submission[0]->file = ResourceFiles::find($submission[0]->pt_submission_file_id);
+            }
 
             $submissionResults = DB::table('pt_submission_results')
                 ->select('sample_id', 'control_line', 'verification_line', 'longterm_line', 'interpretation')
@@ -182,9 +189,9 @@ class Submission extends Controller
 
             return $payload;
             // return SubmissionModel::all();
-        } catch (Exception $ex) {
-            return response()->json(['Message' => 'Error getting org units: ' . $ex->getMessage()], 500);
-        }
+        // } catch (Exception $ex) {
+        //     return response()->json(['Message' => 'Error getting org units: ' . $ex->getMessage()], 500);
+        // }
     }
 
 
@@ -211,8 +218,10 @@ class Submission extends Controller
             $submissionModel->test_justification = $submission["testJustification"];
             $submissionModel->pt_tested = $submission["isPTTested"];
             $submissionModel->not_test_reason = $submission["ptNotTestedReason"];
-            $submissionModel->other_not_tested_reason = $submission["ptNotTestedOtherReason"];
+            // $submissionModel->other_not_tested_reason = $submission["ptNotTestedOtherReason"] ?? $submission["otherComments"];
+            $submissionModel->not_test_reason = $submission["otherComments"] ? $submission["otherComments"] : $submission["ptNotTestedOtherReason"];
             $submissionModel->pt_shipements_id = $submission["ptShipementId"];
+            $submissionModel->pt_panel_id = $submission["ptPanelId"];
 
             $submissionModel->save();
 

@@ -31,11 +31,11 @@ class ShipmentResponses extends React.Component {
             path: `/get-shipment-responses/:shipmentId`,
         });
 
-        if (this.props.page == 'report') {
+        // if (this.props.page == 'report') {
+        if (!pathObject || pathObject == null) {
             pathObject = matchPath(pathname, {
                 path: `/get-shipment-report-responses/:shipmentId`,
             });
-
         }
 
         if (pathObject) {

@@ -71,6 +71,7 @@ class ListReadiness extends React.Component {
                     <th scope="row">{index + 1}</th>
                     <td>{element.name}</td>
                     <td>{element.participant_count}</td>
+                    <td>{element.end_date}</td>
                     <td>{element.last_update}</td>
                     <td>{element.created_by}</td>
                     {
@@ -138,7 +139,8 @@ class ListReadiness extends React.Component {
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Name/Title</th>
-                            <th scope="col">No. of participant(s) (labs)</th>
+                            <th scope="col">No. of participating (labs)</th>
+                            <th scope="col">End date</th>
                             <th scope="col">Date Updated</th>
                             <th scope="col">Edited by</th>
                             <th scope="col">Action</th>

@@ -8,8 +8,12 @@ use App\Lot;
 use App\PtPanel;
 use App\PtSample;
 use App\PtShipement;
+use App\ptsubmission;
 use App\Readiness;
+use App\ReadinessAnswer;
+use App\ReadinessApproval;
 use App\ReadinessQuestion;
+use App\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,22 +27,39 @@ class PTShipmentController extends Controller
     {
 
         try {
+            $data = array();
             $shipments = PtShipement::where('deleted_at', null)->get();
-            foreach ($shipments as $shipment) {
-                $pnls = [];
-                foreach ($shipment->ptpanel_ids as $panel_id) {
-                    $panel = PtPanel::find($panel_id);
-                    if ($panel) {
-                        $pnls[] = [
-                            'id' => $panel->id,
-                            'name' => $panel->name,
-                            'participant_count' => count($panel->participants()) ?? 0,
-                        ];
+            $user = User::where('id', $request->userId)->first();
+            if($user){
+                foreach ($shipments as $shipment) {
+                    // check if there is a submission for this shipment by this user
+                    $submission = ptsubmission::where('pt_shipements_id', $shipment->id)->where('user_id', $request->userId)->first();
+                    if ($submission) {
+                        Log::info('Submission '.$submission->id.' found for shipment ' . $shipment->id . ' and user ' . $request->userId);
+                        // filter shipments that have been submitted by this user
+                        if($submission->pt_shipements_id == $shipment->id){
+                            $pnls = [];
+                            foreach ($shipment->ptpanel_ids as $panel_id) {
+                                $panel = PtPanel::find($panel_id);
+                                if ($panel) {
+                                    $pnls[] = [
+                                        'id' => $panel->id,
+                                        'name' => $panel->name,
+                                        'participant_count' => count($panel->participants()) ?? 0,
+                                    ];
+                                }
+                            }
+                            $shipment->panels = $pnls;
+                            $data[] = $shipment;
+                        }
                     }
                 }
-                $shipment->panels = $pnls;
+                if($request->filterEmpty){
+                    return $data;
+                }else{
+                    return $shipments;
+                }
             }
-            return $shipments;
         } catch (Exception $ex) {
             return response()->json(['Message' => 'Could fetch readiness list: ' . $ex->getMessage()], 500);
         }
@@ -124,13 +145,15 @@ class PTShipmentController extends Controller
                     $participants = $panel->participants();
                     if ($participants && count($participants) > 0) {
                         foreach ($participants as $participant) {
-                            $userlab = $participant->lab();
-                            // save to laboratory_pt_shipment table
-                            DB::table('laboratory_pt_shipement')->insert([
-                                'laboratory_id' => $userlab->id, //$participant['id'],
-                                'pt_shipement_id' => $shipment['id'],
-                                'pt_panel_id' => $panel_id,
-                            ]);
+                            $useracc = User::find($participant['id']);
+                            if ($useracc) {
+                                // save to laboratory_pt_shipment table
+                                DB::table('laboratory_pt_shipement')->insert([
+                                    'laboratory_id' => $useracc->lab()->id,
+                                    'pt_shipement_id' => $shipment['id'],
+                                    'pt_panel_id' => $panel_id,
+                                ]);
+                            }
                         }
                     }
                 }
@@ -202,35 +225,76 @@ class PTShipmentController extends Controller
             // join with lots (name, participants()) on panels.lots includes lots.id
             // where shipment.start_date <= today and shipment.end_date >= today and shipment.participants includes user_id
 
+            // shoud return the following json: 
+            /* [
+                {
+                    "id": 4,
+                    "pt_shipements_id": 4,
+                    "round_name": "Round A",
+                    "code": "R-01",
+                    "start_date": null,
+                    "end_date": "2022-09-28",
+                    "test_instructions": "Discover a whole host of new companies explictly approved by me",
+                    "sample_id": 1,
+                    "sample_name": "SAMPLE A",
+                    "submission_id": null,
+                    "is_readiness_answered": 1,
+                    "readiness_id": null,
+                    "readiness_approval_id": 1
+                }
+            ] */
+
             $data = array();
 
             $shipments = PtShipement::all();
             foreach ($shipments as $shipment) {
-                $readiness = Readiness::find($shipment->readiness_id);
-                if ($readiness) {
-                    $shipment->readiness = $readiness;
-                }
+                // $readiness = Readiness::find($shipment->readiness_id);
+                // if ($readiness) {
+                //     $shipment->readiness = $readiness;
+                // }
+
                 $panels = PtPanel::whereIn('id', $shipment->ptpanel_ids)->get();
                 if ($panels) {
-                    $shipment->panels = $panels;
+                    foreach ($panels as $pnl) {
+                        $pnl->samples = $pnl->ptsamples();
+                    }
+                    // $shipment->panels = $panels;
                     foreach ($panels as $panel) {
                         // filter where participants includes user_id
                         $participants = $panel->participants();
-                        $shipment->participants = $participants;
                         if ($participants && count($participants) > 0) {
                             foreach ($participants as $participant) {
                                 if ($participant['id'] == $user_id) {
-                                    $samples = $panel->ptsamples();
-                                    if ($samples) {
-                                        $panel->samples = $samples;
+                                    $useracc = User::find($participant['id']);
+                                    if ($useracc) {
+                                        // find if the readiness assigned to the lab has been answered
+                                        $readinessAnswer = ReadinessAnswer::where('laboratory_id', $useracc->lab()->id)->where('readiness_id', $shipment->readiness_id)->first();
+                                        if ($readinessAnswer) {
+                                            $shipment->is_readiness_answered = 1;
+                                            $shipment->readiness_approval_id = ReadinessApproval::where('lab_id', $useracc->lab()->id)->where('readiness_id', $shipment->readiness_id)->first()->id ?? null;
+                                        } else {
+                                            $shipment->is_readiness_answered = 0;
+                                            $shipment->readiness_approval_id = null;
+                                        }
+                                        // samples
+                                        $samples = $panel->ptsamples();
+                                        if ($samples) {
+                                            $shipsamples = array();
+                                            foreach ($samples as $sample) {
+                                                $shipsamples[] = [
+                                                    'sample_id' => $sample['id'],
+                                                    'sample_name' => $sample['name'],
+                                                    'panel' => $panel->id,
+                                                ];
+                                            }
+                                            $shipment->samples = $shipsamples;
+                                        }
+                                        // submissions
+                                        $submission = ptsubmission::where('pt_shipements_id', $shipment->id)->where('lab_id', $useracc->lab()->id)->where('user_id', $user_id)->first();
+                                        $shipment->submission = $submission->id ?? null;
                                     }
                                     // push to data
-                                    array_push($data, [
-                                        'shipment' => $shipment,
-                                        'panel' => $panel,
-                                        'participant' => $participant,
-                                        'user' => $user_id,
-                                    ]);
+                                    $data[] = $shipment;
                                 }
                             }
                         }
@@ -410,7 +474,10 @@ class PTShipmentController extends Controller
 
             $shipmentsResponses = DB::table("pt_shipements")->distinct()
                 ->join('ptsubmissions', 'ptsubmissions.pt_shipements_id', '=', 'pt_shipements.id')
-                ->join('pt_panels', 'pt_panels.readiness_id', '=', 'pt_shipements.readiness_id')
+                ->join('laboratory_pt_shipement', 'laboratory_pt_shipement.pt_shipement_id', '=', 'pt_shipements.id')
+                ->join('pt_panels', 'pt_panels.id', '=', 'laboratory_pt_shipement.pt_panel_id')
+                ->join('pt_samples', 'pt_samples.ptpanel_id', '=', 'pt_panels.id')
+                ////
                 ->join('pt_submission_results', 'pt_submission_results.ptsubmission_id', '=', 'ptsubmissions.id')
                 ->join('laboratories', 'ptsubmissions.lab_id', '=', 'laboratories.id')
                 ->join('users', 'ptsubmissions.user_id', '=', 'users.id');
@@ -419,7 +486,8 @@ class PTShipmentController extends Controller
                 $shipmentsResponses = $shipmentsResponses->where('ptsubmissions.lab_id', $user->laboratory_id)
                     ->where('ptsubmissions.pt_shipements_id', $id);
             } else {
-                $shipmentsResponses = $shipmentsResponses->where('ptsubmissions.id', $id);
+                $shipmentsResponses = $shipmentsResponses->where('ptsubmissions.id', $id)
+                    ->where('ptsubmissions.pt_shipements_id', $id);
             }
 
             $shipmentsResponses = $shipmentsResponses->get([
@@ -427,6 +495,7 @@ class PTShipmentController extends Controller
                 "pt_shipements.created_at as shipment_date",
                 "pt_shipements.code",
                 "pt_shipements.end_date",
+                "pt_shipements.pass_mark",
                 "pt_shipements.round_name as name",
                 "laboratories.id as lab_id",
                 "users.name as fname",
@@ -445,12 +514,17 @@ class PTShipmentController extends Controller
 
             //  one
             $shipmentsRefResult = DB::table("pt_shipements")->distinct()
-                ->join('pt_panels', 'pt_panels.readiness_id', '=', 'pt_shipements.readiness_id')
-                ->join('pt_samples', 'pt_samples.ptpanel_id', '=', 'pt_panels.id');
+                ->join('laboratory_pt_shipement', 'laboratory_pt_shipement.pt_shipement_id', '=', 'pt_shipements.id')
+                ->join('pt_panels', 'pt_panels.id', '=', 'laboratory_pt_shipement.pt_panel_id')
+                ->join('pt_samples', 'pt_samples.ptpanel_id', '=', 'pt_panels.id')
+                ->where('pt_shipements.id', $id);
 
             $shipmentsRefResult = $shipmentsRefResult->get([
                 "pt_samples.reference_result as reference_result",
-                "pt_samples.name as sample_name"
+                "pt_samples.name as sample_name",
+                "pt_panels.id as ref_panel_id",
+                "pt_panels.name as ref_panel_name",
+                "pt_shipements.round_name as round_name"
             ]);
 
 
@@ -458,7 +532,10 @@ class PTShipmentController extends Controller
             $shipmentsResponsesRlt = DB::table("pt_shipements")->distinct()
                 ->join('ptsubmissions', 'ptsubmissions.pt_shipements_id', '=', 'pt_shipements.id')
                 ->leftJoin('pt_submission_results', 'pt_submission_results.ptsubmission_id', '=', 'ptsubmissions.id')
+                ->join('pt_panels', 'pt_panels.id', '=', 'ptsubmissions.pt_panel_id')
                 ->join('pt_samples', 'pt_samples.id', '=', 'pt_submission_results.sample_id');
+
+
             if ($is_part == 1) {
                 $shipmentsResponsesRlt = $shipmentsResponsesRlt->where('ptsubmissions.lab_id', $user->laboratory_id)
                     ->where('ptsubmissions.pt_shipements_id', $id);
@@ -471,23 +548,26 @@ class PTShipmentController extends Controller
                 "pt_submission_results.control_line as control_line",
                 "pt_submission_results.verification_line as verification_line",
                 "pt_submission_results.longterm_line as longterm_line",
+                "ptsubmissions.pt_panel_id as panel_id",
                 "pt_samples.name as sample_name"
             ]);
 
 
             $dataPayload = [];
-            foreach ($shipmentsRefResult as $refRslt) {
-                foreach ($shipmentsResponsesRlt as $rslt) {
-                    if ($refRslt->sample_name == $rslt->sample_name) {
-                        $data = [];
-                        $data['result_interpretation'] = $rslt->result_interpretation;
-                        $data['sample_name'] = $refRslt->sample_name;
-                        $data['reference_result'] = $refRslt->reference_result;
-                        $data['control_line'] = $rslt->control_line ?? null;
-                        $data['verification_line'] = $rslt->verification_line ?? null;
-                        $data['longterm_line'] = $rslt->longterm_line ?? null;
-                        $dataPayload[] = $data;
-                    }
+            // Log::info('shipmentsResponsesRlt::::'.json_encode($shipmentsResponsesRlt));
+            // Log::info('shipmentsRefResult::::'.json_encode($shipmentsRefResult));
+            foreach ($shipmentsResponsesRlt as $rslt) {
+                // find the reference result
+                $refResult = $shipmentsRefResult->where('ref_panel_id', $rslt->panel_id)->where('sample_name', $rslt->sample_name)->first();
+                if ($refResult) {
+                    $data = [];
+                    $data['sample_name'] = $refResult->sample_name;
+                    $data['reference_result'] = $refResult->reference_result;
+                    $data['control_line'] = $rslt->control_line ?? null;
+                    $data['verification_line'] = $rslt->verification_line ?? null;
+                    $data['longterm_line'] = $rslt->longterm_line ?? null;
+                    $data['result_interpretation'] = $rslt->result_interpretation;
+                    $dataPayload[] = $data;
                 }
             }
 

@@ -14,6 +14,7 @@ class ptsubmission extends Model
         "kit_expiry_date",
         "kit_lot_no",
         "pt_shipements_id",
+        "pt_panel_id",
         "name_of_test",
         "pt_lot_no",
         "sample_reconstituion_date",

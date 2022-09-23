@@ -45,8 +45,7 @@ class Dashboard extends React.Component {
         (async () => {
             let response = await FetchUserSamples();
             let readiness = await FetchReadnessSurvey();
-            console.log("readiness")
-            console.log(readiness)
+            console.log("subs", response)
             this.setState({
                 data: response,
                 readiness: readiness
@@ -103,20 +102,20 @@ class Dashboard extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevState.page !== this.state.page) {
-            (async () => {
-                let response = await FetchUserSamples();
-                this.setState({
-                    allTableElements: [],
-                    allSubmittedTableElements: [],
-                    allReadinessTableElements: [],
-                    currElementsTableEl: [],
-                    currSubmittedElementsTableEl: [],
-                    currReadinessElementsTableEl: [],
-                    data: response,
-                })
-            })();
-        }
+        // if (prevState.page !== this.state.page) {
+        //     (async () => {
+        //         let response = await FetchUserSamples();
+        //         this.setState({
+        //             allTableElements: [],
+        //             allSubmittedTableElements: [],
+        //             allReadinessTableElements: [],
+        //             currElementsTableEl: [],
+        //             currSubmittedElementsTableEl: [],
+        //             currReadinessElementsTableEl: [],
+        //             data: response,
+        //         })
+        //     })();
+        // }
     }
 
     render() {
@@ -141,18 +140,18 @@ class Dashboard extends React.Component {
 
 
                 let datRow = <tr key={index++}>
-                    <th scope="row">{element.submission_id == null ? unsubmittedIndex++ : submittedIndex++}</th>
+                    <th scope="row">{element.submission == null ? unsubmittedIndex++ : submittedIndex++}</th>
                     <td>{element.round_name}</td>
                     <td>{element.code}</td>
                     <td>{element.end_date}</td>
-                    {element.submission_id == null ? <td >
+                    {element.submission == null ? <td >
                         {Date.parse(element.end_date) > new Date() ?
                             <span style={{ fontSize: '14px', fontWeight: 500 }} className={'badge badge-' + (element.is_readiness_answered == null ? 'danger' : element.readiness_approval_id == null ? 'warning' : 'info')}>
                                 {element.is_readiness_answered == null ? 'Readiness needs filling' : element.readiness_approval_id == null ? 'Pending readiness approval' : 'Submission ready'}
                             </span> : <span className='badge badge-danger'>Past due date</span>}
                     </td> : ''}
                     {<td>
-                        {element.submission_id ?
+                        {element.submission ?
                             <button
                                 onClick={() => {
                                     this.setState({
@@ -195,9 +194,9 @@ class Dashboard extends React.Component {
                     </td>}
                 </tr>;
 
-                datRow = <tr key={index++}><td><small><pre>{JSON.stringify(element,null,1)}</pre></small></td></tr>;
-                
-                if (element.submission_id == null) {
+                // datRow = <tr key={index++}><td><small><pre>{JSON.stringify(element, null, 1)}</pre></small></td></tr>;
+
+                if (element.submission == null) {
                     tableElem.push(datRow);
                 } else {
                     submittedTableElem.push(datRow);
@@ -317,7 +316,7 @@ class Dashboard extends React.Component {
                         {this.state.currSubmittedElementsTableEl.length > 0 ?
                             this.state.currSubmittedElementsTableEl.slice(this.state.startSubmittedTableData, this.state.endeSubmittedTableData) :
                             <tr>
-                                <td colSpan={5}>
+                                <td colSpan={5} className="text-center alert alert-default-warning">
                                     No submissions done
                                 </td>
                             </tr>
@@ -335,7 +334,7 @@ class Dashboard extends React.Component {
 
         </div>;
 
-        //submission_id
+        //submission
         let unSubmittedContent = <div id='user_submitted_content_table' className='row'>
 
 
@@ -363,7 +362,6 @@ class Dashboard extends React.Component {
                             <th scope="col">End Date</th>
                             <th scope="col">Status</th>
                             <th scope="col">Action</th>
-
                         </tr>
                     </thead>
                     <tbody>
@@ -371,7 +369,7 @@ class Dashboard extends React.Component {
                             this.state.currElementsTableEl.length > 0 ?
                                 this.state.currElementsTableEl.slice(this.state.startTableData, this.state.endeTableData) :
                                 <tr>
-                                    <td colSpan={6}>
+                                    <td colSpan={5} className="text-center alert alert-default-warning">
                                         No pending samples to fill
                                     </td>
                                 </tr>
