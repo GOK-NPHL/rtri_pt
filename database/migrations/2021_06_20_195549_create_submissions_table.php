@@ -18,6 +18,7 @@ class CreateSubmissionsTable extends Migration
             $table->timestamps();
 
             $table->integer("pt_shipements_id");
+            $table->integer("pt_panel_id");
             $table->date("testing_date");
             $table->string("name_of_test");
             $table->string("kit_lot_no");

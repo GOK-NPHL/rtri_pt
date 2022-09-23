@@ -69,7 +69,7 @@ class PTPerformanceReport extends React.Component {
                         testingDate: response['metadata'][0].testing_date,
                         kitExpiration: response['metadata'][0].kit_expiry_date,
                         phoneNo: response['metadata'][0].phone_number,
-                        userName: response['metadata'][0]?.fname+' '+response['metadata'][0]?.sname,
+                        userName: response['metadata'][0]?.fname + ' ' + response['metadata'][0]?.sname,
                     });
 
                 }
@@ -122,6 +122,7 @@ class PTPerformanceReport extends React.Component {
             } else {
                 isPassOverallScore = false;
             }
+            console.log('scoring', data.sample_name, '('+data.result_interpretation+' == '+data.reference_result+')', ' result: ', isPass);
             ///////// SCORING ///////////
             results.push(<tr className='' key={uuidv4()} style={{ textTransform: 'uppercase' }}>
                 <td style={tdtyle}>{data.sample_name}</td>

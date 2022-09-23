@@ -91,6 +91,7 @@ class Submission extends Controller
                         "not_test_reason" => $submission["ptNotTestedReason"],
                         "other_not_tested_reason" => $submission["otherComments"] ? $submission["otherComments"] : $submission["ptNotTestedOtherReason"],
                         "pt_shipements_id" => $submission["ptShipementId"],
+                        "pt_panel_id" => $submission["ptPanelId"],
                         "pt_submission_file_id" => $file_id,
                     ]);
 
@@ -159,6 +160,7 @@ class Submission extends Controller
                 'ptsubmissions.tester_name',
                 'ptsubmissions.test_justification',
                 'ptsubmissions.pt_tested',
+                'ptsubmissions.pt_panel_id',
                 'ptsubmissions.not_test_reason',
                 'ptsubmissions.other_not_tested_reason',
                 'ptsubmissions.pt_submission_file_id',
@@ -219,6 +221,7 @@ class Submission extends Controller
             // $submissionModel->other_not_tested_reason = $submission["ptNotTestedOtherReason"] ?? $submission["otherComments"];
             $submissionModel->not_test_reason = $submission["otherComments"] ? $submission["otherComments"] : $submission["ptNotTestedOtherReason"];
             $submissionModel->pt_shipements_id = $submission["ptShipementId"];
+            $submissionModel->pt_panel_id = $submission["ptPanelId"];
 
             $submissionModel->save();
 
