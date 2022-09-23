@@ -25,6 +25,7 @@ class PTPerformanceReport extends React.Component {
             userParams: {},
             adminParams: {},
             results: [],
+            passMark: 100,
         }
 
 
@@ -209,7 +210,9 @@ class PTPerformanceReport extends React.Component {
                                     <tr>
                                         <td style={paragraphStyle} colSpan={totalTableLength}>
                                             <strong>Expert comment:</strong> Thank you for participating in KNEQAS HIV Recency PT.
-                                            Your overall performance: Your EQA performance is <strong>{Math.round((passedScore / totalSamples) * (this.state.passMark || 100))}&#37; {isPassOverallScore ? 'ACCEPATBLE' : 'UNACCEPATBE'}</strong>. The
+                                            Your overall performance: Your EQA performance is <strong>
+                                                {Math.round((passedScore / totalSamples) * 100)}&#37; {Math.round((passedScore / totalSamples) * 100) >= this.state.passMark ? 'ACCEPATBLE' : 'UNACCEPATBE'}
+                                                </strong>. The
                                             expected performance outcome was {this.state?.passMark || 100}% whereby, each sample has an equal score.
 
                                         </td>
