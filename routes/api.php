@@ -11,6 +11,8 @@ use App\Http\Controllers\QC\QCAdminUsersController;
 use App\Http\Controllers\Service\CommonsController;
 use App\Http\Controllers\Service\ReadinessController;
 use App\Http\Controllers\Service\Submission;
+use App\Http\Middleware\admin;
+use App\Http\Middleware\Participant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -88,7 +90,7 @@ Route::get('/get_shipment_responses/{id}', [PTShipmentController::class, 'getShi
 
 Route::get('/get_sample_response_result/{id}', [PTShipmentController::class, 'getUserSampleResponseResult'])->middleware('auth:admin');
 
-Route::get('/get_shipment_response_report/{id}/{is_part}', [PTShipmentController::class, 'getShipmentResponseReport'])->middleware('auth');
+Route::get('/get_shipment_response_report/{id}/{is_part}', [PTShipmentController::class, 'getShipmentResponseReport'])->middleware('web');
 
 Route::get('/get_user_id', [CommonsController::class, 'getUserId']);
 Route::get('/get_user_params', [CommonsController::class, 'getUserParticulars']);
