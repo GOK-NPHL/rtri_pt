@@ -127,11 +127,11 @@ class PTPerformanceReport extends React.Component {
             // console.log('scoring', data.sample_name, '('+data.result_interpretation+' == '+data.reference_result+')', ' result: ', isPass);
             ///////// SCORING ///////////
             results.push(<tr className='' key={uuidv4()} style={{ textTransform: 'uppercase' }}>
-                <td style={tdtyle}>{data.sample_name}</td>
-                <td style={{ verticalAlign: 'middle', textTransform: 'uppercase' }}>{[data.control_line == 1 ? "Control line" : null, data.verification_line == 1 ? "Verification line" : null, data.longterm_line == 1 ? "Long-term line" : null].filter(n => n != null).join('; ')}</td>
-                <td style={{ verticalAlign: 'middle', textTransform: 'uppercase' }}>{data.result_interpretation ? data.result_interpretation : 'No Result'}</td>
-                <td style={{ verticalAlign: 'middle' }}>{data.reference_result}</td>
-                <td style={{ verticalAlign: 'middle' }}>{isPass ? 'ACCEPTABLE' : 'UNACCEPATBE'}</td>
+                <td style={{...tdtyle, textAlign: 'center'}}>{data.sample_name}</td>
+                {/* <td style={{ verticalAlign: 'middle', textTransform: 'uppercase' }}>{[data.control_line == 1 ? "Control line" : null, data.verification_line == 1 ? "Verification line" : null, data.longterm_line == 1 ? "Long-term line" : null].filter(n => n != null).join('; ')}</td> */}
+                <td style={{ verticalAlign: 'middle', textTransform: 'uppercase', textAlign: 'center' }}>{data.result_interpretation ? data.result_interpretation : 'No Result'}</td>
+                <td style={{ verticalAlign: 'middle', textAlign: 'center' }}>{data.reference_result}</td>
+                <td style={{ verticalAlign: 'middle', textAlign: 'center' }}>{isPass ? 'ACCEPTABLE' : 'UNACCEPATBE'}</td>
             </tr>);
             totalSamples += 1;
         })
@@ -159,11 +159,11 @@ class PTPerformanceReport extends React.Component {
                                     </tr>
                                     <tr style={{ "fontWeight": "bold" }} >
                                         <td style={{ "lineHeight": "8px", padding: '8px', textAlign: 'center' }} colSpan={totalTableLength}>
-                                            <p>MINISTRY OF HEALTH</p>
+                                            <h3>MINISTRY OF HEALTH</h3>
+                                            <p>DEPARTMENT OF LABORATORY SERVICES</p>
                                             <p>NATIONAL PUBLIC HEALTH LABORATORIES</p>
-                                            <p>KENYA EXTERNAL QUALITY ASSESSMENT SCHEME (KNEQAS)</p>
                                             <p>NATIONAL HIV REFERENCE LABORATORY</p>
-                                            <p style={{ "fontWeight": "normal" }}>P.O Box 20750 - 00202 NAIROBI Email: nphlpt@nphl.go.ke Help Desk: helpdesk.nphl.go.ke</p>
+                                            <p style={{ "fontWeight": "normal" }}>P.O Box 20750 - 00202 NAIROBI</p>
                                             <h4><b>HIV RECENCY PROFICIENCY TESTING SCHEME REPORT</b></h4>
                                         </td>
                                     </tr>
@@ -191,12 +191,12 @@ class PTPerformanceReport extends React.Component {
                                                 <thead>
                                                     <tr style={{ "fontWeight": "bold" }} className=''>
                                                         <th style={{ verticalAlign: 'middle', textAlign: 'center' }} rowSpan={2} >SAMPLE </th>
-                                                        <th style={{ verticalAlign: 'middle', textAlign: 'center' }} colSpan={3}> ANALYSIS </th>
+                                                        <th style={{ verticalAlign: 'middle', textAlign: 'center' }} colSpan={2}> ANALYSIS </th>
                                                         <th style={{ verticalAlign: 'middle', textAlign: 'center' }} rowSpan={2}>PERFORMANCE</th>
                                                     </tr>
 
                                                     <tr style={{ "fontWeight": "bold" }} className=''>
-                                                        <th style={{ verticalAlign: 'middle', textAlign: 'center' }}>Visual Result</th>
+                                                        {/* <th style={{ verticalAlign: 'middle', textAlign: 'center' }}>Visual Result</th> */}
                                                         <th style={{ verticalAlign: 'middle', textAlign: 'center' }}>Interpretation</th>
                                                         <th style={{ verticalAlign: 'middle', textAlign: 'center' }}>Expected</th>
                                                     </tr>
@@ -279,9 +279,10 @@ class PTPerformanceReport extends React.Component {
                                                                 Nancy Bowen<br />
                                                                 Head, National HIV Reference Laboratory<br />
                                                                 Department of Laboratory Services - NPHL<br />
-                                                                P.O. Box 20750-00200<br />
-                                                                Nairobi, Kenya<br />
-                                                                254722845874<br />
+                                                                {/* P.O. Box 20750-00200<br />
+                                                                Nairobi, Kenya<br /> */}
+                                                                
+                                                                Contact: 254722845874<br />
                                                             </p>
                                                         </td>
                                                         <td className='text-left '>
@@ -289,8 +290,8 @@ class PTPerformanceReport extends React.Component {
                                                                 Christabel Awuor<br />
                                                                 HIV Serology<br />
                                                                 National HIV Reference Laboratory<br />
-                                                                P.O. Box 20750-00200<br />
-                                                                Nairobi, Kenya<br />
+                                                                {/* P.O. Box 20750-00200<br />
+                                                                Nairobi, Kenya<br /> */}
                                                                 Contact: 254723777442
                                                             </p>
                                                         </td>
