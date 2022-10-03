@@ -45,7 +45,7 @@
                         <input type="submit" class="btn col-md-12 btn-lg btn-info" value="Sign in" />
                     </div>
 
-                    <div>
+                    <div class="text-center">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
 
@@ -53,7 +53,7 @@
                                 {{ __('Remember Me') }}
                             </label>
                         </div>
-                        <a href="/participant-signup" style="color:white;">Sign up</a>
+                        &nbsp; &nbsp; No account? <a href="/participant-signup">Sign up</a> &nbsp; &nbsp; &nbsp;
                         <!-- <a href="/auth/reset-password" style="font-size:0.8em;color:white;">Forgot Password?</a> -->
                         <!--<a href="/contact-us" style="">Don't have a login ? Click here to contact us</a>-->
                         @if (Route::has('password.request'))

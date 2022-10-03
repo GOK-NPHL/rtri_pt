@@ -116,9 +116,9 @@ class CustomAuthController extends Controller
             $user->email = $request->email;
             $user->phone_number = $request->phone;
             $user->password = FacadesHash::make($request->password);
-            $user->is_active = 0;
-            $user->has_qc_access = 0;
-            $user->has_pt_access = 0;
+            $user->is_active = 1;
+            $user->has_qc_access = 1;
+            $user->has_pt_access = 1;
             $user->roles = [UserRole::where('slug', 'like', '%guest%')->first()->id];
             $user->save();
             return redirect()->route('participant-login')->with('success', 'User created successfully. Please wait for administrator to activate your account.');
