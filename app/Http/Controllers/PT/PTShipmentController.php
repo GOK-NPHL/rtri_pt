@@ -30,14 +30,14 @@ class PTShipmentController extends Controller
             $data = array();
             $shipments = PtShipement::where('deleted_at', null)->get();
             $user = User::where('id', $request->userId)->first();
-            if($user || $request->userId == '156f41ed97'){
+            if ($user || $request->userId == '156f41ed97') {
                 foreach ($shipments as $shipment) {
                     // check if there is a submission for this shipment by this user
                     $submission = ptsubmission::where('pt_shipements_id', $shipment->id)->where('user_id', $request->userId)->first();
                     if ($submission) {
-                        Log::info('Submission '.$submission->id.' found for shipment ' . $shipment->id . ' and user ' . $request->userId);
+                        Log::info('Submission ' . $submission->id . ' found for shipment ' . $shipment->id . ' and user ' . $request->userId);
                         // filter shipments that have been submitted by this user
-                        if($submission->pt_shipements_id == $shipment->id){
+                        if ($submission->pt_shipements_id == $shipment->id) {
                             $pnls = [];
                             foreach ($shipment->ptpanel_ids as $panel_id) {
                                 $panel = PtPanel::find($panel_id);
@@ -54,9 +54,9 @@ class PTShipmentController extends Controller
                         }
                     }
                 }
-                if($request->filterEmpty){
+                if ($request->filterEmpty) {
                     return $data;
-                }else{
+                } else {
                     return $shipments;
                 }
             }
@@ -484,11 +484,14 @@ class PTShipmentController extends Controller
                 ->join('users', 'ptsubmissions.user_id', '=', 'users.id');
 
             if ($is_part == 1) {
-                $shipmentsResponses = $shipmentsResponses->where('ptsubmissions.lab_id', $user->laboratory_id)
-                    ->where('ptsubmissions.pt_shipements_id', $id);
+                $shipmentsResponses = 
+                    $shipmentsResponses->where('ptsubmissions.lab_id', $user->laboratory_id)
+                    // ->where('ptsubmissions.pt_shipements_id', $id);
+                    ->where('ptsubmissions.id', $id);
             } else {
-                $shipmentsResponses = $shipmentsResponses->where('ptsubmissions.id', $id)
-                    ->where('ptsubmissions.pt_shipements_id', $id);
+                $shipmentsResponses = 
+                    $shipmentsResponses->where('ptsubmissions.id', $id);
+                    // ->where('ptsubmissions.pt_shipements_id', $id);
             }
 
             $shipmentsResponses = $shipmentsResponses->get([
@@ -515,10 +518,11 @@ class PTShipmentController extends Controller
 
             //  one
             $shipmentsRefResult = DB::table("pt_shipements")->distinct()
-                ->join('laboratory_pt_shipement', 'laboratory_pt_shipement.pt_shipement_id', '=', 'pt_shipements.id')
-                ->join('pt_panels', 'pt_panels.id', '=', 'laboratory_pt_shipement.pt_panel_id')
-                ->join('pt_samples', 'pt_samples.ptpanel_id', '=', 'pt_panels.id')
-                ->where('pt_shipements.id', $id);
+            ->join('ptsubmissions', 'ptsubmissions.pt_shipements_id', '=', 'pt_shipements.id')
+            ->join('laboratory_pt_shipement', 'laboratory_pt_shipement.pt_shipement_id', '=', 'pt_shipements.id')
+            ->join('pt_panels', 'pt_panels.id', '=', 'laboratory_pt_shipement.pt_panel_id')
+            ->join('pt_samples', 'pt_samples.ptpanel_id', '=', 'pt_panels.id')
+            ->where('ptsubmissions.id', $id);
 
             $shipmentsRefResult = $shipmentsRefResult->get([
                 "pt_samples.reference_result as reference_result",
@@ -555,21 +559,28 @@ class PTShipmentController extends Controller
 
 
             $dataPayload = [];
-            // Log::info('shipmentsResponsesRlt::::'.json_encode($shipmentsResponsesRlt));
-            // Log::info('shipmentsRefResult::::'.json_encode($shipmentsRefResult));
-            foreach ($shipmentsResponsesRlt as $rslt) {
-                // find the reference result
-                $refResult = $shipmentsRefResult->where('ref_panel_id', $rslt->panel_id)->where('sample_name', $rslt->sample_name)->first();
-                if ($refResult) {
-                    $data = [];
-                    $data['sample_name'] = $refResult->sample_name;
-                    $data['reference_result'] = $refResult->reference_result;
-                    $data['control_line'] = $rslt->control_line ?? null;
-                    $data['verification_line'] = $rslt->verification_line ?? null;
-                    $data['longterm_line'] = $rslt->longterm_line ?? null;
-                    $data['result_interpretation'] = $rslt->result_interpretation;
-                    $dataPayload[] = $data;
+            // Log::info("\r\n\r\n<--------------------------------------");
+            // Log::info("shipmentsRefResult::::  " . json_encode($shipmentsRefResult));
+            // Log::info("shipmentsResponsesRlt::::  " . json_encode($shipmentsResponsesRlt));
+            // Log::info("--------------------------------------/>\r\n\r\n");
+
+            if ($shipmentsResponsesRlt) {
+                foreach ($shipmentsResponsesRlt as $rslt) {
+                    // find the reference result
+                    $refResult = $shipmentsRefResult->where('ref_panel_id', $rslt->panel_id)->where('sample_name', $rslt->sample_name)->first();
+                    if ($refResult) {
+                        $data = [];
+                        $data['sample_name'] = $refResult->sample_name;
+                        $data['reference_result'] = $refResult->reference_result;
+                        $data['control_line'] = $rslt->control_line ?? null;
+                        $data['verification_line'] = $rslt->verification_line ?? null;
+                        $data['longterm_line'] = $rslt->longterm_line ?? null;
+                        $data['result_interpretation'] = $rslt->result_interpretation;
+                        $dataPayload[] = $data;
+                    }
                 }
+            } else {
+                $dataPayload = [];
             }
 
             return [
