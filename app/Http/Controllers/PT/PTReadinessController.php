@@ -4,6 +4,7 @@ namespace App\Http\Controllers\PT;
 
 use App\Http\Controllers\Controller;
 use App\Laboratory;
+use App\Lot;
 use App\Readiness;
 use App\ReadinessApproval;
 use App\ReadinessQuestion;
@@ -28,8 +29,8 @@ class PTReadinessController extends Controller
     public function saveReadiness(Request $request)
     {
         try {
-
             $user = Auth::user();
+
             $checklist = Readiness::where('name', $request->readiness['name'])->get();
             if (count($checklist) > 0) {
                 return response()->json(['Message' => 'Error during creating Checklist. Checklist name already exist '], 500);
@@ -47,7 +48,6 @@ class PTReadinessController extends Controller
             foreach ($request->readiness['readiness_questions'] as $questionItem) {
                 if ($questionItem != null) {
                     $readinessQuestion = new ReadinessQuestion();
-
                     $readinessQuestion->question = $questionItem['question'];
                     $readinessQuestion->answer_options = $questionItem['answer_options'];
                     $readinessQuestion->answer_type = $questionItem['answer_type'];
@@ -63,6 +63,70 @@ class PTReadinessController extends Controller
 
             // Save laboratiories
             $readiness->laboratories()->attach($request->readiness['participants']);
+
+            // Save lots
+            //////////////
+
+
+            // // create lots with the participants
+            // step 1: get all the participants
+            $participants = [];
+            foreach ($request->readiness['participants'] as $participant) {
+                $lab = Laboratory::find($participant);
+                $lab_participants = $lab->participants();
+                foreach ($lab_participants as $lab_participant) {
+                    $participants[] = [
+                        'user_id' => $lab_participant->id,
+                        'user_name' => $lab_participant->name . ' - ' . $lab_participant->second_name,
+                        'lab_id' => $lab->id,
+                        'lab_name' => $lab->lab_name,
+                    ];
+                }
+            }
+            // dd(json_encode($participants));
+
+            // step 2: randomize the order of the participants
+            $randomized_participants = $participants;
+            shuffle($randomized_participants);
+            // dd(json_encode($randomized_participants));
+
+            // divide the participants into groups
+            // the groups have to be as equal as possible but of any size
+            // the number of groups must not be more than 5
+            $groups = [];
+            $group_size = ceil(count($randomized_participants) / 5);
+            $group = [];
+            $group_count = 0;
+            foreach ($randomized_participants as $participant) {
+                $group[] = $participant;
+                if (count($group) == $group_size) {
+                    $groups[] = $group;
+                    $group = [];
+                    $group_count++;
+                }
+            }
+            if (count($group) > 0) {
+                $groups[] = $group;
+            }
+
+            // step 3: create the lots
+            foreach ($groups as $key => $group) {
+                try {
+                    $lot = new Lot();
+                    $lot->name = "Lot " . ($key + 1) . " ( Readiness: " . $readiness->name . " )";
+                    // pluck the user ids from the group
+                    $user_ids = array_column($group, 'user_id');
+                    $lot->participant_ids = json_encode($user_ids);
+                    $lot->readiness_id = $readiness->id;
+                    $lot->created_by = $user->id;
+                    $lot->save();
+                } catch (Exception $e) {
+                    Log::error($e->getMessage());
+                    return response()->json(['Message' => 'Error during creating Checklist Lots' . $e->getMessage()], 500);
+                }
+            }
+            //////////////
+
             return response()->json(['Message' => 'Created successfully'], 200);
         } catch (Exception $ex) {
             return response()->json(['Message' => 'Could not save the checklist ' . $ex->getMessage()], 500);
@@ -165,7 +229,7 @@ class PTReadinessController extends Controller
         try {
             $include_submitted = (isset($request->get_all) || $request->get_all == 1) ? true : false;
             // SELECT readiness_id FROM rtript.pt_shipements where readiness_id is not null
-            if($include_submitted){
+            if ($include_submitted) {
                 $readinesses = Readiness::select(
                     "readinesses.id",
                     "readinesses.name",
@@ -177,7 +241,7 @@ class PTReadinessController extends Controller
                     ->groupBy('laboratory_readiness.readiness_id')
                     ->orderBy('last_update', 'DESC')
                     ->get();
-            }else{
+            } else {
                 $readinesses = Readiness::select(
                     "readinesses.id",
                     "readinesses.name",

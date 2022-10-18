@@ -67,8 +67,8 @@ require('../../node_modules/jquery.easing/jquery.easing.min.js');
 // lots
 require('./user/pt/lots/ListLots');
 require('./user/pt/lots/LotParticipants');
-require('./user/pt/lots/AddLot');
-require('./user/pt/lots/EditLot');
+// require('./user/pt/lots/AddLot');
+// require('./user/pt/lots/EditLot');
 require('./user/pt/lots/ViewLot');
 
 // panels

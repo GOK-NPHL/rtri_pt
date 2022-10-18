@@ -70,7 +70,7 @@ class ListLots extends React.Component {
                 tableElem.push(<tr key={index}>
                     <th scope="row">{index + 1}</th>
                     <td>{element.name}</td>
-                    <td>{element.ending_ids}</td>
+                    {/* <td>{element.ending_ids}</td> */}
                     <td className='text-center'>{element?.participant_count || 0 }</td>
                     <td>{element?.readiness_name || element.readiness_id}</td>
                     <td>{element.created_at ? new Date(element.created_at).toLocaleString() : '-'}</td>
@@ -87,7 +87,7 @@ class ListLots extends React.Component {
                                 className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm text-white">
                                 <i className="fas fa-file"></i> View participants
                             </a>
-                            <a
+                            {/* <a
                                 onClick={
                                     () => {
                                         window.location.assign('/lots/edit/' + element.id)
@@ -96,8 +96,9 @@ class ListLots extends React.Component {
                                 data-toggle="tooltip" data-placement="top" title="Edit Lot"
                                 className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm text-white">
                                 <i className="fas fa-edit"></i> Edit
-                            </a>&nbsp;
-                            <a
+                            </a> */}
+                            &nbsp;
+                            {/* <a
                                 onClick={
                                     (ev) => {
                                         ev.preventDefault();
@@ -114,7 +115,7 @@ class ListLots extends React.Component {
                                 data-toggle="tooltip" data-placement="top" title="Delete Lot"
                                 className="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm text-white">
                                 <i className="fas fa-trash"></i> Delete
-                            </a>
+                            </a> */}
 
                         </td>
                     }
@@ -135,7 +136,7 @@ class ListLots extends React.Component {
         let pageContent = <div id='user_table' className='row'>
             <div className="col-sm-12 mb-3 mt-3">
                 <h3 className="float-left">Lots</h3>
-                <a style={{ "color": "white" }} type="button" href="lots/new" className="btn btn-info float-right">Add Lot</a>
+                {/* <a style={{ "color": "white" }} type="button" href="lots/new" className="btn btn-info float-right">Add Lot</a> */}
             </div>
             <div className='col-sm-12 col-md-12'>
                 <div className="form-group mb-2">
@@ -157,7 +158,7 @@ class ListLots extends React.Component {
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Lot Name</th>
-                            <th scope="col">Ending IDs</th>
+                            {/* <th scope="col">Ending IDs</th> */}
                             <th scope="col">No. of participants</th>
                             <th scope="col">Readiness Checklist</th>
                             <th scope="col">Created on</th>

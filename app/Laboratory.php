@@ -38,4 +38,10 @@ class Laboratory extends Model
     {
         return $this->belongsToMany('App\Readiness');
     }
+
+    public function participants()
+    {
+        $users = User::where('laboratory_id', $this->id)->get();
+        return $users;
+    }
 }

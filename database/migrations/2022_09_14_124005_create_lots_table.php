@@ -18,7 +18,8 @@ class CreateLotsTable extends Migration
             $table->string('name');
             $table->integer('readiness_id');
             // $table->integer('lot');
-            $table->string('ending_ids');
+            // $table->string('ending_ids');
+            $table->json('participant_ids');
             $table->integer('created_by');
             $table->timestamps();
             $table->softDeletes();

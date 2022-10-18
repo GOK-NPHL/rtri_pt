@@ -51,7 +51,7 @@ class LotController extends Controller
         foreach ($lots as $lot) {
             $lot->participant_count = count($lot->participants());
             $lr = $lot->readiness();
-            if($lr){
+            if ($lr) {
                 $lot->readiness_name = $lr->name;
             }
         }
@@ -68,7 +68,7 @@ class LotController extends Controller
         foreach ($lots as $lot) {
             $lot->participant_count = count($lot->participants());
             $lr = $lot->readiness();
-            if($lr){
+            if ($lr) {
                 $lot->readiness_name = $lr->name;
             }
         }
@@ -82,27 +82,32 @@ class LotController extends Controller
 
         // add laboratory info
         foreach ($pcpts as $pcpt) {
-            if($pcpt['laboratory_id'] != null){
+            if ($pcpt['laboratory_id'] != null) {
                 $pc_lab = Laboratory::where('id', $pcpt['laboratory_id'])->first();
-                if($pc_lab != null){
+                if ($pc_lab != null) {
                     $pcpt['lab_name'] = $pc_lab->lab_name;
                     $pcpt['mfl_code'] = $pc_lab->mfl_code;
                 }
             }
             $participants[] = $pcpt;
         }
-        
+
         return response()->json($participants);
     }
     public function createLot(Request $request)
     {
-        $lot = Lot::create([
-            'name' => $request->name,
-            'readiness_id' => $request->readiness_id,
-            // 'lot' => $request->lot,
-            'ending_ids' => $request->ending_ids,
-            'created_by' => $request->created_by ?? Auth::user()->id,
-        ]);
+        $lot = new Lot();
+        $lot->name = $request->name;
+        $lot->readiness_id = $request->readiness_id;
+        if ($request->participant_ids != null) {
+            if (is_string($request->participant_ids)) {
+                $lot->participant_ids = json_decode($request->participant_ids);
+            } else {
+                $lot->participant_ids = $request->participant_ids;
+            }
+        }
+        $lot->created_by = $request->created_by ?? Auth::user()->id;
+        $lot->save();
         return response()->json($lot);
     }
 
@@ -113,7 +118,14 @@ class LotController extends Controller
             $lot->name = $request->name;
             $lot->readiness_id = $request->readiness_id;
             // $lot->lot = $request->lot;
-            $lot->ending_ids = $request->ending_ids;
+            // $lot->ending_ids = $request->ending_ids;
+            if ($request->participant_ids != null) {
+                if (is_string($request->participant_ids)) {
+                    $lot->participant_ids = json_decode($request->participant_ids);
+                } else {
+                    $lot->participant_ids = $request->participant_ids;
+                }
+            }
             $lot->created_by = $request->created_by;
             $lot->save();
             return response()->json($lot);
