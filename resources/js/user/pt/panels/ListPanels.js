@@ -190,6 +190,7 @@ export default ListPanels;
 
 if (document.getElementById('list_panels_page')) {
     ReactDOM.render(<ListPanels />, document.getElementById('list_panels_page'));
-}else{
-    console.log('list_panels_page not found');
 }
+// else{
+//     console.log('list_panels_page not found');
+// }
