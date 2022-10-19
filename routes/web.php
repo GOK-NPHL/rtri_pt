@@ -119,14 +119,23 @@ Route::prefix('access-management')->group(function () {
 
 /// Lots CRUD
 Route::get('lots', [LotController::class, 'index'])->name('lots');
+Route::get('pt_lots', [LotController::class, 'index'])->name('lots');
 Route::get('lots/new', [LotController::class, 'create'])->name('new-lot');
+Route::get('pt_lots/new', [LotController::class, 'create'])->name('new-lot');
 Route::get('lots/{lotId}', [LotController::class, 'show'])->name('view-lot');
+Route::get('pt_lots/{lotId}', [LotController::class, 'show'])->name('view-lot');
 Route::get('lots/{lotId}/participants', [LotController::class, 'show_participants'])->name('view-lot-participants');
+Route::get('pt_lots/{lotId}/participants', [LotController::class, 'show_participants'])->name('view-lot-participants');
 Route::get('lots/edit/{lotId}', [LotController::class, 'edit'])->name('edit-lot');
+Route::get('pt_lots/edit/{lotId}', [LotController::class, 'edit'])->name('edit-lot');
 ///////
 
 // Panels CRUD
 Route::get('panels', [PtPanelController::class, 'index'])->name('panels');
+Route::get('pt_panels', [PtPanelController::class, 'index'])->name('panels');
 Route::get('panels/new', [PtPanelController::class, 'create'])->name('new-panel');
+Route::get('pt_panels/new', [PtPanelController::class, 'create'])->name('new-panel');
 Route::get('panels/{panelId}', [PtPanelController::class, 'show'])->name('view-panel');
+Route::get('pt_panels/{panelId}', [PtPanelController::class, 'show'])->name('view-panel');
 Route::get('panels/edit/{panelId}', [PtPanelController::class, 'edit'])->name('edit-panel');
+Route::get('pt_panels/edit/{panelId}', [PtPanelController::class, 'edit'])->name('edit-panel');
