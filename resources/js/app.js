@@ -64,15 +64,15 @@ require('../../node_modules/@fortawesome/fontawesome-free/js/fontawesome.js');
 
 require('../../node_modules/jquery.easing/jquery.easing.min.js');
 
+// panels
+require('./user/pt/panels/ListPanels');
+require('./user/pt/panels/AddPanel');
+require('./user/pt/panels/EditPanel');
+require('./user/pt/panels/ViewPanel');
+
 // lots
 require('./user/pt/lots/ListLots');
 require('./user/pt/lots/LotParticipants');
 // require('./user/pt/lots/AddLot');
 // require('./user/pt/lots/EditLot');
 require('./user/pt/lots/ViewLot');
-
-// panels
-require('./user/pt/panels/ListPanels');
-require('./user/pt/panels/AddPanel');
-require('./user/pt/panels/EditPanel');
-require('./user/pt/panels/ViewPanel');

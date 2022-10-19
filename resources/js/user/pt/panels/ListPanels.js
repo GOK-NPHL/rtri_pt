@@ -188,6 +188,8 @@ class ListPanels extends React.Component {
 
 export default ListPanels;
 
-if (document.getElementById('list_panels')) {
-    ReactDOM.render(<ListPanels />, document.getElementById('list_panels'));
+if (document.getElementById('list_panels_page')) {
+    ReactDOM.render(<ListPanels />, document.getElementById('list_panels_page'));
+}else{
+    console.log('list_panels_page not found');
 }
