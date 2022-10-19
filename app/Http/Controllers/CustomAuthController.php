@@ -112,14 +112,14 @@ class CustomAuthController extends Controller
             $user = new User;
             $user->name = $request->fname;
             $user->second_name = $request->lname;
-            $user->laboratory_id = Laboratory::where('institute_name', 'like', '%demo%')->first()->id ?? 8;
+            $user->laboratory_id = 1;//Laboratory::where('institute_name', 'like', '%demo%')->first()->id ?? 8;
             $user->email = $request->email;
             $user->phone_number = $request->phone;
             $user->password = FacadesHash::make($request->password);
             $user->is_active = 1;
             $user->has_qc_access = 1;
             $user->has_pt_access = 1;
-            $user->roles = [UserRole::where('slug', 'like', '%guest%')->first()->id];
+            $user->roles = null;//[UserRole::where('slug', 'like', '%participant%')->first()->id];
             $user->save();
             return redirect()->route('participant-login')->with('success', 'User created successfully. Please wait for administrator to activate your account.');
         } catch (\Exception $e) {
