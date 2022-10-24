@@ -209,7 +209,7 @@ class PTPerformanceReport extends React.Component {
                                     </tr>
                                     <tr>
                                         <td style={paragraphStyle} colSpan={totalTableLength}>
-                                            <strong>Expert comment:</strong> Thank you for participating in KNEQAS HIV Recency PT.
+                                            <strong>Expert comment:</strong> Thank you for participating in NPHL-NHRL RTRI-PT.
                                             Your overall performance: Your EQA performance is <strong>
                                                 {Math.round((passedScore / totalSamples) * 100)}&#37; {Math.round((passedScore / totalSamples) * 100) >= this.state.passMark ? 'ACCEPATBLE' : 'UNACCEPATBE'}
                                                 </strong>. The
@@ -325,7 +325,7 @@ class PTPerformanceReport extends React.Component {
                                     <tr>
                                         <td colSpan={3} style={{ padding: '14px 0 0' }} >
                                             <div style={{ borderTop: '1px solid #ccc', padding: '3px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                <span>MOH/DLS/NPHL/KNEQAS/HIV-RTRI/F/01</span>
+                                                <span>MOH/DLS/NPHL/NHRL/HIV-RTRI/F/01</span>
                                                 <span>Version <strong>1.1.0</strong></span>
                                                 <span>Effective date: <strong>{new Date().toLocaleDateString('en-GB')}</strong></span>
                                             </div>

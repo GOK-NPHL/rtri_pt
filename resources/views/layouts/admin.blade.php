@@ -62,7 +62,7 @@ use Illuminate\Support\Facades\Gate;
         <div style="background-color: #2c3e50;" style="width: 100%;">
             <div class="container-fluid">
                 <nav style="background-color: #2c3e50 !important; max-width: 100%;" class="navbar navbar-expand-md navbar-light bg-light">
-                    <a class="navbar-brand" href="{{route('admin-home')}}">KNEQAS PT</a>
+                    <a class="navbar-brand" href="{{route('admin-home')}}">NPHL-NHRL RTRI-PT</a>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
@@ -186,8 +186,8 @@ use Illuminate\Support\Facades\Gate;
         <footer class="m-footer pl-3 pr-3" style="background-color: white;">
             <strong>Copyright &copy; 2014- <script>
                     document.write(new Date().getFullYear());
-                </script> <a href="https://nphl.go.ke/">NPHL KNEQAS -QC/PT</a>.</strong>
-            All rights reserved. | <a href="http://helpdesk.nphl.go.ke/">Recency QC/PT HELP DESK</a>
+                </script> <a href="https://nphl.go.ke/">NPHL-NHRL Recency PT</a>.</strong>
+            All rights reserved. | <a href="http://helpdesk.nphl.go.ke/">HIV Recency QC/PT HELP DESK</a>
             <div class="float-right d-none d-sm-inline-block">
                 <b>Version</b> 1.0.0
             </div>

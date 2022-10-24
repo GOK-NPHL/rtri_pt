@@ -4,7 +4,7 @@
 <div style="background-color: #2c3e50 !important; width: 100%;" class="px-5">
     <nav style="background-color: #2c3e50 !important; border-color: #202d3b;" class="navbar navbar-light bg-light  justify-content-between">
         <a href="{{ route('index') }}" style="color: white;" class="navbar-brand">
-            <h4>KNEQAS EQA</h4>
+            <h4>NPHL NHRL Recency PT</h4>
         </a>
         <form class="form-inline">
 
@@ -25,7 +25,7 @@
                 <img style="max-height: 120px;" src="{{asset('images/nphl-logo-2.png')}}" />
 
                 <div class="mt-2">
-                    <h2 style="color: black;">KNEQAS PT System <p class="mt-4"> Administrative Login</p>
+                    <h2 style="color: black;">NPHL-NHRL RTRI-PT System <p class="mt-4"> Administrative Login</p>
                     </h2>
                 </div>
 
