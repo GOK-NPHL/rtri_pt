@@ -129,3 +129,12 @@ Distributed under the GPL-3.0 License. See `LICENSE` for more information.
 1. Admin sends readiness checklists to lab
 2. Lab admin receives checklist and fills it on behalf of the lab & its staff & sends it back to admin
 3. Admin receives checklist and from the labs that qualify, it divides them into random lots based on their IDs
+
+
+# TODO:
+- Rename Lab administrator to lab manager
+- Check is_required flag in checklist qns
+- Add an option to specify the number of lots to split the users into
+- Add a table to show all users in a round and their respective lots
+- Lab mgr - add an table/report for overall lab performance and individual user performance
+- Email notifications
