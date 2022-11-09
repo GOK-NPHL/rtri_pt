@@ -51,14 +51,14 @@ class AuthServiceProvider extends ServiceProvider
         // lab manager
         Gate::define(SystemAuthorities::$authorities['lab_manager'], function ($user) {
             $curUser = Auth::user();
-            $lab_mgr_role = UserRole::where('slug', 'like', '%lab_admin%')->orWhere('slug', 'like', '%lab_manager%')->first()->id;
+            $lab_mgr_role = UserRole::where('slug', 'like', '%lab_manager%')->first()->id;
             // check if roles array in user table contains lab manager role
             // if (in_array($lab_mgr_role, json_decode($curUser->roles))) {
             $useroles = $curUser->roles;
             if (is_string($useroles)) {
                 $useroles = json_decode($useroles);
             }
-            if (in_array($lab_mgr_role, $useroles)) {
+            if (isset($useroles) && in_array($lab_mgr_role, $useroles)) {
                 return true;
             } else {
                 return false;
@@ -75,7 +75,7 @@ class AuthServiceProvider extends ServiceProvider
             if (is_string($useroles)) {
                 $useroles = json_decode($useroles);
             }
-            if (in_array($participant_role, $useroles)) {
+            if (isset($useroles) && in_array($participant_role, $useroles)) {
                 return true;
             } else {
                 return false;
@@ -92,7 +92,7 @@ class AuthServiceProvider extends ServiceProvider
             if (is_string($useroles)) {
                 $useroles = json_decode($useroles);
             }
-            if (in_array($admin_role, $useroles)) {
+            if (isset($useroles) && in_array($admin_role, $useroles)) {
                 return true;
             } else {
                 return false;
@@ -109,7 +109,7 @@ class AuthServiceProvider extends ServiceProvider
             if (is_string($useroles)) {
                 $useroles = json_decode($useroles);
             }
-            if (in_array($guest_role, $useroles)) {
+            if (in_array(isset($useroles) && $guest_role, $useroles)) {
                 return true;
             } else {
                 return false;

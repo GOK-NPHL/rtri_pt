@@ -20,9 +20,9 @@ class UserRoleSeeder extends Seeder
                 'permissions' => json_encode([])
             ),
             array(
-                'name' => 'Lab Administrator',
+                'name' => 'Lab Manager',
                 'is_active' => true,
-                'slug' => 'lab_administrator',
+                'slug' => 'lab_manager',
                 'permissions' => json_encode([
                     'add_user',
                     'edit_user',

@@ -35,7 +35,7 @@ class CustomAuthController extends Controller
     }
     public function getParticipantSignupPage()
     {
-        return view('auth.participant_signup');
+        return view('auth.participant_signup', ['laboratories' => Laboratory::all()]);
     }
 
     public function doLogin(Request $request)
@@ -83,6 +83,7 @@ class CustomAuthController extends Controller
             'fname' => 'required',
             'lname' => 'required',
             'email' => 'required',
+            'laboratory' => 'required',
             'password' => 'required',
             'password_repeat' => 'required'
         ]);
@@ -112,16 +113,17 @@ class CustomAuthController extends Controller
             $user = new User;
             $user->name = $request->fname;
             $user->second_name = $request->lname;
-            $user->laboratory_id = 1;//Laboratory::where('institute_name', 'like', '%demo%')->first()->id ?? 8;
+            // $user->laboratory_id = 1;//Laboratory::where('institute_name', 'like', '%demo%')->first()->id ?? 8;
+            $user->laboratory_id = $request->laboratory;
             $user->email = $request->email;
             $user->phone_number = $request->phone;
             $user->password = FacadesHash::make($request->password);
             $user->is_active = 1;
             $user->has_qc_access = 1;
             $user->has_pt_access = 1;
-            $user->roles = null;//[UserRole::where('slug', 'like', '%participant%')->first()->id];
+            $user->roles = [UserRole::where('slug', 'like', '%participant%')->first()->id];
             $user->save();
-            return redirect()->route('participant-login')->with('success', 'User created successfully. Please wait for administrator to activate your account.');
+            return redirect()->route('participant-login')->with('success', 'Account created successfully.');
         } catch (\Exception $e) {
             // show log if env is development
             $msg = 'Error creating user';

@@ -98,8 +98,11 @@
 
                 <div style="margin-top: 30px;" class="text-center">
                     <div class="clearfix">&nbsp;</div>
-                    <div>
-                        <a style="background-color: purple; color:white" href="{{ route('participant-login') }}" class="btn home-purple btn-lg ">Click to login</a>
+                    <div style="display:flex;flex-direction:column;">
+                        <div>
+                            <a style="background-color: purple; color:white" href="{{ route('participant-login') }}" class="btn home-purple btn-lg ">Click to login</a>
+                        </div>
+                        <a style="color:#ece467; text-decoration:underline;" href="{{ route('participant-signup') }}" class="btn btn-lg">Click to register</a>
                     </div>
                     </p>
                 </div>

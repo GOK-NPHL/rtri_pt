@@ -91,10 +91,11 @@ class PTReadinessController extends Controller
             // dd(json_encode($randomized_participants));
 
             // divide the participants into groups
-            // the groups have to be as equal as possible but of any size
-            // the number of groups must not be more than 5
+            // the groups have to be as equal as possible
+            // the number of groups is the no_lots in the readiness
             $groups = [];
-            $group_size = ceil(count($randomized_participants) / 5);
+            $no_lots = $request->readiness['no_lots'];
+            $group_size = ceil(count($randomized_participants) / $no_lots);
             $group = [];
             $group_count = 0;
             foreach ($randomized_participants as $participant) {
@@ -299,10 +300,13 @@ class PTReadinessController extends Controller
                 ->where('readinesses.id', $request->id)
                 ->get();
 
+            $lots = Lot::where('readiness_id', $request->id)->get();
+
             $response = [];
             $response['readiness'] = $readiness;
             $response['labs'] = $labIds;
             $response['questions'] = $readinessQuestions;
+            $response['lots'] = $lots;
 
             $envelop = [];
             $envelop['payload'] = $response;

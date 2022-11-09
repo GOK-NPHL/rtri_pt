@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { FetchReadnessSurveyById, FetchReadnessSurveyByIdAndLab, SaveSuveyAnswers,ApproveReadinessAnswer } from '../../../components/utils/Helpers';
+import { FetchReadnessSurveyById, FetchReadnessSurveyByIdAndLab, SaveSuveyAnswers, ApproveReadinessAnswer } from '../../../components/utils/Helpers';
 import { matchPath } from "react-router";
 import { v4 as uuidv4 } from 'uuid';
 import ReadinessQuestions from './ReadinessQuestions';
@@ -12,10 +12,12 @@ class Readiness extends React.Component {
         super(props);
         this.state = {
             message: '',
+            alertType: 'info',
             id: '',
             lab_id: '',
             name: '',
             startDate: '',
+            qns: [],
             endDate: '1970-01-01',
             readinessItems: { 'questions': [], 'answers': [] },
             questionsAnswerMap: {},
@@ -58,6 +60,7 @@ class Readiness extends React.Component {
             if (readinessItems.status == 500) {
                 this.setState({
                     message: readinessItems.data.Message,
+                    alertType: 'danger'
                 });
                 $('#readinessFormModal').modal('toggle');
             } else {
@@ -91,6 +94,7 @@ class Readiness extends React.Component {
                     id: readinessId,
                     name: name,
                     lab_id: qstns[0].lab_id,
+                    qns: qstns,
                     startDate: startDate,
                     endDate: endDate,
                     showSaveButton: Date.parse(endDate) > new Date() && isUser,
@@ -114,15 +118,27 @@ class Readiness extends React.Component {
 
     saveAnswers() {
 
-        for (const [key, element] of Object.entries(this.state.questionsAnswerMap)) {
+        console.log('---> this.state.questionsAnswerMap', Object.values(this.state.questionsAnswerMap));
+        console.log('---> this.state.qns', this.state.qns);
+        // for (const [key, element] of Object.entries(this.state.questionsAnswerMap)) {
+        //     if (element == '' || element == null) {
+        //         this.setState({
+        //             message: "Please answer all questions"
+        //         })
+        //         return;
+        //     }
+        // }
 
-            if (element == '' || element == null) {
+        Object.values(this.state.questionsAnswerMap).map((answer, x) => {
+            const qn = this.state.qns[x];
+            if (qn && qn.is_required && (answer == '' || answer == null)) {
                 this.setState({
-                    message: "Please answer all questions"
+                    message: "Please answer all required questions",
+                    alertType: 'danger'
                 })
                 return;
             }
-        }
+        });
 
         let ansqwers = {
             readiness_id: this.state.id,
@@ -151,6 +167,7 @@ class Readiness extends React.Component {
             let response = await ApproveReadinessAnswer(this.state.id, this.state.lab_id);
             this.setState({
                 message: response.data.Message,
+                alertType: 'info'
             });
             $('#readinessFormModal').modal('toggle');
         })();
@@ -166,6 +183,16 @@ class Readiness extends React.Component {
                         <h5 className="card-title">
                             Readiness Checklist Survey Form
                         </h5><br />
+                        {this.state.message && <div className="row">
+                            <div className="col-md-12">
+                                <div className={"alert alert-default-"+this.state.alertType} role="alert">
+                                    {this.state.message}
+                                    <button type="button" className="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>}
                         <hr />
                         <div style={{ "margin": "0 auto", "width": "80%" }} className="text-center">
                             {this.state.isUser ?

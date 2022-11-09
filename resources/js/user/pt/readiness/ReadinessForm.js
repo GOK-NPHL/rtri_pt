@@ -19,6 +19,7 @@ class ReadinessForm extends React.Component {
             endDate: '',
             selected: [],
             askDefaultQuestion: 0,
+            no_lots: 1,
             dualListptions: [],
             readinessQuestions: [],
             readinessItems: [],
@@ -68,6 +69,7 @@ class ReadinessForm extends React.Component {
                         askDefaultQuestion: editData?.payload?.readiness[0]?.ask_default_qn == 1 ? true : false,
                         startDate: editData?.payload?.readiness[0]?.start_date,
                         endDate: editData?.payload?.readiness[0]?.end_date,
+                        no_lots: editData?.payload?.lots.length || 1,
                         selected: editData?.payload?.labs,
                         pageState: 'edit',
                     });
@@ -140,8 +142,8 @@ class ReadinessForm extends React.Component {
                 });
                 console.log('newReadinessQuestions: ', newReadinessQuestions);
                 this.setState({
-                    readinessQuestions: newReadinessQuestions.filter(n=>n!=null),
-                    readinessItems: newReadinessItems.filter(n=>n!=null),
+                    readinessQuestions: newReadinessQuestions.filter(n => n != null),
+                    readinessItems: newReadinessItems.filter(n => n != null),
                     askDefaultQuestion: checked
                 });
             }
@@ -216,7 +218,7 @@ class ReadinessForm extends React.Component {
                 let id = uuidv4();
                 let qstOptins = readiness['answer_options'].split(',');
                 let qstElement =
-                    <div key={id} data-default={readiness?.is_default ? "1": null} className="card">
+                    <div key={id} data-default={readiness?.is_default ? "1" : null} className="card">
                         <div className="card-body">
                             <div className="form-group text-left">
                                 {!readiness.is_default && <a href="#" onClick={
@@ -241,13 +243,13 @@ class ReadinessForm extends React.Component {
                 let questions = this.state.readinessQuestions;
                 questions.push(qstElement);
                 this.setState({
-                    readinessQuestions: questions.filter(n=>n!=null),
-                    readinessItems: rdItems.filter(n=>n!=null)
+                    readinessQuestions: questions.filter(n => n != null),
+                    readinessItems: rdItems.filter(n => n != null)
                 })
             } else if (readiness['answer_type'] == 'number') {
                 let id = uuidv4();
                 let qstElement =
-                    <div key={id} data-default={readiness?.is_default ? "1": null} className="card">
+                    <div key={id} data-default={readiness?.is_default ? "1" : null} className="card">
                         <div className="card-body">
                             <div className="form-group">
                                 <a href="#" onClick={
@@ -288,7 +290,7 @@ class ReadinessForm extends React.Component {
         } else if (readiness['qustion_type'] == 'comment') {
             let id = uuidv4();
             let qstElement =
-                <div className="form-group" data-default={readiness?.is_default ? "1": null}>
+                <div className="form-group" data-default={readiness?.is_default ? "1" : null}>
                     <a href="#" onClick={
                         (event) => {
                             event.preventDefault();
@@ -354,6 +356,7 @@ class ReadinessForm extends React.Component {
                 readiness['participants'] = this.state.selected;
                 readiness['readiness_questions'] = this.state.readinessItems;
                 readiness['ask_default_qn'] = this.state.askDefaultQuestion || false;
+                readiness['no_lots'] = this.state.no_lots || 1;
 
                 let response;
                 if (this.state.pageState == 'edit') {
@@ -373,6 +376,7 @@ class ReadinessForm extends React.Component {
                             selected: [],
                             readinessQuestions: [],
                             readinessItems: [],
+                            no_lots: 1,
                             submitting: false
                         });
                     } else {
@@ -429,7 +433,7 @@ class ReadinessForm extends React.Component {
                             </pre>
                         </details>
                         <hr /> */}
-                        <div style={{ "margin": "0 auto", "width": "80%" }} className="text-center">
+                        <div className="text-center mx-3">
 
                             <div className="form-group row">
                                 <label htmlFor="u_name" className="col-sm-2 col-form-label">Name/Title *</label>
@@ -474,10 +478,24 @@ class ReadinessForm extends React.Component {
                                     />
                                 </div>
                             </div>
+                            <div className="form-row">
+                                <div className="col-sm-2 mb-3">
+                                    <label className="float-left">Create lots *</label><br />
+                                </div>
+                                <div className="col-sm-10 mb-3">
+                                    <p className='text-left mb-0'>The participants in the laboratories picked above will be randomly split into lots.<br />Please specify the <u>number of lots</u> to create.</p>
+                                    <input type="number" className="form-control" id="u_lots" placeholder='Number of lots to create' value={this.state.no_lots || 1} onChange={ev => {
+                                        this.setState({
+                                            no_lots: ev.target.value
+                                        })
+                                    }} />
+                                </div>
+                            </div>
 
                             <div className="form-group row">
-                                <label htmlFor="u_end_date" className="col-sm-6 col-form-label">Ask default readiness question? *</label>
-                                <div className="col-sm-6">
+                                <label htmlFor="u_end_date" className="col-sm-2 col-form-label">Automatic response approval? *</label>
+                                <div className="col-sm-10">
+                                    <p className='text-left mb-0'>By selecting <u>Yes</u> here, you will activate automatic approval of the readiness checklist responses. This means that participants who respond to the default question with a 'Yes' will proceed to enter results, regardless of their other reponses.</p>
                                     <input
                                         type='radio'
                                         name='ask_default_qn'

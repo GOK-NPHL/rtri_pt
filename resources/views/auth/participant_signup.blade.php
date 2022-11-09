@@ -62,6 +62,16 @@
                         </span>
                         @enderror
                     </div>
+                    <!-- laboratory -->
+                    <div class="form-group">
+                        <label for="laboratory" class="uname" data-icon="u"> Laboratory </label>
+                        <select id="laboratory" name="laboratory" class="form-control" title="Please select your laboratory">
+                            <option value="">Select Laboratory</option>
+                            @foreach($laboratories as $laboratory)
+                            <option value="{{ $laboratory->id }}">{{ $laboratory->lab_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="form-group">
                         <label for="password" class="youpasswd" data-icon="p"> Password </label>
 
@@ -86,13 +96,13 @@
                     <div class="box-footer text-center">
                         <input type="submit" class="btn col-md-12 btn-lg btn-info" value="Sign up" />
                         <hr/>
-                        <p>Have an account? <a href="{{route('participant-login')}}">Log in</a></p>
+                        <p>Have an account? <a style="color: #ece467; text-decoration:underline;" href="{{route('participant-login')}}">Log in</a></p>
                     </div>
 
                     <div>
                         <hr/>
                         <div class="form-check text-center">
-                            <p>Your account will need to be approved before you can log in. Please contact the administrator to activate your account.</p>
+                            <!-- <p>Your account will need to be approved before you can log in. Please contact the administrator to activate your account.</p> -->
                             <a style="display: inline-block;" class="btn btn-link" href="http://helpdesk.nphl.go.ke/index.php?a=add">
                                 RTRI HELP DESK
                             </a>
