@@ -135,7 +135,7 @@ Distributed under the GPL-3.0 License. See `LICENSE` for more information.
 - Rename Lab administrator to lab manager - DONE
 - Check is_required flag in checklist qns - DONE
 - Add an option to specify the number of lots to split the users into - DONE
-- Add a table to show all users in a round and their respective lots
+- Add a table to show all users in a round and their respective lots - DONE
 
 - Lab mgr - add an table/report for overall lab performance and individual user performance
 - Email notifications

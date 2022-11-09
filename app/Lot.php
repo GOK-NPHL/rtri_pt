@@ -62,6 +62,11 @@ class Lot extends Model
             $users = User::whereIn('id', $readiness_participants_ids)->where('id', $participant_ids[$i])->get();
             $participants = array_merge($participants, $users->toArray());
         }
+        // get lab for each participant
+        foreach ($participants as $key => $participant) {
+            $lab = Laboratory::where('id', $participant['laboratory_id'])->first();
+            $participants[$key]['lab'] = $lab;
+        }
         return $participants;
     }
 

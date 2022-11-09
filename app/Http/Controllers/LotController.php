@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Laboratory;
 use App\Lot;
 use App\PtPanel;
+use App\Readiness;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,6 +31,10 @@ class LotController extends Controller
     public function show_participants()
     {
         return view('user.pt.lots.index_participants');
+    }
+    public function show_readiness_participants()
+    {
+        return view('user.pt.readiness.list_participants');
     }
 
     public function create()
@@ -64,9 +69,15 @@ class LotController extends Controller
     }
     public function getLotsByReadinessId(Request $request)
     {
+        $readiness = Readiness::where('id', $request->readiness_id)->first();
+        if(!isset($readiness) || $readiness == null){
+            return response()->json(['message' => 'Readiness not found.'], 404);
+        }
         $lots = Lot::where('readiness_id', $request->readiness_id)->get();
         foreach ($lots as $lot) {
             $lot->participant_count = count($lot->participants());
+            $lot->participants = $lot->participants();
+            $lot->readiness = $readiness;
             $lr = $lot->readiness();
             if ($lr) {
                 $lot->readiness_name = $lr->name;

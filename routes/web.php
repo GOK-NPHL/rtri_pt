@@ -125,6 +125,7 @@ Route::get('pt_lots/new', [LotController::class, 'create'])->name('new-lot');
 Route::get('lots/{lotId}', [LotController::class, 'show'])->name('view-lot');
 Route::get('pt_lots/{lotId}', [LotController::class, 'show'])->name('view-lot');
 Route::get('lots/{lotId}/participants', [LotController::class, 'show_participants'])->name('view-lot-participants');
+Route::get('readiness_participants/{readinessId}', [LotController::class, 'show_readiness_participants'])->name('view-lot-participants');
 Route::get('pt_lots/{lotId}/participants', [LotController::class, 'show_participants'])->name('view-lot-participants');
 Route::get('lots/edit/{lotId}', [LotController::class, 'edit'])->name('edit-lot');
 Route::get('pt_lots/edit/{lotId}', [LotController::class, 'edit'])->name('edit-lot');

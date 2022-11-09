@@ -88,6 +88,15 @@ class ListReadiness extends React.Component {
                                 <i className="fas fa-file"></i> View
                             </a>
                             <a
+                                onClick={() => {
+                                    window.location.assign('readiness_participants/' + element.id)
+                                }}
+                                style={{ 'marginRight': '5px' }}
+                                data-toggle="tooltip" data-placement="top" title="View readiness participantd"
+                                className="d-none d-sm-inline-block btn btn-sm btn-default shadow-sm">
+                                <i className="fas fa-file"></i> Participants
+                            </a>
+                            <a
                                 onClick={
                                     () => {
                                         window.location.assign('edit-readiness/' + element.id)
