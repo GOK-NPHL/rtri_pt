@@ -110,6 +110,17 @@ use Illuminate\Support\Facades\Gate;
                                 </p>
                             </a>
                         </li>
+                        <?php
+                        if (Gate::allows('lab_manager')) { ?>
+                        <li class="nav-item has-treeview">
+                            <a href="{{ route('laboratory-users') }}" class="nav-link">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>
+                                    Laboratory staff
+                                </p>
+                            </a>
+                        </li>
+                        <?php } ?>
 
                         <!-- system actions -->
                         <li class="nav-item has-treeview">

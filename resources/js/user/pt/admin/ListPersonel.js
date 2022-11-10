@@ -93,7 +93,11 @@ class ListPersonel extends React.Component {
                     <td style={{textAlign: 'left'}}><small><ul style={{listStyleType:'disc', margin:'0', padding: '0 12px'}}>{
                     (element.roles && element.roles.length>0 && this.state.allRoles.length>0) ? 
                     Array.from(this.state.allRoles, r=>{
-                        if (JSON.parse(element.roles).includes(r.id)) {
+                        let rls = element.roles;
+                        if(typeof rls === 'string'){
+                            rls = JSON.parse(rls);
+                        }
+                        if (rls.includes(r.id)) {
                             return r.name
                         }
                     }).map(x=>{

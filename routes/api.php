@@ -45,6 +45,8 @@ Route::post('create_admin', [AdminAuthController::class, 'create']);
 Route::post('edit_admin', [AdminAuthController::class, 'edit']);
 
 Route::get('/get_participants', [ParticipantController::class, 'getParticipants'])->name('get_participants')->middleware('auth:admin');
+Route::get('/get_laboratory_users', [ParticipantController::class, 'getLabUsers'])->name('get_lab_participants')->middleware('auth');
+Route::put('/switch_account_activity/{user_id}', [ParticipantController::class, 'switchAccountActivity'])->name('switch_account_activity')->middleware('auth');
 Route::get('/get_participant/{id}', [ParticipantController::class, 'getParticipant'])->name('get_participant')->middleware('auth:admin');
 Route::post('/create_participant', [ParticipantController::class, 'createParticipant'])->name('create_participant')->middleware('auth:admin');
 Route::post('edit_participant', [ParticipantController::class, 'editParticipant'])->name('edit_participant')->middleware('auth:admin');
@@ -52,6 +54,7 @@ Route::post('edit_participant', [ParticipantController::class, 'editParticipant'
 Route::get('/get_lab_personel', [ParticipantController::class, 'getLabPersonel'])->name('get_lab_personel')->middleware('auth:admin');
 Route::get('/get_lab_personel/{id}', [ParticipantController::class, 'getLabPersonelById'])->middleware('auth:admin');
 Route::post('/create_lab_personel', [ParticipantController::class, 'createLabPersonel'])->name('create_lab_personel')->middleware('auth:admin');
+Route::post('/create_lab_personel_mgr', [ParticipantController::class, 'createLabPersonelMgr'])->name('create_lab_personel_mgr')->middleware('auth');
 Route::post('/edit_lab_personel', [ParticipantController::class, 'editPersonel'])->name('edit_lab_personel')->middleware('auth:admin');
 
 Route::get('/get_readiness', [PTReadinessController::class, 'getReadiness'])->name('get_readiness')->middleware('auth:admin');

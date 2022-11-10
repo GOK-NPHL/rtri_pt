@@ -78,3 +78,5 @@ require('./user/pt/lots/LotParticipants');
 require('./user/pt/lots/ViewLot');
 
 require('./user/pt/readiness/ListParticipants');
+
+require('./user/pt/participant/ListLabUsers');

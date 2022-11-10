@@ -228,60 +228,62 @@ class Dashboard extends React.Component {
 
             </div>
 
-            <div className="col-sm-12">
-                <hr />
-                {/* <small>
+            {/* <div className="col-sm-12">
+                <small>
                     <details open>
                         <summary>this.state</summary>
                         <pre>
                             {JSON.stringify(this.state.data, null, 2)}
                         </pre>
                     </details>
-                </small> */}
-            </div>
+                </small>
+            </div> */}
 
-            <div className="form-check form-check-inline  mt-2">
-                <input
-                    onClick={() => {
-                        this.setState({
-                            listingName: 'Samples Submitted tests',
-                            listing: 'submitted'
-                        })
-                    }}
-                    defaultChecked={this.state.listing == 'submitted'}
-                    className="form-check-input" type="radio"
-                    name="inlineRadioOptions" id="inlineRadio2" value="option2" />
-                <label className="form-check-label" htmlFor="inlineRadio2">View submitted results</label>
-            </div>
+            <div className="col-md-12 p-2 mb-2" style={{ borderBottom: '1px solid #b1cfee' }}>
+                <div className="form-check form-check-inline  mt-2">
+                    <input
+                        onClick={() => {
+                            this.setState({
+                                listingName: 'Samples Submitted tests',
+                                listing: 'submitted'
+                            })
+                        }}
+                        defaultChecked={this.state.listing == 'submitted'}
+                        className="form-check-input" style={{ opacity: 0 }} type="radio"
+                        name="inlineRadioOptions" id="inlineRadio2" value="option2" />
+                    <label className={"form-check-label p-2 " + (this.state.listing == 'submitted' ? ' bg-primary rounded' : '')} htmlFor="inlineRadio2">View submitted results</label>
+                </div>
 
-            <div className="form-check form-check-inline pl-2 mt-2">
-                <input
-                    onClick={() => {
-                        this.setState({
-                            listingName: 'Samples Pending tests',
-                            listing: 'pending',
-                        })
-                    }}
-                    defaultChecked={this.state.listing == 'pending'} className="form-check-input"
-                    type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" />
-                <label className="form-check-label" htmlFor="inlineRadio1">View pending submissions</label>
-            </div>
-
-            {/* Readiness */}
-            {/* check if user is lab manager in Gate */}
-            {this.state.userPermissions && Object.keys(this.state.userPermissions).includes('lab_manager') && this.state.userPermissions.lab_manager === true &&
                 <div className="form-check form-check-inline pl-2 mt-2">
                     <input
                         onClick={() => {
                             this.setState({
-                                listingName: 'Readiness Survey List',
-                                listing: 'readiness',
+                                listingName: 'Samples Pending tests',
+                                listing: 'pending',
                             })
                         }}
-                        defaultChecked={this.state.listing == 'readiness'} className="form-check-input"
-                        type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3" />
-                    <label className="form-check-label" htmlFor="inlineRadio3">View readiness</label>
-                </div>}
+                        defaultChecked={this.state.listing == 'pending'} className="form-check-input" style={{ opacity: 0 }}
+                        type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" />
+                    <label className={"form-check-label p-2 " + (this.state.listing == 'pending' ? ' bg-primary rounded' : '')} htmlFor="inlineRadio1">View pending submissions</label>
+                </div>
+
+
+                {/* Readiness */}
+                {/* check if user is lab manager in Gate */}
+                {this.state.userPermissions && Object.keys(this.state.userPermissions).includes('lab_manager') && this.state.userPermissions.lab_manager === true &&
+                    <div className="form-check form-check-inline pl-2 mt-2">
+                        <input
+                            onClick={() => {
+                                this.setState({
+                                    listingName: 'Readiness Survey List',
+                                    listing: 'readiness',
+                                })
+                            }}
+                            defaultChecked={this.state.listing == 'readiness'} className="form-check-input" style={{ opacity: 0 }}
+                            type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3" />
+                        <label className={"form-check-label p-2 " + (this.state.listing == 'readiness' ? ' bg-primary rounded' : '')} htmlFor="inlineRadio3">View readiness</label>
+                    </div>}
+            </div>
 
         </div>
 

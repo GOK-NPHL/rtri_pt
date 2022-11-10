@@ -45,6 +45,7 @@ Route::post('custom-registration', [CustomAuthController::class, 'customRegistra
 Route::get('logout', [CustomAuthController::class, 'signOut'])->name('logout');
 Route::get('participant-pt-demographics', [QCParticipantController::class, 'participantDemographicsPage'])->name('participant-pt-demographics')->middleware('auth');
 Route::get('participant-pt-reports', [QCParticipantController::class, 'participantPTReportPage'])->name('participant-pt-reports')->middleware('auth');
+Route::get('laboratory-users', [QCParticipantController::class, 'labUsers'])->name('laboratory-users')->middleware('auth');
 
 Route::get('participant-home', [QCParticipantController::class, 'participantHome'])->name('participant-home')->middleware('auth');
 Route::get('participant-pt-home', [QCParticipantController::class, 'participantPTHome'])->name('participant-pt-home')->middleware('auth');;

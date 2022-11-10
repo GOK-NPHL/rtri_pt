@@ -40,6 +40,14 @@ class QCParticipantController extends Controller
             return view('user.general.dashboard');
         }
     }
+    public function labUsers()
+    {
+        if (Gate::allows('view_pt_component')) {
+            return view('user.pt.participant.list_users');
+        } else {
+            return view('user.general.dashboard');
+        }
+    }
 
     public function participantDemographicsPage()
     {

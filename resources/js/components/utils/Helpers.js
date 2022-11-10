@@ -59,6 +59,30 @@ export async function FetchUserSamples() {
     }
 
 }
+export async function FetchLabUsers() {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_laboratory_users`);
+        const responseData = response.data;
+        return responseData;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+
+}
+
+export async function SwitchAccountActivity(id) {
+    // put request to switch account activity
+    try {
+        const response = await axios.put(`${settings.serverBaseApi}/switch_account_activity/${id}`);
+        const responseData = response.data;
+        return responseData;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+}
 
 export async function FetchSampleResponseResultById(id) {
 
@@ -334,6 +358,22 @@ export async function SaveLabPersonel(personel) {
         const response = await axios({
             method: 'post',
             url: `${settings.serverBaseApi}/create_lab_personel`,
+            data: {
+                personel: personel,
+            }
+        });
+        return response;
+    } catch (err) {
+        // Handle Error Here
+        console.log(err);
+        return err.response
+    }
+}
+export async function SaveLabPersonelMgr(personel) {
+    try {
+        const response = await axios({
+            method: 'post',
+            url: `${settings.serverBaseApi}/create_lab_personel_mgr`,
             data: {
                 personel: personel,
             }

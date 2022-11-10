@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Laboratory;
 use App\User;
+use App\UserRole;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
 class ParticipantController extends Controller
@@ -18,6 +20,48 @@ class ParticipantController extends Controller
             return Laboratory::all();
         } catch (Exception $ex) {
             return response()->json(['Message' => 'Could fetch participants: ' . $ex->getMessage()], 500);
+        }
+    }
+    public function getLabUsers(Request $request)
+    {
+        try {
+            // check lab manager role
+            $user = Auth::user();
+            if( Gate::allows('lab_manager') ) {
+                $lab = Laboratory::where('id', $user->laboratory_id)->first();
+                $participants = $lab->participants();
+                foreach ($participants as $participant) {
+                    $prs = $participant['roles'];
+                    if($prs !== null){
+                        if( is_string($prs) ) $prs = json_decode($prs);
+                        $participant['roles'] = UserRole::whereIn('id', $prs)->get();
+                    }
+                }
+                return [
+                    'lab' => $lab,
+                    'participants' => $participants
+                ];
+            } else {
+                return response()->json(['Message' => 'You are not authorized to view this page'], 401);
+            }
+        } catch (Exception $ex) {
+            return response()->json(['Message' => 'Could fetch participants: ' . $ex->getMessage()], 500);
+        }
+    }
+
+    public function switchAccountActivity(Request $request)
+    {
+        try {
+            $user = User::where('id', $request->user_id)->first();
+            if ($user->is_active == 1) {
+                $user->is_active = 0;
+            } else {
+                $user->is_active = 1;
+            }
+            $user->save();
+            return response()->json(['Message' => 'Account status updated successfully'], 200);
+        } catch (Exception $ex) {
+            return response()->json(['Message' => 'Could not update account status: ' . $ex->getMessage()], 500);
         }
     }
 
@@ -91,6 +135,42 @@ class ParticipantController extends Controller
 
             // resave roles
             $user->roles = json_encode($request->personel['roles']);
+            $lab->personel()->save($user);
+
+            return response()->json(['Message' => 'Created successfully'], 200);
+        } catch (Exception $ex) {
+            return response()->json(['Message' => 'Could not save lab personel: ' . $ex->getMessage()], 500);
+        }
+    }
+    public function createLabPersonelMgr(Request $request)
+    {
+        $user = Auth::user();
+        $lab_id = $user->laboratory_id;
+        try {
+            $roles = [UserRole::where('name', 'like', '%participant%')->first()->id];
+            if($request->personel['role']) {
+                if($request->personel['role'] == 'participant') {
+                    $roles = [UserRole::where('name', 'like', '%participant%')->first()->id];
+                } else if($request->personel['role'] == 'lab_manager') {
+                    $roles = [UserRole::where('name', 'like', '%lab_manager%')->first()->id];
+                }
+            }
+            $user = new User([
+                'name' => $request->personel['first_name'],
+                'second_name' => $request->personel['second_name'],
+                'email' => $request->personel['email'],
+                'phone_number' => $request->personel['phone_number'],
+                'is_active' => $request->personel['is_active'],
+                'password' => Hash::make($request->personel['password']),
+                'has_qc_access' => 1,
+                'has_pt_access' => 1,
+                'roles' => $roles,
+            ]);
+            $lab = Laboratory::find($lab_id);
+            $lab->personel()->save($user);
+
+            // resave roles
+            $user->roles = $roles;
             $lab->personel()->save($user);
 
             return response()->json(['Message' => 'Created successfully'], 200);
