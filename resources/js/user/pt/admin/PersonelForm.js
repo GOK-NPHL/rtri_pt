@@ -54,7 +54,7 @@ class PersonelForm extends React.Component {
             path: `/edit-personel/:personelId`,
         });
         let participantList = [];
-        
+
         (async () => {
             participantList = await FetchParticipantList();
             this.setState({
@@ -228,7 +228,7 @@ class PersonelForm extends React.Component {
                 personel['has_qc_access'] = this.state.hasQcAccess ? 1 : 0;
                 personel['has_pt_access'] = this.state.hasPtAccess ? 1 : 0;
                 personel['is_active'] = this.state.isActive;
-                personel['roles'] = this.state.userRoles;
+                personel['roles'] = typeof this.state.userRoles == 'object' ? this.state.userRoles : [this.state.userRoles];
 
                 let response;
 
@@ -269,7 +269,7 @@ class PersonelForm extends React.Component {
     componentDidUpdate() {
         try {
             $('#u_facility').selectpicker();
-            if(this.state.facility && this.state.facility != '' && this.state.facility != null){
+            if (this.state.facility && this.state.facility != '' && this.state.facility != null) {
                 $('#u_facility').val(this.state.facility);
                 $('#u_facility').selectpicker('refresh');
             }
@@ -385,7 +385,7 @@ class PersonelForm extends React.Component {
                                 </div>
 
                                 <div className="form-row">
-                                    <div className="col-md-6 mb-3">
+                                    <div className="col-md-5 mb-3">
                                         <label htmlFor="u_active" >Active</label>
                                         <select
                                             id="u_active"
@@ -396,31 +396,37 @@ class PersonelForm extends React.Component {
                                             <option value={0}>False</option>
                                         </select>
                                     </div>
-                                    <div className="col-md-6 mb-3">
-                                        <label className="ml-3" htmlFor="u_qc_access" >Has QC Access:</label><br/>
+                                    <div className="col-md-2 mb-3">
+                                        <label className="ml-3" htmlFor="u_qc_access" >Has QC Access:</label><br />
                                         <input
                                             checked={this.state.hasQcAccess}
                                             onChange={(event) => this.handleIsQcActiveChange(event.target.checked)}
                                             type="checkbox"
-                                            id="u_qc_access" 
+                                            id="u_qc_access"
                                         />
                                         &nbsp;
                                         <label>Yes</label>
                                     </div>
+                                    <div className="col-md-5 mb-3">
+                                        <label className="ml-3" htmlFor="u_user_roles" >User roles:</label><br />
+                                        {(this.state.allRoles && this.state.allRoles.length > 0) && <>
+                                            <select
+                                                id="u_is_active"
+                                                value={typeof this.state.userRoles == 'object' ? this.state.userRoles[0] : this.state.userRoles}
+                                                onChange={(event) => {
+                                                    this.setState({ userRoles: event.target.value })
+                                                }}
+                                                className="custom-select" >
+                                                <option value="">Select roles</option>
+                                                {this.state.allRoles.map((role, i) => {
+                                                    return <option key={i} value={role.id}>{role.name}</option>
+                                                })}
+                                            </select>
+                                        </>}
+                                    </div>
                                 </div>
 
-                                <div className="form-row">
-                                    {/* <div className="col-md-6 mb-3">
-                                        <input
-                                            checked={this.state.hasPtAccess}
-                                            onChange={(event) => this.handleIsPtActiveChange(event.target.checked)}
-                                            type="checkbox"
-                                            id="u_pt_access" />
-                                        <label className="ml-3" htmlFor="u_pt_access" > Has PT Access</label>
-                                    </div> */}
-                                </div>
-
-                                <div className="col-md-12 mb-3">
+                                {/* <div className="col-md-12 mb-3">
                                     <label htmlFor="u_is_active" >User roles</label>
                                     {(this.state.allRoles && this.state.allRoles.length > 0) && <>
                                         <MultiSelect
@@ -439,12 +445,9 @@ class PersonelForm extends React.Component {
                                             onChange={w => this.setState({
                                                 userRoles: Array.from(w, item => item.id)
                                             })}
-                                        // onChange={this.handleRolesChange}
                                         />
-                                        {/* <pre>All: {JSON.stringify(this.state.allRoles)}</pre> */}
-                                        {/* <pre>Picked: {JSON.stringify(this.state.userRoles)}</pre> */}
                                     </>}
-                                </div>
+                                </div> */}
 
                                 <div className="form-group row">
                                     <div className="col-sm-12 text-center">
