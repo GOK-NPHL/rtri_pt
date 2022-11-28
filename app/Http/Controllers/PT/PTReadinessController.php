@@ -305,6 +305,18 @@ class PTReadinessController extends Controller
             $response = [];
             $response['readiness'] = $readiness;
             $response['labs'] = $labIds;
+            $response['participants'] = [];
+            foreach ($labs as $lab) {
+                $laboratory = Laboratory::find($lab->id);
+                if ($laboratory) {
+                    $lab_staff = $laboratory->participants();
+                    $response['participants'][] = [
+                        'id' => $laboratory->id,
+                        'name' => $laboratory->lab_name,
+                        'staff' => $lab_staff
+                    ];
+                }
+            }
             $response['questions'] = $readinessQuestions;
             $response['lots'] = $lots;
 
