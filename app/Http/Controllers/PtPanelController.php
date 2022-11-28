@@ -27,6 +27,10 @@ class PtPanelController extends Controller
     {
         return view('user.pt.panels.show');
     }
+    public function participants()
+    {
+        return view('user.pt.panels.list_participants');
+    }
 
     public function create()
     {
@@ -54,6 +58,7 @@ class PtPanelController extends Controller
                     $lotsArray[] = [
                         'name' => $lt->name,
                         'participants' => count($lt->participants()),
+                        'participants_list' => $lt->participants(),
                     ];
                 }
             }
@@ -109,6 +114,7 @@ class PtPanelController extends Controller
                         'id' => $lt->id,
                         'name' => $lt->name,
                         'participants' => $pcps,
+                        'participants_list' => $lt->participants(),
                     ];
                     //readiness
                     $panel->readiness = Readiness::find($lt->readiness_id);

@@ -19,6 +19,7 @@ class ListPanels extends React.Component {
             startTableData: 0,
             endeTableData: 10,
             activePage: 1,
+            linelist: []
         }
         this.handlePageChange = this.handlePageChange.bind(this)
     }
@@ -93,6 +94,17 @@ class ListPanels extends React.Component {
                                 className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm text-white">
                                 <i className="fas fa-edit"></i> Edit
                             </a> &nbsp;
+
+                            <a
+                                onClick={
+                                    () => {
+                                        window.location.assign('/panels/' + element.id + '/participants')
+                                    }
+                                }
+                                data-toggle="tooltip" data-placement="top" title="Edit Panel"
+                                className="btn btn-sm btn-success shadow-sm text-white">
+                                <i className="fas fa-list"></i> Linelist
+                            </a> &nbsp;
                             <a
                                 onClick={
                                     (ev) => {
@@ -108,7 +120,7 @@ class ListPanels extends React.Component {
                                     }
                                 }
                                 data-toggle="tooltip" data-placement="top" title="Delete Panel"
-                                className="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm text-white">
+                                className="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm text-white m-1">
                                 <i className="fas fa-trash"></i> Delete
                             </a>
 

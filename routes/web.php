@@ -138,6 +138,7 @@ Route::get('pt_panels', [PtPanelController::class, 'index'])->name('panels');
 Route::get('panels/new', [PtPanelController::class, 'create'])->name('new-panel');
 Route::get('pt_panels/new', [PtPanelController::class, 'create'])->name('new-panel');
 Route::get('panels/{panelId}', [PtPanelController::class, 'show'])->name('view-panel');
+Route::get('panels/{panelId}/participants', [PtPanelController::class, 'participants'])->name('view-panel-participants');
 Route::get('pt_panels/{panelId}', [PtPanelController::class, 'show'])->name('view-panel');
 Route::get('panels/edit/{panelId}', [PtPanelController::class, 'edit'])->name('edit-panel');
 Route::get('pt_panels/edit/{panelId}', [PtPanelController::class, 'edit'])->name('edit-panel');

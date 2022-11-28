@@ -69,6 +69,7 @@ require('./user/pt/panels/ListPanels');
 require('./user/pt/panels/AddPanel');
 require('./user/pt/panels/EditPanel');
 require('./user/pt/panels/ViewPanel');
+require('./user/pt/panels/ListPanelParticipants');
 
 // lots
 require('./user/pt/lots/ListLots');

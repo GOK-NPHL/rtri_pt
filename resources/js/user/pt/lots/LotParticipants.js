@@ -117,7 +117,7 @@ class LotParticipants extends React.Component {
                     <a className="float-left" href="/lots">&larr; Go back</a>
                 </div>
                 <div className="col-sm-6">
-                    <h3>Lot (<b>{this.state.lot?.name}</b>) participants</h3>
+                    <h3>Lot participants</h3>
                 </div>
                 <div className="col-sm-3">
                     <a style={{ "color": "white" }} type="button" href="lots/new" className="btn btn-info float-right">Add Lot</a>
