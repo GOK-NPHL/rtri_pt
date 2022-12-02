@@ -88,6 +88,7 @@ class ListPersonel extends React.Component {
                 tableElem.push(<tr key={index}>
                     <th scope="row">{index + 1}</th>
                     <td>{element.lab_name}</td>
+                    <td>{element.county}</td>
                     <td>{element.name} {element.second_name}</td>
                     <td>{element.phone_number}</td>
                     <td style={{textAlign: 'left'}}><small><ul style={{listStyleType:'disc', margin:'0', padding: '0 12px'}}>{
@@ -164,7 +165,8 @@ class ListPersonel extends React.Component {
                                     elemnt['props']['children'][2]['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
                                     elemnt['props']['children'][3]['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
                                     elemnt['props']['children'][4]['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
-                                    elemnt['props']['children'][5]['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase())
+                                    elemnt['props']['children'][5]['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
+                                    elemnt['props']['children'][6]['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase())
                                 );
                                 this.updatedSearchItem(currElementsTableEl);
                             }}
@@ -176,6 +178,7 @@ class ListPersonel extends React.Component {
                                 let final_data = this.state.data.map(element => {
                                     return {
                                         'Lab/Facility': element.lab_name,
+                                        'County': element.county,
                                         'Personnel name': element.name,
                                         'Phone number (mobile)': element.phone_number,
                                         'Email': element.email,
@@ -199,6 +202,7 @@ class ListPersonel extends React.Component {
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Laboratory Name</th>
+                            <th scope="col">County</th>
                             <th scope="col">Personel Name</th>
                             <th scope="col">Cell/Mobile</th>
                             <th scope="col">Roles</th>

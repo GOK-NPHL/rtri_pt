@@ -221,8 +221,10 @@ class ParticipantController extends Controller
                 'users.has_pt_access',
                 'users.is_active',
                 'users.second_name',
-                'users.roles'
+                'users.roles',
+                "counties.name as county"
             )->join('laboratories', 'laboratories.id', '=', 'users.laboratory_id')
+            ->join('counties', 'counties.id', '=', 'laboratories.county')
                 ->get();
 
             return $users;
@@ -246,8 +248,10 @@ class ParticipantController extends Controller
                 'users.has_pt_access',
                 'users.is_active',
                 'users.second_name',
-                'users.roles'
+                'users.roles',
+                "counties.name as county"
             )->join('laboratories', 'laboratories.id', '=', 'users.laboratory_id')
+            ->join('counties', 'counties.id', '=', 'laboratories.county')
                 ->where('users.id', '=', $request->id)
                 ->get();
 
