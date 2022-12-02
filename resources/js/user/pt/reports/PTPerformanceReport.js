@@ -1,10 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { matchPath } from "react-router";
 import { v4 as uuidv4 } from 'uuid';
 import { FetchShipmentResponsesReport, FetchAdminParams } from '../../../components/utils/Helpers';
 import ReactToPrint from "react-to-print";
-
-import { matchPath } from "react-router";
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 
 class PTPerformanceReport extends React.Component {
@@ -90,7 +91,7 @@ class PTPerformanceReport extends React.Component {
 
     render() {
         const imgStyle = {
-            width: "80px"
+            width: "180px"
         };
         let tdtyle = {
             textAlign: 'left',
@@ -127,7 +128,7 @@ class PTPerformanceReport extends React.Component {
             // console.log('scoring', data.sample_name, '('+data.result_interpretation+' == '+data.reference_result+')', ' result: ', isPass);
             ///////// SCORING ///////////
             results.push(<tr className='' key={uuidv4()} style={{ textTransform: 'uppercase' }}>
-                <td style={{...tdtyle, textAlign: 'center'}}>{data.sample_name}</td>
+                <td style={{ ...tdtyle, textAlign: 'center' }}>{data.sample_name}</td>
                 {/* <td style={{ verticalAlign: 'middle', textTransform: 'uppercase' }}>{[data.control_line == 1 ? "Control line" : null, data.verification_line == 1 ? "Verification line" : null, data.longterm_line == 1 ? "Long-term line" : null].filter(n => n != null).join('; ')}</td> */}
                 <td style={{ verticalAlign: 'middle', textTransform: 'uppercase', textAlign: 'center' }}>{data.result_interpretation ? data.result_interpretation : 'No Result'}</td>
                 <td style={{ verticalAlign: 'middle', textAlign: 'center' }}>{data.reference_result}</td>
@@ -141,19 +142,33 @@ class PTPerformanceReport extends React.Component {
                 <div className='container'>
                     <div className='row' style={{ padding: '16px 4px' }}>
                         <div className='col-md-12 py-3'>
-                            <ReactToPrint
+                            {/* <ReactToPrint
                                 documentTitle={"HIV Recency PT Report"}
                                 trigger={() => <button className='btn btn-primary float-right'>Download report</button>}
                                 content={() => this.componentRef}
-                            />
-                        </div>
-                        <div className='col-md-12 w-100'>
+                            /> */}
+                            {/* download page as PDF */}
+                            <button className='btn btn-primary float-right' onClick={() => {
+                                // pdf download of #printableArea with some margin
+                                var element = document.getElementById('printableArea');
+                                html2canvas(element).then((canvas) => {
+                                    var imgData = canvas.toDataURL('image/png');
+                                    var pdf = new jsPDF('p', 'mm', 'a4');
+                                    var width = pdf.internal.pageSize.getWidth();
+                                    var height = pdf.internal.pageSize.getHeight();
+                                    pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+                                    pdf.save("HIV Recency PT Report.pdf");
+                                });
 
-                            <table className="table table-condensed" style={{ verticalAlign: 'middle' }}
+                            }}>Download report</button>
+                        </div>
+                        <div className='col-md-12 w-100' id="printableArea">
+
+                            <table className="table table-condensed a4" style={{ verticalAlign: 'middle' }}
                                 ref={el => (this.componentRef = el)}>
                                 <tbody >
                                     <tr >
-                                        <td colSpan={totalTableLength}>
+                                        <td colSpan={totalTableLength} style={{ textAlign: 'center' }}>
                                             <img style={imgStyle} src={this.props.chart1}></img>
                                         </td>
                                     </tr>
@@ -164,7 +179,10 @@ class PTPerformanceReport extends React.Component {
                                             <p>NATIONAL PUBLIC HEALTH LABORATORIES</p>
                                             <p>NATIONAL HIV REFERENCE LABORATORY</p>
                                             <p style={{ "fontWeight": "normal" }}>P.O Box 20750 - 00202 NAIROBI</p>
-                                            <h4><b>HIV RECENCY PROFICIENCY TESTING SCHEME REPORT</b></h4>
+                                            {/* <h4><b>HIV RECENCY PROFICIENCY TESTING SCHEME REPORT</b></h4> */}
+                                            <h4><b>RAPID TESTING FOR HIV-1 RECENT INFECTION</b></h4>
+                                            <h4><b>PROFICIENCY TEST REPORT</b></h4>
+
                                         </td>
                                     </tr>
                                     <tr style={{ "marginTop": "5px" }}>
@@ -212,7 +230,7 @@ class PTPerformanceReport extends React.Component {
                                             <strong>Expert comment:</strong> Thank you for participating in NPHL-NHRL RTRI-PT.
                                             Your overall performance: Your EQA performance is <strong>
                                                 {Math.round((passedScore / totalSamples) * 100)}&#37; {Math.round((passedScore / totalSamples) * 100) >= this.state.passMark ? 'ACCEPATBLE' : 'UNACCEPATBE'}
-                                                </strong>. The
+                                            </strong>. The
                                             expected performance outcome was {this.state?.passMark || 100}% whereby, each sample has an equal score.
 
                                         </td>
@@ -281,7 +299,7 @@ class PTPerformanceReport extends React.Component {
                                                                 Department of Laboratory Services - NPHL<br />
                                                                 {/* P.O. Box 20750-00200<br />
                                                                 Nairobi, Kenya<br /> */}
-                                                                
+
                                                                 Contact: 254722845874<br />
                                                             </p>
                                                         </td>

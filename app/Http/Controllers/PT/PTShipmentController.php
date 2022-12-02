@@ -483,7 +483,7 @@ class PTShipmentController extends Controller
                 ->join('laboratories', 'ptsubmissions.lab_id', '=', 'laboratories.id')
                 ->join('users', 'ptsubmissions.user_id', '=', 'users.id');
 
-            if ($is_part == 1) {
+            if (false){//$is_part == 1) {
                 $shipmentsResponses = 
                     $shipmentsResponses->where('ptsubmissions.lab_id', $user->laboratory_id)
                     // ->where('ptsubmissions.pt_shipements_id', $id);
@@ -541,7 +541,7 @@ class PTShipmentController extends Controller
                 ->join('pt_samples', 'pt_samples.id', '=', 'pt_submission_results.sample_id');
 
 
-            if ($is_part == 1) {
+            if (false){//$is_part == 1) {
                 $shipmentsResponsesRlt = $shipmentsResponsesRlt->where('ptsubmissions.lab_id', $user->laboratory_id)
                     ->where('ptsubmissions.pt_shipements_id', $id);
             } else {
