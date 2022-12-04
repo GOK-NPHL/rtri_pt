@@ -152,17 +152,19 @@ class Dashboard extends React.Component {
                     </td> : ''}
                     {<td>
                         {element.submission ?
-                            <button
-                                onClick={() => {
-                                    this.setState({
-                                        selectedElement: element,
-                                        selectedElementHasSubmmisions: true,
-                                        page: 'edit'
-                                    });
-                                }} type="button" className="btn btn-success">
-                                {Date.parse(element.end_date) > new Date() ? <i className="far fa-edit"></i> : <i className="fas fa-eye"></i>}
-                                {Date.parse(element.end_date) > new Date() ? 'Edit' : 'View only'}
-                            </button> : <button
+                            // <button
+                            //     onClick={() => {
+                            //         this.setState({
+                            //             selectedElement: element,
+                            //             selectedElementHasSubmmisions: true,
+                            //             page: 'edit'
+                            //         });
+                            //     }} type="button" className="btn btn-success">
+                            //     {Date.parse(element.end_date) > new Date() ? <i className="far fa-edit"></i> : <i className="fas fa-eye"></i>}
+                            //     {Date.parse(element.end_date) > new Date() ? 'Edit' : 'View only'}
+                            // </button>
+                            <span className='badge badge-dark'>Submitted</span>
+                             : <button
                                 onClick={() => {
                                     if (element.is_readiness_answered == null) {
                                         window.location.assign('get-readiness-form/' + element.readiness_id)
