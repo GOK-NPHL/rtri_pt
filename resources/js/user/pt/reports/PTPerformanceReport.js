@@ -130,9 +130,9 @@ class PTPerformanceReport extends React.Component {
             results.push(<tr className='' key={uuidv4()} style={{ textTransform: 'uppercase' }}>
                 <td style={{ ...tdtyle, textAlign: 'center' }}>{data.sample_name}</td>
                 {/* <td style={{ verticalAlign: 'middle', textTransform: 'uppercase' }}>{[data.control_line == 1 ? "Control line" : null, data.verification_line == 1 ? "Verification line" : null, data.longterm_line == 1 ? "Long-term line" : null].filter(n => n != null).join('; ')}</td> */}
-                <td style={{ verticalAlign: 'middle', textTransform: 'uppercase', textAlign: 'center' }}>{data.result_interpretation ? data.result_interpretation : 'No Result'}</td>
-                <td style={{ verticalAlign: 'middle', textAlign: 'center' }}>{data.reference_result}</td>
-                <td style={{ verticalAlign: 'middle', textAlign: 'center' }}>{isPass ? 'ACCEPTABLE' : 'UNACCEPATBE'}</td>
+                <td style={{ verticalAlign: 'middle', textTransform: 'uppercase', textAlign: 'center' }}>{data.result_interpretation ? (data.result_interpretation.toLowerCase() == 'lt' ? 'Long-Term' : (data.result_interpretation.toLowerCase() == 'neg' ? 'NEGATIVE' : data.result_interpretation)) : 'No Result'}</td>
+                <td style={{ verticalAlign: 'middle', textAlign: 'center' }}>{data.reference_result.toLowerCase() == 'lt' ? 'Long-Term' : (data.reference_result.toLowerCase() == 'neg' ? 'NEGATIVE' : data.reference_result)}</td>
+                <td style={{ verticalAlign: 'middle', textAlign: 'center' }}>{isPass ? 'ACCEPTABLE' : 'UNACCEPTABLE'}</td>
             </tr>);
             totalSamples += 1;
         })
@@ -190,12 +190,12 @@ class PTPerformanceReport extends React.Component {
                                             <div><strong>Code:</strong> &nbsp;{this.state.rptCode}</div>
                                             <div><strong>Shipment Date:</strong> &nbsp; {this.state.shipmentDate}</div>
                                             <div><strong>Specimen Receipt Date:</strong> &nbsp; {this.state.specimenReceiptDate}</div>
-                                            <div><strong>HIV Recency Lot No:</strong> &nbsp; {this.state.kitLotNumber}</div>
+                                            {/* <div><strong>HIV Recency Kit Lot No:</strong> &nbsp; {this.state.kitLotNumber}</div> */}
                                         </td>
                                         <td style={tdtyle}>
                                             <div><strong>Lab Name:</strong> &nbsp; {this.state.labName}</div>
                                             <div><strong>Result Submission Date:</strong> &nbsp; {this.state.resultSubmissionDate}</div>
-                                            <div><strong>HIV Recency Expiry Date :</strong> &nbsp; {this.state.kitExpiration}</div>
+                                            {/* <div><strong>HIV Recency Kit Expiry Date :</strong> &nbsp; {this.state.kitExpiration}</div> */}
                                         </td>
                                         <td style={tdtyle}>
                                             {true && <div style={{ textTransform: 'capitalize' }}><strong>Laboratory personnel testing:</strong> &nbsp; {this.state.userName}</div>}
@@ -215,7 +215,7 @@ class PTPerformanceReport extends React.Component {
 
                                                     <tr style={{ "fontWeight": "bold" }} className=''>
                                                         {/* <th style={{ verticalAlign: 'middle', textAlign: 'center' }}>Visual Result</th> */}
-                                                        <th style={{ verticalAlign: 'middle', textAlign: 'center' }}>Interpretation</th>
+                                                        <th style={{ verticalAlign: 'middle', textAlign: 'center' }}>Your Results</th>
                                                         <th style={{ verticalAlign: 'middle', textAlign: 'center' }}>Expected</th>
                                                     </tr>
                                                 </thead>
@@ -227,29 +227,15 @@ class PTPerformanceReport extends React.Component {
                                     </tr>
                                     <tr>
                                         <td style={paragraphStyle} colSpan={totalTableLength}>
-                                            <strong>Expert comment:</strong> Thank you for participating in NPHL-NHRL RTRI-PT.
+                                            <strong>Expert comment:</strong> <br />
+                                            {/* Thank you for participating in NPHL-NHRL RTRI-PT.
                                             Your overall performance: Your EQA performance is <strong>
-                                                {Math.round((passedScore / totalSamples) * 100)}&#37; {Math.round((passedScore / totalSamples) * 100) >= this.state.passMark ? 'ACCEPATBLE' : 'UNACCEPATBE'}
-                                            </strong>. The
-                                            expected performance outcome was {this.state?.passMark || 100}% whereby, each sample has an equal score.
+                                                {Math.round((passedScore / totalSamples) * 100)}&#37; {Math.round((passedScore / totalSamples) * 100) >= this.state.passMark ? 'ACCEPTABLE' : 'UNACCEPTABLE'}
+                                            </strong>. The expected performance outcome was {this.state?.passMark || 100}% whereby, each sample has an equal score. */}
+                                            {Math.round((passedScore / totalSamples) * 100) == 100 ? <span>You have received a satisfactory score of 100%. Congratulations on your excellent performance.</span> : <span>You have received a score of {Math.round((passedScore / totalSamples) * 100)}&#37; for testing performance. You will need to do a corrective action for the sample (s) whose score was unacceptable.</span>}
 
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style={paragraphStyle} colSpan={totalTableLength}>
-                                            <p><strong>Testing scheme information:</strong></p>
 
-                                            <ol className="report">
-                                                <li>HIV Recency PT is a qualitative scheme.</li>
-                                                <li>The panel samples come as dried samples.</li>
-                                                <li>The PT samples have been fully characterised for the assigned qualitative HIV Recency status.</li>
-                                                <li>The reference values are used to grade the participants.</li>
-                                                <li>The panel samples have been tested for stability and are stable.</li>
-                                                <li>Homogeneity was done using systematic random sampling and the results were the same as the expected results.</li>
-                                                <li>Participants performance report is confidential and will only be shared with the<br /> responsible quality assurance officers for the participating laboratories and for any purpose of corrective interventions.</li>
-                                                <li>Subcontracted services: PT panel distribution and return of results.</li>
-                                                <li>The schemes final report with summaries of overall performance analysis are indicated below</li>
-                                            </ol>
+
                                         </td>
                                     </tr>
 
@@ -259,18 +245,30 @@ class PTPerformanceReport extends React.Component {
                                         </td>
                                     </tr>
 
-                                    <tr style={paragraphStyle} >
+                                    <tr>
+                                        <td colSpan={totalTableLength}>
+                                            This report has been compiled by the National HIV Reference Laboratory.<br/>
+                                            For any query or clarification, please contact us via <a href='mailto:nhrlrtriqa@gmail.com'>nhrlrtriqa@gmail.com</a>.
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colSpan={totalTableLength}>
+                                            <hr />
+                                        </td>
+                                    </tr>
+
+                                    {/* <tr style={paragraphStyle} >
                                         <td colSpan={4} style={{ "textAlign": "left", "marginBottom": "0px" }} >
                                             <strong>Documentation of Report Review:</strong>
                                             We the undersigned, have read and reviewed the above HIV Recency performance evaluation report. If the final score is less than {this.state?.passMark || 100}% we have downloaded the root cause analysis and corrective actions forms from ePT, completed, and attached them to this report. Performance report and any attachments must be filed and retained as documentation.
                                         </td>
-                                    </tr>
+                                    </tr> */}
 
-                                    <tr>
+                                    {/* <tr>
                                         <td colSpan={totalTableLength}>
                                             <hr />
                                         </td>
-                                    </tr>
+                                    </tr> */}
 
                                     {/* <tr><td><p></p></td></tr>
                                     <tr style={{ "fontWeight": "bold" }} >
@@ -294,23 +292,18 @@ class PTPerformanceReport extends React.Component {
                                                     <tr>
                                                         <td className='text-left '>
                                                             <p style={{ margin: 0, padding: '2px 7px' }}>
+                                                                <strong>Final Report Authorized By:</strong><br />
                                                                 Nancy Bowen<br />
                                                                 Head, National HIV Reference Laboratory<br />
                                                                 Department of Laboratory Services - NPHL<br />
-                                                                {/* P.O. Box 20750-00200<br />
-                                                                Nairobi, Kenya<br /> */}
-
-                                                                Contact: 254722845874<br />
                                                             </p>
                                                         </td>
                                                         <td className='text-left '>
                                                             <p style={{ margin: 0, padding: '2px 7px' }}>
-                                                                Christabel Awuor<br />
-                                                                HIV Serology<br />
+                                                                <strong>Final Report Released By:</strong><br />
+                                                                Christabel Ogola<br />
                                                                 National HIV Reference Laboratory<br />
-                                                                {/* P.O. Box 20750-00200<br />
-                                                                Nairobi, Kenya<br /> */}
-                                                                Contact: 254723777442
+                                                                Department of Laboratory Services - NPHL<br />
                                                             </p>
                                                         </td>
                                                     </tr>
@@ -326,26 +319,19 @@ class PTPerformanceReport extends React.Component {
                                     </tr>
                                     <tr style={{ "fontWeight": "bold" }} >
                                         <td>
-                                            Final Report Authorized By:
+                                            {/* Sign: */}
                                         </td>
                                         <td>
-                                            Date:
+                                            Release Date: {new Date().toLocaleDateString('en-GB')}
                                         </td>
                                     </tr>
-                                    <tr style={{ "fontWeight": "bold" }} >
-                                        <td style={paragraphStyle} >
-                                            Final Results Released By:
-                                        </td>
-                                        <td style={paragraphStyle} >
-                                            Date:
-                                        </td>
-                                    </tr>
+
                                     <tr>
                                         <td colSpan={3} style={{ padding: '14px 0 0' }} >
                                             <div style={{ borderTop: '1px solid #ccc', padding: '3px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                <span>MOH/DLS/NPHL/NHRL/HIV-RTRI/F/01</span>
-                                                <span>Version <strong>1.1.0</strong></span>
-                                                <span>Effective date: <strong>{new Date().toLocaleDateString('en-GB')}</strong></span>
+                                                <span>MOH/NHRL/HIV REC PT/FORM 002</span>
+                                                <span>Version <strong>1.0</strong></span>
+                                                <span>Effective date: <strong>{"04/12/2022"}</strong></span>
                                             </div>
                                         </td>
                                     </tr>
