@@ -120,6 +120,8 @@ class Dashboard extends React.Component {
 
     render() {
 
+        console.log("state", this.state)
+
         const imgStyle = {
             width: "100%"
         };
@@ -428,6 +430,6 @@ class Dashboard extends React.Component {
 
 export default Dashboard;
 
-if (document.getElementById('participant-pt-dashboard')) {
-    ReactDOM.render(<Dashboard />, document.getElementById('participant-pt-dashboard'));
+if (document.getElementById('participant_pt_dashboard')) {
+    ReactDOM.render(<Dashboard />, document.getElementById('participant_pt_dashboard'));
 }

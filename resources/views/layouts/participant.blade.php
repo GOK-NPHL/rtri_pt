@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Gate;
     <meta name="author" content="NPHL ICT" <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'HIV Recency PT') }}</title>
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
