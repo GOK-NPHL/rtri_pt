@@ -928,7 +928,7 @@ class SubmitResults extends React.Component {
                                 </button>
                             </div>
                             <div className="modal-body">
-                                <p id="returnedMessage">{this.state.message}</p>
+                                <p id="returnedMessage">{this.state.message ? this.state.message : "An error had occurred. Please refresh and try again"}</p>
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
