@@ -163,7 +163,7 @@ class Dashboard extends React.Component {
                             //     {Date.parse(element.end_date) > new Date() ? <i className="far fa-edit"></i> : <i className="fas fa-eye"></i>}
                             //     {Date.parse(element.end_date) > new Date() ? 'Edit' : 'View only'}
                             // </button>
-                            <span className='badge badge-dark'>Submitted</span>
+                            <span className='badge badge-success' style={{cursor: 'not-allowed', opacity: 0.59}}> <i className='fa fa-check'></i> Submitted</span>
                              : <button
                                 onClick={() => {
                                     if (element.is_readiness_answered == null) {

@@ -439,7 +439,7 @@ class PTShipmentController extends Controller
                 ->join('ptsubmissions', 'ptsubmissions.pt_shipements_id', '=', 'pt_shipements.id')
                 ->join('laboratories', 'ptsubmissions.lab_id', '=', 'laboratories.id')
                 ->join('users', 'ptsubmissions.user_id', '=', 'users.id')
-                ->join('resource_files', 'ptsubmissions.pt_submission_file_id', '=', 'resource_files.id')
+                ->leftJoin('resource_files', 'ptsubmissions.pt_submission_file_id', '=', 'resource_files.id')
                 ->where('pt_shipements.id', $request->id)
                 ->get([
                     "pt_shipements.id",

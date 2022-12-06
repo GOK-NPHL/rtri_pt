@@ -102,7 +102,7 @@ class ShipmentResponses extends React.Component {
                     <td>{element.updated_at}</td>
                     <td> {<span>{element.fname} {element.sname}</span>} </td>
                     <td>
-                        <a href={window.location.origin + '/api/resources/files/download/' + element.pt_submission_file_id} target="_blank" download={element.pt_submission_file_name}>{"File_"+element.pt_submission_file_id}</a>
+                        {element.pt_submission_file_id ? <a href={window.location.origin + '/api/resources/files/download/' + element.pt_submission_file_id} target="_blank" download={element.pt_submission_file_name}>{"File_"+element.pt_submission_file_id}</a> : <span className="badge badge-dark">No File</span>}
                     </td>
 
                     {
