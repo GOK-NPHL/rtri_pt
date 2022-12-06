@@ -31,7 +31,7 @@ class Submission extends Controller
     {
         try {
             $submission = json_decode($request->input('submission'), true);
-            Log::info("Submission::", json_encode($submission));
+            Log::info("Submission::" . json_encode($submission));
             if (!$submission) {
                 return response()->json([
                     'status' => 'error',
@@ -66,63 +66,62 @@ class Submission extends Controller
                 $file->save();
                 $file_id = $file->id;
 
-                if(!$file_id) {
+                if (!$file_id) {
                     return response()->json([
                         'status' => 'error',
                         'message' => 'File could not be saved',
                     ])->status(400);
-                }else{
-                    Log::info('-----------------------File saved: '.$file_id);
-                    $submissionModel = new SubmissionModel([
-                        "testing_date" => $submission["testingDate"],
-                        "kit_date_received" => $submission["kitReceivedDate"],
-                        "lot_date_received" => $submission["ptLotReceivedDate"],
-                        "kit_expiry_date" => $submission["kitExpiryDate"],
-                        "kit_lot_no" => $submission["kitLotNo"],
-                        "name_of_test" => $submission["nameOfTest"],
-                        "pt_lot_no" => $submission["ptLotNumber"],
-                        "lab_id" => $submission["labId"],
-                        "user_id" => $submission["userId"],
-                        "sample_reconstituion_date" => $submission["ptReconstituionDate"],
-                        "sample_type" => $submission["sampleType"],
-                        "tester_name" => $submission["testerName"],
-                        "test_justification" => $submission["testJustification"],
-                        "pt_tested" => $submission["isPTTested"],
-                        "not_test_reason" => $submission["ptNotTestedReason"],
-                        "other_not_tested_reason" => $submission["otherComments"] ? $submission["otherComments"] : $submission["ptNotTestedOtherReason"],
-                        "pt_shipements_id" => $submission["ptShipementId"],
-                        "pt_panel_id" => $submission["ptPanelId"],
-                        "pt_submission_file_id" => $file_id,
-                    ]);
-
-                    // Log::info('-----------------------Submission : '.json_encode($submissionModel));
-        
-                    $submissionModel->save();
-                    $submissionId = $submissionModel->id;
-        
-                    foreach ($submission["samples"] as $key => $val) {
-        
-                        $ptLtResult = new PtSubmissionResult([
-                            "control_line" => $val["visual"]["c"],
-                            "verification_line" => $val["visual"]["v"],
-                            "interpretation" => $val["interpretation"],
-                            "longterm_line" => $val["visual"]["lt"],
-                            "interpretation" => $val["interpretation"],
-                            "ptsubmission_id" => $submissionId,
-                            "sample_id" => $key
-                        ]);
-                        $ptLtResult->save();
-                    }
                 }
+            }
+            // else{
+            $submissionModel = new SubmissionModel([
+                "testing_date" => $submission["testingDate"],
+                "kit_date_received" => $submission["kitReceivedDate"],
+                "lot_date_received" => $submission["ptLotReceivedDate"],
+                "kit_expiry_date" => $submission["kitExpiryDate"],
+                "kit_lot_no" => $submission["kitLotNo"],
+                "name_of_test" => $submission["nameOfTest"],
+                "pt_lot_no" => $submission["ptLotNumber"],
+                "lab_id" => $submission["labId"],
+                "user_id" => $submission["userId"],
+                "sample_reconstituion_date" => $submission["ptReconstituionDate"],
+                "sample_type" => $submission["sampleType"],
+                "tester_name" => $submission["testerName"],
+                "test_justification" => $submission["testJustification"],
+                "pt_tested" => $submission["isPTTested"],
+                "not_test_reason" => $submission["ptNotTestedReason"],
+                "other_not_tested_reason" => $submission["otherComments"] ? $submission["otherComments"] : $submission["ptNotTestedOtherReason"],
+                "pt_shipements_id" => $submission["ptShipementId"],
+                "pt_panel_id" => $submission["ptPanelId"],
+                "pt_submission_file_id" => $file_id,
+            ]);
 
-            } 
+            Log::info('-----------------------Submission saved : '.json_encode($submissionModel));
+
+            $submissionModel->save();
+            $submissionId = $submissionModel->id;
+
+            foreach ($submission["samples"] as $key => $val) {
+
+                $ptLtResult = new PtSubmissionResult([
+                    "control_line" => $val["visual"]["c"],
+                    "verification_line" => $val["visual"]["v"],
+                    "interpretation" => $val["interpretation"],
+                    "longterm_line" => $val["visual"]["lt"],
+                    "interpretation" => $val["interpretation"],
+                    "ptsubmission_id" => $submissionId,
+                    "sample_id" => $key
+                ]);
+                $ptLtResult->save();
+            }
+            // }
             // else {
             //     return response()->json([
             //         'status' => 'error',
             //         'message' => 'No file provided',
             //     ])->status(400);
             // }
-            
+
             return response()->json(['Message' => 'Saved successfully'], 200);
         } catch (Exception $ex) {
             Log::error($ex);
@@ -146,50 +145,50 @@ class Submission extends Controller
         $user = Auth::user();
         // try {
 
-            $submission = SubmissionModel::select(
-                'ptsubmissions.id',
-                'ptsubmissions.testing_date',
-                'ptsubmissions.name_of_test',
-                'ptsubmissions.kit_lot_no',
-                'ptsubmissions.kit_date_received',
-                'ptsubmissions.kit_expiry_date',
-                'ptsubmissions.pt_lot_no',
-                'ptsubmissions.lot_date_received',
-                'ptsubmissions.sample_reconstituion_date',
-                'ptsubmissions.user_id',
-                'ptsubmissions.sample_type',
-                'ptsubmissions.tester_name',
-                'ptsubmissions.test_justification',
-                'ptsubmissions.pt_tested',
-                'ptsubmissions.pt_panel_id',
-                'ptsubmissions.not_test_reason',
-                'ptsubmissions.other_not_tested_reason',
-                'ptsubmissions.pt_submission_file_id',
-                'laboratories.email',
-                'ptsubmissions.lab_id',
-                'laboratories.lab_name',
-                'laboratories.mfl_code',
-                'pt_shipements.test_instructions',
+        $submission = SubmissionModel::select(
+            'ptsubmissions.id',
+            'ptsubmissions.testing_date',
+            'ptsubmissions.name_of_test',
+            'ptsubmissions.kit_lot_no',
+            'ptsubmissions.kit_date_received',
+            'ptsubmissions.kit_expiry_date',
+            'ptsubmissions.pt_lot_no',
+            'ptsubmissions.lot_date_received',
+            'ptsubmissions.sample_reconstituion_date',
+            'ptsubmissions.user_id',
+            'ptsubmissions.sample_type',
+            'ptsubmissions.tester_name',
+            'ptsubmissions.test_justification',
+            'ptsubmissions.pt_tested',
+            'ptsubmissions.pt_panel_id',
+            'ptsubmissions.not_test_reason',
+            'ptsubmissions.other_not_tested_reason',
+            'ptsubmissions.pt_submission_file_id',
+            'laboratories.email',
+            'ptsubmissions.lab_id',
+            'laboratories.lab_name',
+            'laboratories.mfl_code',
+            'pt_shipements.test_instructions',
 
-            )->join('laboratories', 'laboratories.id', '=', 'ptsubmissions.lab_id')
-                ->join('pt_shipements', 'pt_shipements.id', '=', 'ptsubmissions.pt_shipements_id')
-                ->where('ptsubmissions.lab_id', '=', $user->laboratory_id)
-                ->where('ptsubmissions.id', '=', $request->id)
-                ->get();
+        )->join('laboratories', 'laboratories.id', '=', 'ptsubmissions.lab_id')
+            ->join('pt_shipements', 'pt_shipements.id', '=', 'ptsubmissions.pt_shipements_id')
+            ->where('ptsubmissions.lab_id', '=', $user->laboratory_id)
+            ->where('ptsubmissions.id', '=', $request->id)
+            ->get();
 
-            if($submission->count() > 0){
-                $submission[0]->file = ResourceFiles::find($submission[0]->pt_submission_file_id);
-            }
+        if ($submission->count() > 0) {
+            $submission[0]->file = ResourceFiles::find($submission[0]->pt_submission_file_id);
+        }
 
-            $submissionResults = DB::table('pt_submission_results')
-                ->select('sample_id', 'control_line', 'verification_line', 'longterm_line', 'interpretation')
-                ->where('ptsubmission_id', $request->id)
-                ->get();
+        $submissionResults = DB::table('pt_submission_results')
+            ->select('sample_id', 'control_line', 'verification_line', 'longterm_line', 'interpretation')
+            ->where('ptsubmission_id', $request->id)
+            ->get();
 
-            $payload = ['data' => $submission[0], 'test_results' => $submissionResults];
+        $payload = ['data' => $submission[0], 'test_results' => $submissionResults];
 
-            return $payload;
-            // return SubmissionModel::all();
+        return $payload;
+        // return SubmissionModel::all();
         // } catch (Exception $ex) {
         //     return response()->json(['Message' => 'Error getting org units: ' . $ex->getMessage()], 500);
         // }

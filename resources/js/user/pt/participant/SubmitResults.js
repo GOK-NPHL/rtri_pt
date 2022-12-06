@@ -159,12 +159,14 @@ class SubmitResults extends React.Component {
 
 
     submitForm() {
+        console.log(this.state.samples);
         //check if results filled
         if (this.state.isPtDone) {
             for (const [key, value] of Object.entries(this.state.samples)) {
+                // console.log("Checking ", key, value);
                 if (value['interpretation'] == null) {
                     this.setState({
-                        message: "Fill in all the fields marked *"
+                        message: "Please fill in all the fields marked *"
                     })
                     $('#messageModal').modal('toggle');
                     return;
@@ -251,6 +253,11 @@ class SubmitResults extends React.Component {
 
         samples[sample_id]["interpretation"] = interpretValue;
 
+        this.setState({
+            samples: samples
+        });
+        
+
     }
 
     visualResultsHandler(event, sample_id) {
@@ -262,6 +269,12 @@ class SubmitResults extends React.Component {
         let results = samples[sample_id]["visual"]; //{ c: 0, v: 0, lt: 0 };
         results[visualValue] = status;
         samples[sample_id]["visual"] = results;
+
+        this.setState({
+            samples: samples
+        });
+
+        // console.log("Sample: ", sample_id, "Visual: ", samples[sample_id]["visual"], "Interpretation: ", samples[sample_id]["interpretation"]);
 
     }
 
@@ -467,7 +480,13 @@ class SubmitResults extends React.Component {
                             : ''
                         }
                         <hr />
+
                     </div>
+                    {/* {this.state.message && <div className='col-md-12'>
+                        <div className={"alert alert-default-" + ((this.state.message && this.state.message.toLowerCase().includes("success")) ? "success" : "warning")} role="alert">
+                            {this.state.message}
+                        </div>
+                    </div>} */}
                     <div className="col-sm-12 float-left">
                         {new Date() > Date.parse(this.state.endDate) ?
                             <h3 style={{ "color": "red" }} className="col-sm-12">Past Due date. Submission disabled</h3>
@@ -790,6 +809,7 @@ class SubmitResults extends React.Component {
                                                             ? true : false
 
                                                     }
+                                                    checked={this.state.samples && this.state.samples[sample.sample_id] && this.state.samples[sample.sample_id]["visual"] && this.state.samples[sample.sample_id]["visual"]['c'] && this.state.samples[sample.sample_id]["visual"]['c'] == 1}
                                                     value="c" type="checkbox" /> Control line</td>
                                                 <td ><input onChange={(event) => this.visualResultsHandler(event, sample.sample_id)}
                                                     defaultChecked={
@@ -802,7 +822,7 @@ class SubmitResults extends React.Component {
                                                             ? true : false
 
                                                     }
-
+                                                    checked={this.state.samples && this.state.samples[sample.sample_id] && this.state.samples[sample.sample_id]["visual"] && this.state.samples[sample.sample_id]["visual"]['v'] && this.state.samples[sample.sample_id]["visual"]['v'] == 1}
                                                     value="v" type="checkbox" /> Verification line</td>
                                                 <td ><input onChange={(event) => this.visualResultsHandler(event, sample.sample_id)}
                                                     defaultChecked={
@@ -813,7 +833,7 @@ class SubmitResults extends React.Component {
                                                             this.state.samples[sample.sample_id]["visual"]['lt'] == 1
                                                             ? true : false
                                                     }
-
+                                                    checked={this.state.samples && this.state.samples[sample.sample_id] && this.state.samples[sample.sample_id]["visual"] && this.state.samples[sample.sample_id]["visual"]['lt'] && this.state.samples[sample.sample_id]["visual"]['lt'] == 1}
                                                     value="lt" type="checkbox" /> Long-Term line</td>
                                                 <td onChange={(event) => this.ptInterpretation(event, sample.sample_id)}>
                                                     <div className="form-check form-check-inline">
@@ -827,6 +847,7 @@ class SubmitResults extends React.Component {
                                                                     this.state.samples[sample.sample_id]["interpretation"] == 'lt'
                                                                     ? true : false
                                                             }
+                                                            checked={this.state.samples && this.state.samples[sample.sample_id] && this.state.samples[sample.sample_id]["interpretation"] && this.state.samples[sample.sample_id]["interpretation"] == 'lt'}
                                                         />
                                                         <label className="form-check-label" htmlFor="result_lt">
                                                             Long-Term (LT)
@@ -844,6 +865,7 @@ class SubmitResults extends React.Component {
                                                                     this.state.samples[sample.sample_id]["interpretation"] == 'recent'
                                                                     ? true : false
                                                             }
+                                                            checked={this.state.samples && this.state.samples[sample.sample_id] && this.state.samples[sample.sample_id]["interpretation"] && this.state.samples[sample.sample_id]["interpretation"] == 'recent'}
                                                         />
                                                         <label className="form-check-label" htmlFor="result_recent">
                                                             Recent
@@ -861,6 +883,7 @@ class SubmitResults extends React.Component {
                                                                     this.state.samples[sample.sample_id]["interpretation"] == 'neg'
                                                                     ? true : false
                                                             }
+                                                            checked={this.state.samples && this.state.samples[sample.sample_id] && this.state.samples[sample.sample_id]["interpretation"] && this.state.samples[sample.sample_id]["interpretation"] == 'neg'}
                                                         />
                                                         <label className="form-check-label" htmlFor="result_neg">
                                                             Negative
@@ -878,6 +901,7 @@ class SubmitResults extends React.Component {
                                                                     this.state.samples[sample.sample_id]["interpretation"] == 'invalid'
                                                                     ? true : false
                                                             }
+                                                            checked={this.state.samples && this.state.samples[sample.sample_id] && this.state.samples[sample.sample_id]["interpretation"] && this.state.samples[sample.sample_id]["interpretation"] == 'invalid'}
                                                         />
                                                         <label className="form-check-label" htmlFor="result_invalid">
                                                             Invalid
@@ -925,7 +949,7 @@ class SubmitResults extends React.Component {
                                 </button>
                             </div>
                             <div className="modal-body">
-                                <p id="returnedMessage">{this.state.message ? this.state.message : "An error had occurred. Please refresh and try again"}</p>
+                                <p id="returnedMessage">{this.state.message ? this.state.message : "An error has occurred. Please refresh and try again"}</p>
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>

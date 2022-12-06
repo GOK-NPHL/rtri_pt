@@ -14,7 +14,7 @@ class AddFileFieldSubmissions extends Migration
     public function up()
     {
         Schema::table('ptsubmissions', function (Blueprint $table) {
-            $table->integer('pt_submission_file_id');
+            $table->integer('pt_submission_file_id')->nullable();
         });
     }
 
