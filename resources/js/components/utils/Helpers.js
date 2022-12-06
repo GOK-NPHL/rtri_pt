@@ -11,7 +11,9 @@ export async function SaveSubmission(submission, ptFile) {
 
     try {
         const formData = new FormData();
-        formData.append('file', ptFile);
+        if (ptFile && ptFile != null) {
+            formData.append('file', ptFile);
+        }
         formData.append('submission', JSON.stringify(submission));
         let response = await axios.post(`${settings.serverBaseApi}/save_submission`, formData, {
             headers: {

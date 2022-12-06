@@ -31,7 +31,7 @@ class Submission extends Controller
     {
         try {
             $submission = json_decode($request->input('submission'), true);
-            Log::info(json_encode($submission));
+            Log::info("Submission::", json_encode($submission));
             if (!$submission) {
                 return response()->json([
                     'status' => 'error',
@@ -115,12 +115,13 @@ class Submission extends Controller
                     }
                 }
 
-            } else {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'No file provided',
-                ])->status(400);
-            }
+            } 
+            // else {
+            //     return response()->json([
+            //         'status' => 'error',
+            //         'message' => 'No file provided',
+            //     ])->status(400);
+            // }
             
             return response()->json(['Message' => 'Saved successfully'], 200);
         } catch (Exception $ex) {

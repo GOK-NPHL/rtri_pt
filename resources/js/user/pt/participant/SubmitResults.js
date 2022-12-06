@@ -218,7 +218,6 @@ class SubmitResults extends React.Component {
 
             // console.log("submission", submission)
 
-
             (async () => {
                 if (this.props.selectedElementHasSubmmisions) {
                     let response = await UpdateSubmission(submission);
@@ -239,8 +238,6 @@ class SubmitResults extends React.Component {
                         this.props.toggleView("list");
                     }
                 }
-
-
             })();
         }
     }
@@ -817,7 +814,7 @@ class SubmitResults extends React.Component {
                                                             ? true : false
                                                     }
 
-                                                    value="lt" type="checkbox" /> Long-term line</td>
+                                                    value="lt" type="checkbox" /> Long-Term line</td>
                                                 <td onChange={(event) => this.ptInterpretation(event, sample.sample_id)}>
                                                     <div className="form-check form-check-inline">
                                                         <input className="form-check-input" type="radio" value="lt"
@@ -832,7 +829,7 @@ class SubmitResults extends React.Component {
                                                             }
                                                         />
                                                         <label className="form-check-label" htmlFor="result_lt">
-                                                            LT
+                                                            Long-Term (LT)
                                                         </label>
                                                     </div>
                                                     <div className="form-check form-check-inline">
@@ -849,7 +846,7 @@ class SubmitResults extends React.Component {
                                                             }
                                                         />
                                                         <label className="form-check-label" htmlFor="result_recent">
-                                                            recent
+                                                            Recent
                                                         </label>
                                                     </div>
                                                     <div className="form-check form-check-inline">
@@ -866,7 +863,7 @@ class SubmitResults extends React.Component {
                                                             }
                                                         />
                                                         <label className="form-check-label" htmlFor="result_neg">
-                                                            neg
+                                                            Negative
                                                         </label>
                                                     </div>
                                                     <div className="form-check form-check-inline">
@@ -883,7 +880,7 @@ class SubmitResults extends React.Component {
                                                             }
                                                         />
                                                         <label className="form-check-label" htmlFor="result_invalid">
-                                                            invalid
+                                                            Invalid
                                                         </label>
                                                     </div>
                                                 </td>
@@ -922,7 +919,7 @@ class SubmitResults extends React.Component {
                     <div className="modal-dialog modal-dialog-centered" role="document">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h5 className="modal-title" id="exampleModalLongTitle">Notice!</h5>
+                                <h5 className="modal-title" id="exampleModalLongTitle">Notice</h5>
                                 <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
