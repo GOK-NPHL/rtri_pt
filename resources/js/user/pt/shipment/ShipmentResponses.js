@@ -95,12 +95,12 @@ class ShipmentResponses extends React.Component {
             this.state.data.map((element, index) => {
                 tableElem.push(<tr key={index}>
                     <th scope="row">{index + 1}</th>
+                    <td>{element.fname} {element.sname}</td>
+                    <td>{element.lab_name}</td>
                     <td>{element.name}</td>
                     <td>{element.code}</td>
-                    <td>{element.lab_name}</td>
                     <td>{element.created_at}</td>
                     <td>{element.updated_at}</td>
-                    <td> {<span>{element.fname} {element.sname}</span>} </td>
                     <td>
                         {element.pt_submission_file_id ? <a href={window.location.origin + '/api/resources/files/download/' + element.pt_submission_file_id} target="_blank" download={element.pt_submission_file_name}>{"File_"+element.pt_submission_file_id}</a> : <span className="badge badge-dark">No File</span>}
                     </td>
@@ -172,7 +172,10 @@ class ShipmentResponses extends React.Component {
                             let currElementsTableEl = this.state.allTableElements.filter(elemnt =>
                                 elemnt['props']['children'][1]['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
                                 elemnt['props']['children'][2]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
-                                elemnt['props']['children'][3]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase())
+                                elemnt['props']['children'][3]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
+                                elemnt['props']['children'][4]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
+                                elemnt['props']['children'][5]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
+                                elemnt['props']['children'][6]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase())
                             );
                             this.updatedSearchItem(currElementsTableEl);
                         }}
@@ -183,12 +186,12 @@ class ShipmentResponses extends React.Component {
                     <thead>
                         <tr>
                             <th scope="col">#</th>
+                            <th scope="col">Participant name</th>
+                            <th scope="col">Responded by</th>
                             <th scope="col">Round name</th>
                             <th scope="col">Shipment code</th>
-                            <th scope="col">Participant name</th>
                             <th scope="col">Date responded</th>
                             <th scope="col">Date updated</th>
-                            <th scope="col">Responded by</th>
                             <th scope="col">PT Files</th>
                             <th scope="col">Action</th>
                         </tr>
