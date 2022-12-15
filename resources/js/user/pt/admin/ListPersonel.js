@@ -179,7 +179,7 @@ class ListPersonel extends React.Component {
                                     return {
                                         'Lab/Facility': element.lab_name,
                                         'County': element.county,
-                                        'Personnel name': element.name,
+                                        'Personnel name': element.name + ' ' + element.second_name,
                                         'Phone number (mobile)': element.phone_number,
                                         'Email': element.email,
                                         'Status': element.is_active ? 'Active' : 'Inactive'
