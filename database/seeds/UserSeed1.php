@@ -16,8 +16,8 @@ class UserSeed extends Seeder
         $dataUser = array(
 
             array(
-                'name' => 'Ndiithi Wachira',
-                'email' => 'duncanndiithi@yahoo.com',
+                'name' => 'NPHL User',
+                'email' => 'defaultnphluser@yahoo.com',
                 'second_name' => 'User',
                 'has_qc_access' => true,
                 'has_pt_access' => true,
