@@ -62,7 +62,7 @@ class UserSeed extends Seeder
         $dataAdmin = array(
             array(
                 'name' => 'NPHL EQA',
-                'email' => 'nphleqa@gmail.com',
+                'email' => 'dlsqneqas@gmail.com',
                 'password' => '$2y$10$wCyQ7j2mwl.NGD3brp1RSuCo3nIv9b1pDO4Cb8v0xjmfBshm93bGm',
                 'phone_number' => '0710238034',
                 'is_admin' => true,
