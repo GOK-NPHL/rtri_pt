@@ -31,6 +31,8 @@ class ShipmentForm extends React.Component {
             panel_ids: [],
             allPanelDetails: [],
             tempanel: null,
+            surveyQns: [],
+            newSurveyQn: {},
         }
 
         this.handleRoundChange = this.handleRoundChange.bind(this);
@@ -42,6 +44,10 @@ class ShipmentForm extends React.Component {
         this.handleParticipantSourceChange = this.handleParticipantSourceChange.bind(this);
         this.dualListOnChange = this.dualListOnChange.bind(this);
         this.getShipementDataById = this.getShipementDataById.bind(this);
+        this.addSurveyQn = this.addSurveyQn.bind(this);
+        this.editSurveyQn = this.editSurveyQn.bind(this);
+        this.deleteSurveyQn = this.deleteSurveyQn.bind(this);
+
 
     }
 
@@ -65,6 +71,12 @@ class ShipmentForm extends React.Component {
                     resultDueDate: editData.shipment.end_date,
                     passMark: editData.shipment.pass_mark,
                     testInstructions: editData.shipment.test_instructions,
+                    surveyQns: Array.from(editData.survey_questions, q=>{
+                        return {
+                            ...q,
+                            _id: uuidv4(),
+                        }
+                    }) || [],
                     pageState: 'edit',
                 });
 
@@ -72,7 +84,7 @@ class ShipmentForm extends React.Component {
                 if (all_panels && all_panels.length > 0) {
                     all_panels.forEach((panel) => {
                         FetchPanel(panel).then((response) => {
-                            console.log('panel::::', response);
+                            // console.log('panel::::', response);
                             this.setState({
                                 panel_ids: [...this.state.panel_ids, panel],
                                 allPanelDetails: [...this.state.allPanelDetails, response]
@@ -95,6 +107,65 @@ class ShipmentForm extends React.Component {
                 });
             }
         })();
+    }
+
+    addSurveyQn = () => {
+        // add this.state.newSurveyQn to this.state.surveyQns
+        if (Object.keys(this.state.newSurveyQn).length === 0) {
+            return;
+        } else if (
+            Object.keys(this.state.newSurveyQn).length > 0 && Object.keys(this.state.newSurveyQn).includes('question') && Object.keys(this.state.newSurveyQn).includes('question_type')
+        ) {
+            // if qn contains _id, then it is an edit
+            if (Object.keys(this.state.newSurveyQn).includes('_id')) {
+                let index = this.state.surveyQns.findIndex((qn) => qn._id === this.state.newSurveyQn._id);
+                let surveyQns = [...this.state.surveyQns];
+                surveyQns[index] = this.state.newSurveyQn;
+                this.setState({
+                    surveyQns: surveyQns,
+                    newSurveyQn: {}
+                });
+            } else {
+                this.setState({
+                    surveyQns: [...this.state.surveyQns, {
+                        ...this.state.newSurveyQn,
+                        _id: uuidv4()
+                    }],
+                    newSurveyQn: {}
+                });
+            }
+        }
+    }
+
+    editSurveyQn = (id) => {
+        let qn2edit = this.state.surveyQns.find((qn) => qn._id === id);
+        console.log(qn2edit);
+        if (qn2edit) {
+            this.setState({
+                newSurveyQn: qn2edit
+            });
+            $('#surveyQnModal').modal('toggle');
+        }else{
+            return;
+        }
+        // modal
+    }
+
+    deleteSurveyQn = (uid) => {
+        let qns = this.state.surveyQns
+        let qn = this.state.surveyQns.find((qn) => qn._id === uid);
+        if (!qn) {
+            return;
+        }
+        let qn_index = this.state.surveyQns.findIndex((qn) => qn._id === uid);
+        if(Object.keys(qn).includes('id')){
+            qns[qn_index].delete = true;
+        }else{
+            qns = qns.filter((qn) => qn._id !== uid);
+        }
+        this.setState({
+            surveyQns: qns
+        });
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -251,6 +322,8 @@ class ShipmentForm extends React.Component {
                 shipement['panel_ids'] = this.state.panel_ids;
                 shipement['readiness_id'] = this.state.readiness_id;
                 shipement['test_instructions'] = this.state.testInstructions;
+                // survey questions
+                shipement['survey_questions'] = this.state.surveyQns;
 
                 if (this.state.pageState == 'edit') {
                     let response = await UpdateShipment(shipement);
@@ -544,6 +617,120 @@ class ShipmentForm extends React.Component {
                                         </div>
                                     </div>
                                 </div>)}
+
+                                <hr />
+                                {/* <survey questions> */}
+                                <div className="row mt-2 mb-2">
+                                    <div className="col-sm-8">
+                                        <h5>Survey questions</h5>
+                                    </div>
+                                    <div className="col-sm-4 text-right">
+                                        {/* modal */}
+                                        <button type="button" className="btn btn-primary btn-sm" data-toggle="modal" data-target="#surveyQnModal" id="surveyQnModalTrigger"> {this.state.newSurveyQn && (Object.keys(this.state.newSurveyQn).includes("_id")) ? "Edit" : "Add"} survey question</button>
+                                        <div className="modal fade" id="surveyQnModal" tabIndex="-1" role="dialog" aria-labelledby="surveyQnModalLabel" aria-hidden="true">
+                                            <div className="modal-dialog" role="document">
+                                                <div className="modal-content">
+                                                    <div className="modal-header">
+                                                        <h5 className="modal-title" id="surveyQnModalLabel">Add survey question</h5>
+                                                        <button type="button" className="close" data-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div className="modal-body text-left">
+                                                        <div className="form-group">
+                                                            <label htmlFor="surveyQn">Question type</label>
+                                                            <select className="form-control" id="surveyQn" value={
+                                                                (this.state.newSurveyQn && this.state.newSurveyQn.question_type) ? this.state.newSurveyQn.question_type : ""
+                                                            } onChange={(e) => {
+                                                                this.setState({
+                                                                    newSurveyQn: {
+                                                                        ...this.state.newSurveyQn,
+                                                                        question_type: e.target.value
+                                                                    }
+                                                                })
+                                                            }}>
+                                                                <option value=""> - Select - </option>
+                                                                <option value="select">Dropdown</option>
+                                                                <option value="text">Text</option>
+                                                                <option value="number">Number</option>
+                                                                <option value="date">Date</option>
+                                                            </select>
+                                                        </div>
+                                                        <div className="form-group">
+                                                            <label htmlFor="surveyQn">Question</label>
+                                                            <input type="text" className="form-control" value={
+                                                                (this.state.newSurveyQn && this.state.newSurveyQn.question) ? this.state.newSurveyQn.question : ""
+                                                            } id="surveyQn" placeholder="Enter question" onChange={(e) => {
+                                                                this.setState({
+                                                                    newSurveyQn: {
+                                                                        ...this.state.newSurveyQn,
+                                                                        question: e.target.value
+                                                                    }
+                                                                })
+                                                            }} />
+                                                        </div>
+                                                        {this.state.newSurveyQn && this.state.newSurveyQn?.question_type == "select" && <div className="form-group">
+                                                            <label htmlFor="surveyQn">Options (pipe-separated)</label>
+                                                            <input type="text" className="form-control" value={
+                                                                (this.state.newSurveyQn && this.state.newSurveyQn.question_options) ? this.state.newSurveyQn.question_options.join('|') : ""
+                                                            } id="surveyQn" placeholder="Enter options" onChange={(e) => {
+                                                                this.setState({
+                                                                    newSurveyQn: {
+                                                                        ...this.state.newSurveyQn,
+                                                                        question_options: Array.from(e.target.value.split('|'), o=>o.trim()) || []
+                                                                    }
+                                                                })
+                                                            }} />
+                                                        </div>}
+                                                    </div>
+                                                    <div className="modal-footer">
+                                                        <button type="button" className="btn btn-sm text-muted" data-dismiss="modal">Cancel</button>
+                                                        <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={() => {
+                                                            this.addSurveyQn()
+                                                        }}>Add</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-sm-12">
+                                        {/* list */}
+                                        <table className="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Type</th>
+                                                    <th scope="col">Question</th>
+                                                    {/* <th scope="col">Options</th> */}
+                                                    <th scope="col" className='text-right'>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {this.state.surveyQns && this.state.surveyQns.length > 0 ? this.state.surveyQns.filter(q=>{
+                                                    return (q?.deleted_at == null || q?.deleted_at == undefined) && (q?.delete == false || q?.delete == undefined)
+                                                }).map((qn, index) => {
+                                                    return (
+                                                        <tr key={index}>
+                                                            <td style={{ textTransform: 'capitalize' }} title={qn?._id}>{qn.question_type}</td>
+                                                            <td>{qn.question}</td>
+                                                            {/* <td style={{ textTransform: 'capitalize' }}>{qn.question_options ? qn.question_options.join(',') : ""}</td> */}
+                                                            <td className='text-right'>
+                                                                <a href="#" onClick={() => {
+                                                                    this.editSurveyQn(qn._id)
+                                                                }} className="btn btn-sm btn-primary btn-xs">Edit</a> &nbsp;
+                                                                <a href="#" onClick={() => {
+                                                                    this.deleteSurveyQn(qn._id)
+                                                                }} className="btn btn-sm btn-danger btn-xs">Delete</a>
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                                }) : <tr><td colSpan="4" className="text-center">No questions added</td></tr>}
+                                            </tbody>
+                                        </table>
+                                        {/* <div className="col-md-12">
+                                            <pre>{JSON.stringify(this.state.surveyQns,null,2)}</pre>
+                                        </div> */}
+                                    </div>
+                                </div>
+                                {/* </survey questions> */}
+
 
                                 <div className="form-group row mt-4">
                                     <div className="col-sm-12 text-center">

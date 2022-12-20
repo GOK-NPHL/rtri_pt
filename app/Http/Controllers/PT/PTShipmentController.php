@@ -13,6 +13,7 @@ use App\Readiness;
 use App\ReadinessAnswer;
 use App\ReadinessApproval;
 use App\ReadinessQuestion;
+use App\SurveyQuestion;
 use App\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -73,8 +74,8 @@ class PTShipmentController extends Controller
             $labIds = [];
             $shipment = PtShipement::find($request->id);
             if ($shipment) {
+                // panels
                 $panels = PtPanel::whereIn('id', $shipment->ptpanel_ids)->get();
-                /////
                 if ($panels && count($panels) > 0) {
                     foreach ($panels as $panel) {
                         $panel->participants = [];
@@ -98,11 +99,17 @@ class PTShipmentController extends Controller
                     }
                 }
 
+                // survey questions
+                $surveyQns = SurveyQuestion::where('shipment_id', $shipment->id)
+                    ->where('deleted_at', null)
+                    ->get();
+
                 $payload = [];
                 $payload['shipment'] = $shipment;
                 $payload['labs'] = $labIds;
                 $payload['panel'] = $panel;
                 $payload['samples'] = $panel->samples;
+                $payload['survey_questions'] = $surveyQns;
                 return $payload;
             } else {
                 return response()->json(['Message' => 'Could not find shipment'], 404);
@@ -158,6 +165,19 @@ class PTShipmentController extends Controller
                     }
                 }
             }
+
+            // save survey questions
+            if (isset($request->shipement['survey_questions']) && count($request->shipement['survey_questions']) > 0) {
+                foreach ($request->shipement['survey_questions'] as $question) {
+                    $survey = SurveyQuestion::create([
+                        'question' => $question['question'],
+                        'question_type' => $question['question_type'],
+                        'question_options' => $question['question_options'] ?? null,
+                        'meta' => $question['meta'] ?? null,
+                        'shipment_id' => $shipment['id'],
+                    ]);
+                }
+            }
             return response()->json(['Message' => 'Created successfully'], 200);
         } catch (Exception $ex) {
             return response()->json(['Message' => 'Could not save the checklist ' . $ex->getMessage()], 500);
@@ -185,6 +205,32 @@ class PTShipmentController extends Controller
             $shipments->test_instructions = $request->shipement['test_instructions'];
             $shipments->ptpanel_ids = $request->shipement['panel_ids'] ?? $request->shipement['ptpanel_ids'];
 
+            // update survey questions
+            if (isset($request->shipement['survey_questions'])) {
+                foreach ($request->shipement['survey_questions'] as $question) {
+                    if ( !empty($question['id']) ) {
+                        $survey = SurveyQuestion::find($question['id']);
+                        if (!empty($question['delete']) && $question['delete'] == true) {
+                            $survey->delete();
+                        } else {
+                            $survey->question = $question['question'];
+                            $survey->question_type = $question['question_type'];
+                            $survey->question_options = $question['question_options'] ?? null;
+                            $survey->meta = $question['meta'] ?? null;
+                            $survey->save();
+                        }
+                    } else {
+                        $survey = SurveyQuestion::create([
+                            'question' => $question['question'],
+                            'question_type' => $question['question_type'],
+                            'question_options' => $question['question_options'] ?? null,
+                            'meta' => $question['meta'] ?? null,
+                            'shipment_id' => $request->shipement['id'],
+                        ]);
+                    }
+                }
+            }
+
             $shipments->save();
 
             // save participants
@@ -203,6 +249,11 @@ class PTShipmentController extends Controller
             $shipment = PtShipement::find($request->id);
             if ($shipment) {
                 $shipment->delete();
+                // delete all the survey questions
+                $surveyQuestions = SurveyQuestion::where('shipment_id', $request->id)->get();
+                foreach ($surveyQuestions as $question) {
+                    $question->delete();
+                }
                 return response()->json(['Message' => 'Deleted successfully'], 200);
             } else {
                 return response()->json(['Message' => 'Could not find the shipment'], 404);
@@ -293,6 +344,10 @@ class PTShipmentController extends Controller
                                         // submissions
                                         $submission = ptsubmission::where('pt_shipements_id', $shipment->id)->where('lab_id', $useracc->lab()->id)->where('user_id', $user_id)->first();
                                         $shipment->submission = $submission->id ?? null;
+
+                                        // survey questions
+                                        $survey_qns = SurveyQuestion::where('shipment_id', $shipment->id)->get();
+                                        $shipment->survey_questions = $survey_qns;
                                     }
                                     // push to data
                                     $data[] = $shipment;

@@ -38,7 +38,9 @@ class SubmitResults extends React.Component {
             samples: {},
             submissionId: '',
             test_instructions: '',
-            endDate: Date.parse('1970-01-01')
+            endDate: Date.parse('1970-01-01'),
+            survey_questions: [],
+            qa_responses: [],
         }
 
         this.onNameOfTestHandler = this.onNameOfTestHandler.bind(this);
@@ -56,6 +58,7 @@ class SubmitResults extends React.Component {
         this.onSampleTypeHandler = this.onSampleTypeHandler.bind(this);
         this.validateTestingDateAndCurrentDate = this.validateTestingDateAndCurrentDate.bind(this);
 
+        this.handleSurveyQnResponse = this.handleSurveyQnResponse.bind(this);
         this.submitForm = this.submitForm.bind(this);
 
         this.onNameOfTestHandler = this.onNameOfTestHandler.bind(this);
@@ -144,6 +147,13 @@ class SubmitResults extends React.Component {
                     userId: userDemographics[0].user_id,
                     edittableSubmission: edittableSubmission,
                     test_instructions: this.props.shipment.test_instructions,
+                    survey_questions: this.props.shipment.survey_questions ? this.props.shipment.survey_questions : [],
+                    qa_responses: this.props.shipment.survey_questions ? Array.from(this.props.shipment.survey_questions, q=>{
+                        return {
+                            "question_id": q.id,
+                            "response": ""
+                        }
+                    }) : [],
                     samples: samples,
                     endDate: this.props.shipment.end_date
                 });
@@ -157,6 +167,33 @@ class SubmitResults extends React.Component {
 
     }
 
+
+    handleSurveyQnResponse = (e, qnId) => {
+        let survey_questions = this.state.survey_questions;
+        let qn = survey_questions.find(q => q.id == qnId);
+        // qn.response = e.target.value;
+        // this.setState({
+        //     survey_questions: survey_questions
+        // });
+        let survey_questions_responses = this.state.qa_responses;
+        let survey_questions_response = this.state.qa_responses.find(q => q.question_id == qnId);
+        let response_index = this.state.qa_responses.findIndex(q => q.question_id == qnId);
+        if (survey_questions_response) {
+            survey_questions_response.response = e.target.value;
+            survey_questions_responses[response_index] = survey_questions_response;
+            this.setState({
+                qa_responses: survey_questions_responses
+            });
+        } else {
+            survey_questions_response = {
+                question_id: qnId,
+                response: e.target.value
+            }
+            this.setState({
+                qa_responses: [...this.state.qa_responses, survey_questions_response]
+            });
+        }
+    }
 
     submitForm() {
         console.log(this.state.samples);
@@ -216,6 +253,7 @@ class SubmitResults extends React.Component {
             submission["samples"] = this.state.samples;
             submission["ptPanelId"] = this.props.shipment.pt_panel_id || this.state.samples[0]?.panel || null;
             submission["id"] = this.state.submissionId;
+            submission["qa_responses"] = this.state.qa_responses;
             // submission["file"] = this.state.ptFile;
 
             // console.log("submission", submission)
@@ -256,7 +294,7 @@ class SubmitResults extends React.Component {
         this.setState({
             samples: samples
         });
-        
+
 
     }
 
@@ -924,8 +962,53 @@ class SubmitResults extends React.Component {
 
                         {/* End PT Test results fields */}
                         <hr />
-
                     </div>
+
+                    {/* <survey section */}
+                    {this.state.survey_questions && this.state.survey_questions.length > 0 && <div className="w-100 d-flex flex-column">
+                        <div className="text-center">
+                            <h4 className='text-bold'>Survey</h4>
+                            <p className='text-muted'> Additonal questions related to the test </p>
+                            {/* <small><pre>{JSON.stringify(this.state.qa_responses)}</pre></small> */}
+                            <hr style={{ maxWidth: '400px' }} />
+                        </div>
+                        <div className="px-3 text-center">
+                            {this.state.survey_questions && this.state.survey_questions.length > 0 ? this.state.survey_questions.map((question, index) => {
+                                return (
+                                    <div className="form-group d-flex flex-column align-items-center" key={index}>
+                                        <label htmlFor="question">{question.question}</label>
+                                        {question.question_type != "select" ? <input style={{ maxWidth: '320px' }} type={question.question_type || "text"} className="form-control" id="question" name={question.id} placeholder={question.question}
+                                        value={(()=>{
+                                            let response_obj = this.state.qa_responses.find(qa=>qa.question_id == question.id)
+                                            return response_obj ? response_obj.response : ''
+                                        })()}
+                                        onChange={e=>{
+                                            this.handleSurveyQnResponse(e, question.id)
+                                        }}
+                                        /> : <select style={{ maxWidth: '320px' }} className="form-control" id="question" name={question.id} placeholder={question.question}
+                                        value={(()=>{
+                                            let response_obj = this.state.qa_responses.find(qa=>qa.question_id == question.id)
+                                            return response_obj ? response_obj.response : ''
+                                        })()}
+                                        onChange={e=>{
+                                            this.handleSurveyQnResponse(e, question.id)
+                                        }}
+                                        >
+                                            <option value="">Select</option>
+                                            {question.question_options.map((option, index) => {
+                                                return (
+                                                    <option value={option} key={index}>{option}</option>
+                                                )
+                                            })}
+                                        </select>}
+                                    </div>
+                                )
+                            }) : ""}
+                        </div>
+                        <hr />
+                    </div>}
+                    {/* survey section/> */}
+
                     <div className="d-flex w-100 justify-content-center">
 
                         {Date.parse(this.state.endDate) > new Date() && this.props.shipment.readiness_approval_id != null ?

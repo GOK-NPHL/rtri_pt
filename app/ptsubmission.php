@@ -26,6 +26,11 @@ class ptsubmission extends Model
         "user_id",
         "sample_type",
         "tester_name",
-        "pt_submission_file_id"
+        "pt_submission_file_id",
+        "qa_responses",
+    ];
+
+    protected $casts = [
+        'qa_responses' => 'array',
     ];
 }

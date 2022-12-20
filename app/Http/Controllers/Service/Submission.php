@@ -94,6 +94,7 @@ class Submission extends Controller
                 "pt_shipements_id" => $submission["ptShipementId"],
                 "pt_panel_id" => $submission["ptPanelId"],
                 "pt_submission_file_id" => $file_id,
+                "qa_responses" => $submission["qa_responses"],
             ]);
 
             Log::info('-----------------------Submission saved : '.json_encode($submissionModel));
@@ -222,6 +223,7 @@ class Submission extends Controller
             $submissionModel->not_test_reason = $submission["otherComments"] ? $submission["otherComments"] : $submission["ptNotTestedOtherReason"];
             $submissionModel->pt_shipements_id = $submission["ptShipementId"];
             $submissionModel->pt_panel_id = $submission["ptPanelId"];
+            $submissionModel->qa_responses = $submission["qa_responses"];
 
             $submissionModel->save();
 
