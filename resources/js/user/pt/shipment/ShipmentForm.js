@@ -109,7 +109,7 @@ class ShipmentForm extends React.Component {
         })();
     }
 
-    addSurveyQn = () => {
+    addSurveyQn() {
         // add this.state.newSurveyQn to this.state.surveyQns
         if (Object.keys(this.state.newSurveyQn).length === 0) {
             return;
