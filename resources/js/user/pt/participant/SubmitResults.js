@@ -168,7 +168,7 @@ class SubmitResults extends React.Component {
     }
 
 
-    handleSurveyQnResponse = (e, qnId) => {
+    handleSurveyQnResponse(e, qnId) {
         let survey_questions = this.state.survey_questions;
         let qn = survey_questions.find(q => q.id == qnId);
         // qn.response = e.target.value;
