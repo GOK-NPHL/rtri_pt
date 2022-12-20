@@ -47,7 +47,7 @@ class ShipmentResponseForm extends React.Component {
     }
 
     render() {
-        console.log(this.state.data)
+        // console.log(this.state.data)
         return (
             <React.Fragment>
                 {/* {this.state.data ? <SubmitResults

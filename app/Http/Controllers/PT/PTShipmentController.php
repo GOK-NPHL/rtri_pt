@@ -740,9 +740,10 @@ class PTShipmentController extends Controller
 
             foreach ($shipmentsResponses as $key => $value) {
                 $shipmentsResponses[$key]->survey_responses = json_decode($value->survey_responses);
-
-                foreach ($shipmentsResponses[$key]->survey_responses as $key1 => $value1) {
-                    $shipmentsResponses[$key]->survey_responses[$key1]->question = SurveyQuestion::find($value1->question_id)->question;
+                if ( !empty($shipmentsResponses[$key]->survey_responses) && count($shipmentsResponses[$key]->survey_responses) > 0) {
+                    foreach ($shipmentsResponses[$key]->survey_responses as $key1 => $value1) {
+                        $shipmentsResponses[$key]->survey_responses[$key1]->question = SurveyQuestion::find($value1->question_id)->question;
+                    }
                 }
             }
 
