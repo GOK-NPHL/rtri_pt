@@ -208,7 +208,7 @@ class PTShipmentController extends Controller
             // update survey questions
             if (isset($request->shipement['survey_questions'])) {
                 foreach ($request->shipement['survey_questions'] as $question) {
-                    if ( !empty($question['id']) ) {
+                    if (!empty($question['id'])) {
                         $survey = SurveyQuestion::find($question['id']);
                         if (!empty($question['delete']) && $question['delete'] == true) {
                             $survey->delete();
@@ -582,7 +582,7 @@ class PTShipmentController extends Controller
 
             if ($is_participant == 1) {
                 $shipmentsRefResult = $shipmentsRefResult->where('ptsubmissions.pt_shipements_id', $id);
-            }else{
+            } else {
                 $shipmentsRefResult = $shipmentsRefResult->where('ptsubmissions.id', $id);
             }
 
@@ -658,6 +658,102 @@ class PTShipmentController extends Controller
 
     public function getUserSampleResponseResult(Request $request)
     {
-        return $this->geSamples($request->id);
+        // 7777777777777
+        $user = Auth::user();
+        $id = $request->id;
+        try {
+
+            $shipmentsResponses = DB::table("pt_shipements")->distinct()
+                ->join('ptsubmissions', 'ptsubmissions.pt_shipements_id', '=', 'pt_shipements.id')
+                ->join('laboratory_pt_shipement', 'laboratory_pt_shipement.pt_shipement_id', '=', 'pt_shipements.id')
+                ->join('pt_panels', 'pt_panels.id', '=', 'laboratory_pt_shipement.pt_panel_id')
+                ->join('pt_samples', 'pt_samples.ptpanel_id', '=', 'pt_panels.id')
+                ////
+                ->join('pt_submission_results', 'pt_submission_results.ptsubmission_id', '=', 'ptsubmissions.id')
+                ->join('laboratories', 'ptsubmissions.lab_id', '=', 'laboratories.id')
+                ->join('users', 'ptsubmissions.user_id', '=', 'users.id');
+
+            $shipmentsResponses =
+                $shipmentsResponses->where('ptsubmissions.id', $id);
+
+            $shipmentsResponses = $shipmentsResponses->get([
+                "pt_shipements.id",
+                "pt_shipements.created_at as shipment_date",
+                "pt_shipements.code as shipment_code",
+                "pt_shipements.end_date",
+                "pt_shipements.pass_mark",
+                "pt_shipements.round_name as round_name",
+                "laboratories.id as lab_id",
+                "users.name as first_name",
+                "users.second_name as surname",
+                "laboratories.phone_number",
+                "laboratories.lab_name",
+                "laboratories.email as lab_email",
+                "ptsubmissions.id as ptsubmission_id",
+                "ptsubmissions.created_at as submission_date",
+                "ptsubmissions.updated_at  as updated_at",
+                "ptsubmissions.testing_date",
+                "ptsubmissions.kit_expiry_date",
+                "ptsubmissions.kit_date_received",
+                "ptsubmissions.pt_lot_no",
+                "ptsubmissions.qa_responses as survey_responses",
+            ]);
+
+            //  one
+            $shipmentsRefResult = DB::table("pt_shipements")->distinct()
+                ->join('ptsubmissions', 'ptsubmissions.pt_shipements_id', '=', 'pt_shipements.id')
+                ->join('laboratory_pt_shipement', 'laboratory_pt_shipement.pt_shipement_id', '=', 'pt_shipements.id')
+                ->join('pt_panels', 'pt_panels.id', '=', 'laboratory_pt_shipement.pt_panel_id')
+                ->join('survey_questions', 'survey_questions.shipment_id', '=', 'pt_shipements.id')
+                ->join('pt_samples', 'pt_samples.ptpanel_id', '=', 'pt_panels.id');
+
+            $shipmentsRefResult = $shipmentsRefResult->where('ptsubmissions.id', $id);
+
+            $shipmentsRefResult = $shipmentsRefResult->get([
+                "pt_samples.reference_result as reference_result",
+                "pt_samples.name as sample_name",
+                "pt_panels.id as ref_panel_id",
+                "pt_panels.name as ref_panel_name",
+                "pt_shipements.round_name as round_name"
+            ]);
+
+
+            //  two
+            $shipmentsResponsesRlt = DB::table("pt_shipements")->distinct()
+                ->join('ptsubmissions', 'ptsubmissions.pt_shipements_id', '=', 'pt_shipements.id')
+                ->leftJoin('pt_submission_results', 'pt_submission_results.ptsubmission_id', '=', 'ptsubmissions.id')
+                ->join('pt_panels', 'pt_panels.id', '=', 'ptsubmissions.pt_panel_id')
+                ->join('pt_samples', 'pt_samples.id', '=', 'pt_submission_results.sample_id');
+
+
+            $shipmentsResponsesRlt = $shipmentsResponsesRlt->where('ptsubmissions.id', $id);
+
+            $shipmentsResponsesRlt = $shipmentsResponsesRlt->get([
+                "pt_submission_results.interpretation as result_interpretation",
+                "pt_submission_results.control_line as control_line",
+                "pt_submission_results.verification_line as verification_line",
+                "pt_submission_results.longterm_line as longterm_line",
+                "ptsubmissions.pt_panel_id as panel_id",
+                "pt_samples.name as sample_name",
+                "ptsubmissions.id as submission_id",
+            ]);
+
+            foreach ($shipmentsResponses as $key => $value) {
+                $shipmentsResponses[$key]->survey_responses = json_decode($value->survey_responses);
+
+                foreach ($shipmentsResponses[$key]->survey_responses as $key1 => $value1) {
+                    $shipmentsResponses[$key]->survey_responses[$key1]->question = SurveyQuestion::find($value1->question_id)->question;
+                }
+            }
+
+
+
+            return [
+                'shipmentsResponses' => $shipmentsResponses, 'sample_results' => $shipmentsResponsesRlt, 'reference_results' => $shipmentsRefResult
+            ];
+        } catch (Exception $ex) {
+            return response()->json(['Message' => 'Could fetch report data: ' . $ex->getMessage()], 500);
+        }
+        // 7777777777777
     }
 }

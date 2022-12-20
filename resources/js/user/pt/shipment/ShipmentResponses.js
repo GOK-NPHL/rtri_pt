@@ -111,14 +111,24 @@ class ShipmentResponses extends React.Component {
 
                             {
                                 this.props.page == 'report' ?
+                                <>
                                     <a
                                         onClick={() => {
                                             window.location.assign('/get-shipment-response-performance/' + element.ptsubmission_id)
                                         }}
                                         data-toggle="tooltip" data-placement="top" title="View performance report"
-                                        className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm text-white">
-                                        <i className="fas fa-file-pdf"></i> Performance
+                                        className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm text-white m-1">
+                                        <i className="fas fa-file-pdf"></i> View Performance
+                                    </a> &nbsp;
+                                    <a
+                                        onClick={() => {
+                                            window.location.assign('/get-shipment-response-form/' + element.ptsubmission_id)
+                                        }}
+                                        data-toggle="tooltip" data-placement="top" title="View responses"
+                                        className="d-none d-sm-inline-block btn btn-sm btn-light shadow-sm m-1">
+                                        <i className="fas fa-eye"></i> View Response
                                     </a>
+                                </>
                                     :
                                     <a
                                         onClick={() => {
