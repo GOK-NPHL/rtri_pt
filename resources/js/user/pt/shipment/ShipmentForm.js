@@ -137,7 +137,7 @@ class ShipmentForm extends React.Component {
         }
     }
 
-    editSurveyQn = (id) => {
+    editSurveyQn(id) {
         let qn2edit = this.state.surveyQns.find((qn) => qn._id === id);
         console.log(qn2edit);
         if (qn2edit) {
@@ -151,7 +151,7 @@ class ShipmentForm extends React.Component {
         // modal
     }
 
-    deleteSurveyQn = (uid) => {
+    deleteSurveyQn(uid) {
         let qns = this.state.surveyQns
         let qn = this.state.surveyQns.find((qn) => qn._id === uid);
         if (!qn) {
