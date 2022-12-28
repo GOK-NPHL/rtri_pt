@@ -28,9 +28,10 @@ use Illuminate\Support\Facades\Route;
 // });
 
 // Auth::routes(['register' => false]);
-//Auth::routes();
+Auth::routes();
 
 
+Route::get('/home',  [CustomAuthController::class, 'index'])->name('home');
 Route::get('/',  [CustomAuthController::class, 'index'])->name('home');
 Route::get('index', [CustomAuthController::class, 'index'])->name('index');
 Route::get('participant-login', [CustomAuthController::class, 'getParticipantLoginPage'])->name('participant-login');

@@ -53,16 +53,18 @@
                                 {{ __('Remember Me') }}
                             </label>
                         </div>
-                        &nbsp; &nbsp; No account? <a href="/participant-signup">Sign up</a> &nbsp; &nbsp; &nbsp;
+                        <hr/>
+                        &nbsp; &nbsp; No account? <a href="/participant-signup" style="color:aquamarine;">Sign up</a> &nbsp; &nbsp; &nbsp;
+                        <hr/>
                         <!-- <a href="/auth/reset-password" style="font-size:0.8em;color:white;">Forgot Password?</a> -->
                         <!--<a href="/contact-us" style="">Don't have a login ? Click here to contact us</a>-->
                         @if (Route::has('password.request'))
-                        <a style="display: inline-block;" class="btn btn-link" href="{{ route('password.request') }}">
+                        <a style="display: inline-block; color: aquamarine;" class="btn btn-link" href="{{ route('password.request') }}">
                             {{ __('Forgot Your Password?') }}
                         </a>
                         @endif
                         | <a style="display: inline-block;" class="btn btn-link" href="http://helpdesk.nphl.go.ke/index.php?a=add">
-                            RTRI HELP DESK
+                            RTRI Help Desk
                         </a>
                     </div>
 
