@@ -91,21 +91,26 @@ class ReadinessResponse extends React.Component {
                 tableElem.push(<tr key={index} style={{ fontSize: '16px' }}>
                     <th scope="row">{index + 1}</th>
                     <td>
-                        <p style={{ marginLeft: '3px', marginRight: '3px' }}>{element.name}</p>
+                        <span>{element.lab_name}</span>
                     </td>
                     <td>
-                        {element.lab_name}
-                    </td>
-                    <td>{element.created_at ? new Date(element.created_at).toLocaleString('en-GB') : '-'}</td>
-                    <td>{element.updated_at ? new Date(element.updated_at).toLocaleString('en-GB') : '-'}</td>
-                    <td>
-                        {element.fname == null && element.sname == null && element.email == null ?
+                        {element.created_at == null ?
                             <span className='badge badge-danger' style={{ fontWeight: 500, backgroundColor: '#fc4545' }}>Not Responded</span> :
-                            <span style={{ textTransform: 'capitalize' }}>{element.fname} {element.sname} {element.email}</span>
+                            <span style={{ textTransform: 'capitalize' }}>{element?.fname} {element?.sname}</span>
                         }
                     </td>
                     <td>
-                        {element.fname == null && element.sname == null ?
+                        {element.email == null ?
+                            <span>-</span> :
+                            <span style={{ textTransform: 'capitalize' }}>{element.email}</span>
+                        }
+                    </td>
+                    <td>
+                        <p style={{ marginLeft: '3px', marginRight: '3px' }}>{element.name}</p>
+                    </td>
+                    <td>{element.created_at ? new Date(element.created_at).toLocaleString('en-GB') : '-'}</td>
+                    <td>
+                        {element.created_at == null ?
                             <span className='badge badge-danger' style={{ fontWeight: 500 }}>Not responded</span>
                             :
                             element.approved_id == null ?
@@ -148,8 +153,8 @@ class ReadinessResponse extends React.Component {
                 })
             }
 
-        }else{
-            tableElem = <tr><td colSpan="6" style={{textAlign:'center'}}>No data available</td></tr>
+        } else {
+            tableElem = <tr><td colSpan="6" style={{ textAlign: 'center' }}>No data available</td></tr>
         }
 
         let pageContent = <div id='user_table' className='row'>
@@ -157,15 +162,15 @@ class ReadinessResponse extends React.Component {
                 <div className='col-md-8'>
                     <h3 className="float-left">Readiness response list</h3>
                 </div>
-                <div className='col-md-4' style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                <div className='col-md-4' style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <button type="button" className="btn btn-success btn-sm mx-1" onClick={() => {
                         if (this.state.data && this.state.data.length > 0) {
                             let final_data = this.state.data.map(element => {
                                 return {
                                     'checklist name': element.name,
                                     'participant name': element.lab_name,
+                                    'respondent email': element.email || '',
                                     'date responded': element.created_at,
-                                    'date responded': element.updated_at,
                                     'responded by': `${element.fname || ''} ${element.sname || ''}`,
                                     'approved': element.approved_id == null ? 'Not Approved' : 'Approved',
                                 }
@@ -195,9 +200,11 @@ class ReadinessResponse extends React.Component {
                     <input type="text"
                         onChange={(event) => {
                             // console.log(this.state.allTableElements);
-                            let currElementsTableEl = this.state.allTableElements.filter(elemnt => {
-                                return elemnt['props']['children'][1]['props']['children']['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
-                                    elemnt['props']['children'][2]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase())
+                            let currElementsTableEl = this.state.allTableElements.filter((elemnt,ix) => {
+                                console.log(elemnt['props']['children'][3]['props']['children']['props']['children'].toString())
+                                return elemnt['props']['children'][1]['props']['children']['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) 
+                                || elemnt['props']['children'][2]['props']['children']['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase())
+                                || elemnt['props']['children'][3]['props']['children']['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase())
                             });
                             this.updatedSearchItem(currElementsTableEl);
                         }}
@@ -208,11 +215,11 @@ class ReadinessResponse extends React.Component {
                     <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Name/Title</th>
                             <th scope="col">Participant name</th>
-                            <th scope="col">Date responded</th>
-                            <th scope="col">Date updated</th>
                             <th scope="col">Responded by</th>
+                            <th scope="col">Respondent email</th>
+                            <th scope="col">Round</th>
+                            <th scope="col">Date responded</th>
                             <th scope="col">Approval status</th>
                             <th scope="col">Action</th>
                         </tr>
