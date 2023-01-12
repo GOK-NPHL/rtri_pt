@@ -20,7 +20,7 @@ class ReadinessResponse extends React.Component {
             allowedPermissions: [],
             userActionState: 'userList',
             startTableData: 0,
-            endeTableData: 10,
+            endeTableData: 20,
             activePage: 1,
         }
         this.handlePageChange = this.handlePageChange.bind(this)
@@ -57,7 +57,7 @@ class ReadinessResponse extends React.Component {
     }
 
     handlePageChange(pageNumber) {
-        let pgNumber = pageNumber * 10 + 1;
+        let pgNumber = pageNumber * 20 + 1;
         this.setState({
             startTableData: pgNumber - 11,
             endeTableData: pgNumber - 1,
@@ -71,7 +71,7 @@ class ReadinessResponse extends React.Component {
             currElementsTableEl: currElementsTableEl,
             activePage: 1,
             startTableData: 0,
-            endeTableData: 10,
+            endeTableData: 20,
         })
     }
 
@@ -86,9 +86,8 @@ class ReadinessResponse extends React.Component {
 
         let tableElem = [];
 
-        if (this.state.data_f.length > 0) {
-
-            this.state.data_f.map((element, index) => {
+        if (Object.values(this.state.data_f).length > 0) {
+            Object.values(this.state.data_f).map((element, index) => {
                 tableElem.push(<tr key={index} style={{ fontSize: '16px' }}>
                     <th scope="row">{index + 1}</th>
                     <td>
@@ -107,7 +106,7 @@ class ReadinessResponse extends React.Component {
                     </td>
                     <td>
                         {element.fname == null && element.sname == null ?
-                            <span>N/A</span>
+                            <span className='badge badge-danger' style={{ fontWeight: 500 }}>Not responded</span>
                             :
                             element.approved_id == null ?
                                 <span className='badge badge-warning' style={{ fontWeight: 500 }}>Pending Approval</span>
@@ -149,6 +148,8 @@ class ReadinessResponse extends React.Component {
                 })
             }
 
+        }else{
+            tableElem = <tr><td colSpan="6" style={{textAlign:'center'}}>No data available</td></tr>
         }
 
         let pageContent = <div id='user_table' className='row'>
@@ -226,7 +227,7 @@ class ReadinessResponse extends React.Component {
                     itemClass="page-item"
                     linkClass="page-link"
                     activePage={this.state.activePage}
-                    itemsCountPerPage={10}
+                    itemsCountPerPage={20}
                     totalItemsCount={this.state.currElementsTableEl.length}
                     pageRangeDisplayed={5}
                     onChange={this.handlePageChange.bind(this)}
