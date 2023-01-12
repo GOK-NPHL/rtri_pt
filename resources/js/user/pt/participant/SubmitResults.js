@@ -24,7 +24,7 @@ class SubmitResults extends React.Component {
             labId: '',
             userId: '',
             ptNegativeIntepreation: '',
-
+            isSubmitting: false,
             ptRecentIntepreation: '',
             ptLongtermIntepreation: '',
             isPtDone: true,
@@ -148,7 +148,7 @@ class SubmitResults extends React.Component {
                     edittableSubmission: edittableSubmission,
                     test_instructions: this.props.shipment.test_instructions,
                     survey_questions: this.props.shipment.survey_questions ? this.props.shipment.survey_questions : [],
-                    qa_responses: this.props.shipment.survey_questions ? Array.from(this.props.shipment.survey_questions, q=>{
+                    qa_responses: this.props.shipment.survey_questions ? Array.from(this.props.shipment.survey_questions, q => {
                         return {
                             "question_id": q.id,
                             "response": ""
@@ -196,7 +196,8 @@ class SubmitResults extends React.Component {
     }
 
     submitForm() {
-        console.log(this.state.samples);
+        // console.log(this.state.samples);
+
         //check if results filled
         if (this.state.isPtDone) {
             for (const [key, value] of Object.entries(this.state.samples)) {
@@ -231,6 +232,10 @@ class SubmitResults extends React.Component {
             })
             $('#messageModal').modal('toggle');
         } else {
+            // disable the submit button
+            this.setState({
+                isSubmitting: true
+            });
             let submission = {};
             submission["ptLotReceivedDate"] = this.state.ptLotReceivedDate;
             submission["kitExpiryDate"] = this.state.kitExpiryDate;
@@ -978,21 +983,21 @@ class SubmitResults extends React.Component {
                                     <div className="form-group d-flex flex-column align-items-center" key={index}>
                                         <label htmlFor="question">{question.question}</label>
                                         {question.question_type != "select" ? <input style={{ maxWidth: '320px' }} type={question.question_type || "text"} className="form-control" id="question" name={question.id} placeholder={question.question}
-                                        value={(()=>{
-                                            let response_obj = this.state.qa_responses.find(qa=>qa.question_id == question.id)
-                                            return response_obj ? response_obj.response : ''
-                                        })()}
-                                        onChange={e=>{
-                                            this.handleSurveyQnResponse(e, question.id)
-                                        }}
+                                            value={(() => {
+                                                let response_obj = this.state.qa_responses.find(qa => qa.question_id == question.id)
+                                                return response_obj ? response_obj.response : ''
+                                            })()}
+                                            onChange={e => {
+                                                this.handleSurveyQnResponse(e, question.id)
+                                            }}
                                         /> : <select style={{ maxWidth: '320px' }} className="form-control" id="question" name={question.id} placeholder={question.question}
-                                        value={(()=>{
-                                            let response_obj = this.state.qa_responses.find(qa=>qa.question_id == question.id)
-                                            return response_obj ? response_obj.response : ''
-                                        })()}
-                                        onChange={e=>{
-                                            this.handleSurveyQnResponse(e, question.id)
-                                        }}
+                                            value={(() => {
+                                                let response_obj = this.state.qa_responses.find(qa => qa.question_id == question.id)
+                                                return response_obj ? response_obj.response : ''
+                                            })()}
+                                            onChange={e => {
+                                                this.handleSurveyQnResponse(e, question.id)
+                                            }}
                                         >
                                             <option value="">Select</option>
                                             {question.question_options.map((option, index) => {
@@ -1012,7 +1017,7 @@ class SubmitResults extends React.Component {
                     <div className="d-flex w-100 justify-content-center">
 
                         {Date.parse(this.state.endDate) > new Date() && this.props.shipment.readiness_approval_id != null ?
-                            <button type="button " onClick={() => this.submitForm()} className="btn btn-info float-left mx-2">Submit</button>
+                            <button type="button " onClick={() => this.submitForm()} id="submitBtn" className="btn btn-info float-left mx-2" disabled={isSubmitting}>Submit</button>
                             : ''
                         }
                         <button type="button" onClick={() => {
