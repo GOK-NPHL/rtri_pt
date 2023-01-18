@@ -1017,7 +1017,9 @@ class SubmitResults extends React.Component {
                     <div className="d-flex w-100 justify-content-center">
 
                         {Date.parse(this.state.endDate) > new Date() && this.props.shipment.readiness_approval_id != null ?
-                            <button type="button " onClick={() => this.submitForm()} id="submitBtn" className="btn btn-info float-left mx-2" disabled={isSubmitting}>Submit</button>
+                            <button type="button " onClick={() => this.submitForm()} id="submitBtn" className="btn btn-info float-left mx-2"
+                            // disabled={isSubmitting}
+                            >Submit</button>
                             : ''
                         }
                         <button type="button" onClick={() => {
