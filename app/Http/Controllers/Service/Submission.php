@@ -31,7 +31,7 @@ class Submission extends Controller
     {
         try {
             $submission = json_decode($request->input('submission'), true);
-            Log::info("Submission::" . json_encode($submission));
+            // Log::info("Submission::" . json_encode($submission));
             if (!$submission) {
                 return response()->json([
                     'status' => 'error',
@@ -41,6 +41,7 @@ class Submission extends Controller
             $file_id = null;
             // save file and get id
             if ($request->hasFile('file')) {
+                Log::info("Submission with file::" . json_encode($submission));
                 $file = $request->file('file');
                 $banned_files = ['exe', 'sh', 'bat', 'php', 'go', 'js', 'py', 'rb', 'pl', 'sh', 'c', 'cpp', 'java', 'cs', 'html', 'css', 'json', 'xml', 'sql', 'dmg', null, 'bin', 'jar', 'ts', 'cpp'];
                 $name = $file->getClientOriginalName();
@@ -50,6 +51,7 @@ class Submission extends Controller
                 $new_name = strtolower(str_replace([' ', '-'], '_', $new_name));
                 $extension = $file->getClientOriginalExtension();
                 if (in_array($extension, $banned_files)) {
+                    Log::info("Submission file NOT Saved:: BAD_FILE_TYPE");
                     return response()->json([
                         'status' => 'error',
                         'message' => 'File type not allowed',
@@ -67,11 +69,14 @@ class Submission extends Controller
                 $file_id = $file->id;
 
                 if (!$file_id) {
+                    Log::info("Submission file NOT Saved::" . json_encode($submission));
                     return response()->json([
                         'status' => 'error',
                         'message' => 'File could not be saved',
                     ])->status(400);
                 }
+            }else{
+                Log::info("Submission without file::" . json_encode($submission));
             }
             // else{
             $submissionModel = new SubmissionModel([

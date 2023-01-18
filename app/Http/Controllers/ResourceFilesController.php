@@ -47,7 +47,7 @@ class ResourceFilesController extends Controller
     }
     public function getPublicFiles()
     {
-        $files = ResourceFiles::where('is_public', 1, 'is_ptfile', 0)->get();
+        $files = ResourceFiles::where('is_public', 1)->where('is_ptfile', 0)->get();
         return response()->json($files);
     }
 
