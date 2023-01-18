@@ -99,7 +99,8 @@ Route::get('/get_user_id', [CommonsController::class, 'getUserId']);
 Route::get('/get_user_params', [CommonsController::class, 'getUserParticulars']);
 Route::get('/get_admin_params', [AdminAuthController::class, 'getAdminParticulars']);
 
-Route::get('resources/files_all', ['as' => 'resources.files', 'uses' => 'ResourceFilesController@getAllFiles']);
+// Route::get('resources/files_all', ['as' => 'resources.files', 'uses' => 'ResourceFilesController@getAllFiles']);
+Route::get('resources/files_all', ['as' => 'resources.files', 'uses' => 'ResourceFilesController@getPublicFiles']);
 Route::get('resources/files_public', ['as' => 'resources.files_public', 'uses' => 'ResourceFilesController@getPublicFiles']);
 Route::get('resources/files_private', ['as' => 'resources.files_private', 'uses' => 'ResourceFilesController@getPrivateFiles']);
 Route::delete('resources/files/{id}', ['as' => 'resources.delete', 'uses' => 'ResourceFilesController@destroy']);
