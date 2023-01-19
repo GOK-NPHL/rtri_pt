@@ -30,15 +30,14 @@ class Submission extends Controller
     public function createSubmission(Request $request)
     {
         try {
-            $submission = $request->submission;
-            // $submission = json_decode($request->input('submission'), true);
-            // // Log::info("Submission::" . json_encode($submission));
-            // if (!$submission) {
-            //     return response()->json([
-            //         'status' => 'error',
-            //         'message' => 'Invalid submission',
-            //     ], 400);
-            // }
+            $submission = json_decode($request->input('submission'), true);
+            // Log::info("Submission::" . json_encode($submission));
+            if (!$submission) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Invalid submission',
+                ], 400);
+            }
             $file_id = null;
             // save file and get id
             if ($request->hasFile('file')) {
