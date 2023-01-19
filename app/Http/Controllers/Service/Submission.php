@@ -65,6 +65,7 @@ class Submission extends Controller
                 $file->type = mime_content_type($path); //$file->getMimeType();
                 $file->size = filesize($path); //$file->getSize();
                 $file->is_public = false;
+                $file->is_ptfile = true;
                 $file->save();
                 $file_id = $file->id;
 
