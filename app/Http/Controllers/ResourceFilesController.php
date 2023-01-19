@@ -56,7 +56,7 @@ class ResourceFilesController extends Controller
         $is_logged_in = Auth::check();
         $is_admin = Auth::guard('admin')->check();
         if ($is_logged_in || $is_admin) {
-            $files = ResourceFiles::where('is_public', 0, 'is_ptfile', 0)->get();
+            $files = ResourceFiles::where('is_public', 0)->where('is_ptfile', 0)->get();
             return response()->json($files);
         } else {
             return redirect('/');
