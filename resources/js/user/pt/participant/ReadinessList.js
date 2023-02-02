@@ -91,7 +91,7 @@ class ReadinessList extends React.Component {
                                             Date.parse(element.end_date) > new Date() ? <i className="fas fa-paper-plane"></i>
                                                 : <i className="fas fa-eye"></i>
                                         }
-                                        {Date.parse(element.end_date) > new Date() ? ' Submit' : ' View only'}
+                                        {Date.parse(element.end_date) > new Date() ? ' Fill readiness' : ' View only'}
                                     </a>
 
                             }

@@ -181,7 +181,7 @@ class Dashboard extends React.Component {
                                 {Date.parse(element.end_date) > new Date() ? <i className="fas fa-paper-plane"></i> : <i className="fas fa-eye"></i>}
                                 {Date.parse(element.end_date) > new Date() ?
                                     element.is_readiness_answered == null ?
-                                        ' Fill readiness' : element.readiness_approval_id == null ? ' View only' : ' Submit' : 'View only'}
+                                        ' Fill readiness' : element.readiness_approval_id == null ? ' View only' : ' Enter results' : 'View only'}
                             </button>
                         }
                         {/* <a
