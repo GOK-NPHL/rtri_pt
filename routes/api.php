@@ -93,6 +93,10 @@ Route::get('/get_shipment_responses/{id}', [PTShipmentController::class, 'getShi
 
 Route::get('/get_sample_response_result/{id}', [PTShipmentController::class, 'getUserSampleResponseResult'])->middleware('auth:admin');
 
+// evaluate - works. for debugging. change fxn to public
+Route::get('/evaluate_submission/{submission_id}', [PTShipmentController::class, 'evaluateSubmission'])->middleware('auth:admin');
+Route::get('/evaluate_shipment/{shipment_id}', [PTShipmentController::class, 'evaluateShipment'])->middleware('auth:admin');
+
 Route::get('/get_shipment_response_report/{id}/{is_part}', [PTShipmentController::class, 'getShipmentResponseReport'])->middleware('web');
 
 Route::get('/get_user_id', [CommonsController::class, 'getUserId']);

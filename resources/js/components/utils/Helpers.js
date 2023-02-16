@@ -1270,3 +1270,26 @@ export async function DeletePanel(id) {
         return err.response
     }
 }
+
+// evaluate submission
+export async function EvaluateSubmission(submissionId) {
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/evaluate_submission/${submissionId}`);
+        const evaluation = response.data;
+        return evaluation;
+    }
+    catch (err) {
+        return err.response
+    }
+}
+// evaluate shipment
+export async function EvaluateShipment(shipment_id) {
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/evaluate_shipment/${shipment_id}`);
+        const evaluation = response.data;
+        return evaluation;
+    }
+    catch (err) {
+        return err.response
+    }
+}

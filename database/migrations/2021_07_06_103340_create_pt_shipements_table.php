@@ -24,6 +24,7 @@ class CreatePtShipementsTable extends Migration
             $table->integer('readiness_id');
             $table->integer('pass_mark');
             $table->json('ptpanel_ids');
+            $table->string('status')->default('created');
             $table->softDeletes();
         });
     }

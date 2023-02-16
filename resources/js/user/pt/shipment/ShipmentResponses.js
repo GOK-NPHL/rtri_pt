@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { v4 as uuidv4 } from 'uuid';
 import Pagination from "react-js-pagination";
-import { FetchShipmentResponses } from '../../../components/utils/Helpers';
+import { EvaluateSubmission, FetchShipmentResponses, EvaluateShipment } from '../../../components/utils/Helpers';
 import { matchPath } from "react-router";
 
 class ShipmentResponses extends React.Component {
@@ -20,6 +20,8 @@ class ShipmentResponses extends React.Component {
             startTableData: 0,
             endeTableData: 10,
             activePage: 1,
+            shipmentId: null,
+            is_evaluating: false,
         }
         this.handlePageChange = this.handlePageChange.bind(this)
     }
@@ -41,8 +43,10 @@ class ShipmentResponses extends React.Component {
         if (pathObject) {
             (async () => {
 
+                this.setState({
+                    shipmentId: pathObject.params.shipmentId
+                })
                 let response = await FetchShipmentResponses(pathObject.params.shipmentId, this.props.userId);
-
                 if (response.status == 500) {
                     this.setState({
                         message: response.data.Message,
@@ -101,8 +105,9 @@ class ShipmentResponses extends React.Component {
                     <td>{element.code}</td>
                     <td>{element.created_at}</td>
                     <td>{element.updated_at}</td>
+                    <td>{element.score}{!isNaN(element.score) ? '%' : ''}</td>
                     <td>
-                        {element.pt_submission_file_id ? <a href={window.location.origin + '/api/resources/files/download/' + element.pt_submission_file_id} target="_blank" download={element.pt_submission_file_name}>{"File_"+element.pt_submission_file_id}</a> : <span className="badge badge-dark">No File</span>}
+                        {element.pt_submission_file_id ? <a href={window.location.origin + '/api/resources/files/download/' + element.pt_submission_file_id} target="_blank" download={element.pt_submission_file_name}>{"File_" + element.pt_submission_file_id}</a> : <span className="badge badge-dark">No File</span>}
                     </td>
 
                     {
@@ -111,24 +116,38 @@ class ShipmentResponses extends React.Component {
 
                             {
                                 this.props.page == 'report' ?
-                                <>
-                                    <a
-                                        onClick={() => {
-                                            window.location.assign('/get-shipment-response-performance/' + element.ptsubmission_id)
-                                        }}
-                                        data-toggle="tooltip" data-placement="top" title="View performance report"
-                                        className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm text-white m-1">
-                                        <i className="fas fa-file-pdf"></i> View Performance
-                                    </a> &nbsp;
-                                    <a
-                                        onClick={() => {
-                                            window.location.assign('/get-shipment-response-form/' + element.ptsubmission_id)
-                                        }}
-                                        data-toggle="tooltip" data-placement="top" title="View responses"
-                                        className="d-none d-sm-inline-block btn btn-sm btn-light shadow-sm m-1">
-                                        <i className="fas fa-eye"></i> View Response
-                                    </a>
-                                </>
+                                    <>
+                                        <a
+                                            onClick={() => {
+                                                window.location.assign('/get-shipment-response-performance/' + element.ptsubmission_id)
+                                            }}
+                                            data-toggle="tooltip" data-placement="top" title="View performance report"
+                                            className="d-none d-sm-inline-block btn btn-sm btn-info shadow-sm text-white m-1">
+                                            <i className="fas fa-file-pdf"></i> View Performance
+                                        </a> &nbsp;
+                                        <a
+                                            onClick={() => {
+                                                window.location.assign('/get-shipment-response-form/' + element.ptsubmission_id)
+                                            }}
+                                            data-toggle="tooltip" data-placement="top" title="View responses"
+                                            className="d-none d-sm-inline-block btn btn-sm btn-light shadow-sm m-1">
+                                            <i className="fas fa-eye"></i> View Response
+                                        </a> &nbsp;
+                                        <a
+                                            onClick={() => {
+                                                EvaluateSubmission(element.ptsubmission_id).then(res => {
+                                                    if (res.error) {
+                                                        alert("Evaluation failed")
+                                                    } else {
+                                                        alert("Evaluation successful")
+                                                        window.location.reload()
+                                                    }
+                                                })
+                                            }}
+                                            className="d-none d-sm-inline-block btn btn-sm btn-dark text-light shadow-sm m-1">
+                                            {element.evaluation_id ? "Re-evaluate" : "Evaluate"}
+                                        </a>
+                                    </>
                                     :
                                     <a
                                         onClick={() => {
@@ -163,17 +182,41 @@ class ShipmentResponses extends React.Component {
 
 
         let pageContent = <div id='user_table' className='row'>
-            <div className="col-sm-12 mb-3 mt-3">
-                <h3 className="float-left">Shipment response list</h3>
-                <button style={{ "color": "white" }} type="button"
-                    className="btn btn-success float-right"
-                    onClick={() => {
-                        this.props.page == 'report' ?
-                            window.location.assign('/pt-shipment-report-list') :
-                            window.location.assign('/pt-shipment')
-                    }}>
-                    ← back
-                </button>
+            <div className="col-md-12 mb-3 mt-3">
+                <div className="row">
+                    <div className="col-md-4">
+                        <h3 className="float-left">Shipment response list</h3>
+                    </div>
+                    <div className="col-md-4">
+                        {this.state.shipmentId && <button className='btn btn-primary btn-sm btn-dark text-white' onClick={() => {
+                            this.setState({
+                                is_evaluating: true
+                            })
+                            EvaluateShipment(this.state.shipmentId).then(res => {
+                                if (res.error) {
+                                    alert("Evaluation failed: " + (res?.count ? res.count : "No") + " submissions evaluated. " + (res?.error || ""))
+                                } else {
+                                    alert("Evaluation successful. " + (res?.count ? res.count : "All") + " submissions evaluated")
+                                    window.location.reload()
+                                }
+                                this.setState({
+                                    is_evaluating: false
+                                })
+                            })
+                        }} disabled={this.state.is_evaluating}>{this.state.is_evaluating ? "Evaluating..." : "Evaluate all submissions"}</button>}
+                    </div>
+                    <div className="col-md-4">
+                        <button style={{ "color": "white" }} type="button"
+                            className="btn btn-success float-right"
+                            onClick={() => {
+                                this.props.page == 'report' ?
+                                    window.location.assign('/pt-shipment-report-list') :
+                                    window.location.assign('/pt-shipment')
+                            }}>
+                            ← back
+                        </button>
+                    </div>
+                </div>
             </div>
             <div className='col-sm-12 col-md-12'>
                 <div className="form-group mb-2">
@@ -202,6 +245,7 @@ class ShipmentResponses extends React.Component {
                             <th scope="col">Shipment code</th>
                             <th scope="col">Date responded</th>
                             <th scope="col">Date updated</th>
+                            <th scope="col">Score</th>
                             <th scope="col">PT Files</th>
                             <th scope="col">Action</th>
                         </tr>

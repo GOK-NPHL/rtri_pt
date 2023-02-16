@@ -9,6 +9,7 @@ use App\PtPanel;
 use App\PtSample;
 use App\PtShipement;
 use App\ptsubmission;
+use App\PTSubmissionEvaluation;
 use App\Readiness;
 use App\ReadinessAnswer;
 use App\ReadinessApproval;
@@ -495,17 +496,25 @@ class PTShipmentController extends Controller
                 ->join('laboratories', 'ptsubmissions.lab_id', '=', 'laboratories.id')
                 ->join('users', 'ptsubmissions.user_id', '=', 'users.id')
                 ->leftJoin('resource_files', 'ptsubmissions.pt_submission_file_id', '=', 'resource_files.id')
+                ->join('pt_panels', 'pt_panels.id', '=', 'ptsubmissions.pt_panel_id')
+                // ->join('pt_samples', 'pt_samples.ptpanel_id', '=', 'pt_panels.id')
+                ->leftJoin('pt_submission_evaluations', 'pt_submission_evaluations.submission_id', '=', 'ptsubmissions.id')
                 ->where('pt_shipements.id', $request->id)
                 ->get([
                     "pt_shipements.id",
                     "pt_shipements.start_date",
                     "pt_shipements.code",
+                    "pt_shipements.status as shipment_status",
                     "resource_files.path as pt_submission_file_path",
                     "resource_files.id as pt_submission_file_id",
                     "resource_files.name as pt_submission_file_name",
                     "pt_shipements.end_date",
                     "pt_shipements.round_name as name",
                     "laboratories.id as lab_id",
+                    "users.id as user_id",
+                    "pt_panels.id as panel_id",
+                    "pt_submission_evaluations.id as evaluation_id",
+                    "pt_submission_evaluations.score as score",
                     "users.name as fname",
                     "users.second_name as sname",
                     "laboratories.phone_number",
@@ -515,12 +524,25 @@ class PTShipmentController extends Controller
                     "ptsubmissions.created_at",
                     "ptsubmissions.updated_at",
                 ]);
+            
+            // get score per submission
+            foreach ($shipmentsResponses as $key => $value) {
+                $shipmentsResponses[$key]->score = 0;
+                if($value->evaluation_id){
+                    $score = PTSubmissionEvaluation::find($value->evaluation_id);
+                    $shipmentsResponses[$key]->score = $score->score ?? 0;
+                }else{
+                    // $score = $this->evaluateSubmission($value->ptsubmission_id);
+                    $shipmentsResponses[$key]->score = "Not evaluated"; //$score['score'] ?? 0;
+                }
+            }
 
             return $shipmentsResponses;
         } catch (Exception $ex) {
             return response()->json(['Message' => 'Could fetch ptsubmissions list: ' . $ex->getMessage()], 500);
         }
     }
+
 
 
     public function getShipmentResponseReport($id,  $is_participant)
@@ -655,6 +677,128 @@ class PTShipmentController extends Controller
         }
     }
 
+    /**
+     * Evaluate a submission
+     *
+     * @param  int  $submission_id
+     * @return \Illuminate\Http\Response
+     */
+    public function evaluateSubmission($submission_id)
+    {
+        try {
+            $submission = DB::table('ptsubmissions')->where('id', $submission_id)->first();
+            $evaluation = array();
+            if ($submission) {
+                $panel_id = $submission->pt_panel_id;
+                $round = PtShipement::find($submission->pt_shipements_id);
+                if ($round) {
+                    $evaluation['round_id'] = $round->id;
+                    $evaluation['round_code'] = $round->code;
+                    $evaluation['pass_mark'] = $round->pass_mark ?? 100;
+                    $evaluation['score'] = 0;
+                }
+                if ($panel_id) {
+                    $panel = PtPanel::find($panel_id);
+                    if ($panel) {
+                        $evaluation['panel_id'] = $panel_id;
+                        $evaluation['user_id'] = $submission->user_id;
+                        $evaluation['round_id'] = $submission->pt_shipements_id;
+                        $evaluation['lab_id'] = $submission->lab_id;
+                        $reference_samples = PtSample::where('ptpanel_id', $panel_id)->get();
+                        $perc_per_sample = 100 / count($reference_samples);
+                        $submission_samples = DB::table('pt_submission_results')->where('ptsubmission_id', $submission_id)->get();
+                        if ($submission_samples) {
+                            $evaluation['submission_id'] = $submission_id;
+                            foreach ($reference_samples as $reference_sample) {
+                                $submission_sample = DB::table('pt_submission_results')->where('ptsubmission_id', $submission_id)->where('sample_id', $reference_sample->id)->first();
+                                if ($submission_sample) {
+                                    $eval = $this->evaluateSample($reference_sample, $submission_sample, $perc_per_sample);
+                                    $evaluation['samples'][] = $eval;
+                                }
+                            }
+                            // total avg score
+                            $evaluation['score'] = array_sum(array_column($evaluation['samples'], 'perc_score')) ?? 0;
+                            // save evaluation. overwrite if exists
+                            PTSubmissionEvaluation::updateOrCreate(
+                                ['submission_id' => $submission_id],
+                                [
+                                    'shipment_id' => $submission->pt_shipements_id,
+                                    'submission_id' => $submission_id,
+                                    'panel_id' => $panel_id,
+                                    'user_id' => $submission->user_id,
+                                    'lab_id' => $submission->lab_id,
+                                    'sample_evaluations' => $evaluation['samples'],
+                                    'score' => $evaluation['score'],
+                                ]
+                            );
+                        }
+                    }
+                }
+            }
+            return $evaluation;
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Evaluate all submissions for a given shipment
+     * 
+     * @param int $shipment_id
+     * @return array
+     */
+
+    public function evaluateShipment($shipment_id)
+    {
+        //use evaluateSubmission for each submission
+        $evaluations = array();
+        $submissions = PtSubmission::where('pt_shipements_id', $shipment_id)->get();
+        if ($submissions) {
+            foreach ($submissions as $submission) {
+                $eval = $this->evaluateSubmission($submission->id);
+                $evaluations[] = $eval;
+            }
+        }
+        // check if all submissions have been evaluated
+        $all_evaluated = PTSubmissionEvaluation::where('shipment_id', $shipment_id)->count();
+        if ($all_evaluated == count($submissions)) {
+            // update shipment status
+            $shipment = PtShipement::find($shipment_id);
+            $shipment->status = 'evaluated';
+            $shipment->save();
+            // return success
+            return response()->json(['success' => 'All submissions evaluated', 'count' => $all_evaluated], 200);
+        }else{
+            return response()->json(['error' => 'Not all submissions evaluated', 'count' => $all_evaluated], 500);
+        }
+    }
+
+    /**
+     * Evaluate a single sample
+     *
+     * @param PtSample $reference_sample
+     * @param PtSubmissionResult $submission_sample
+     * @param int $pps
+     * @return array
+     */
+    private function evaluateSample($reference_sample, $submission_sample, $pps)
+    {
+        $evaluation = array();
+        $evaluation['sample_id'] = $reference_sample->id;
+        $evaluation['perc_score'] = 0;
+        $evaluation['sample_name'] = $reference_sample->name;
+        $evaluation['reference_result'] = $reference_sample->reference_result;
+        $evaluation['result_interpretation'] = $submission_sample->interpretation;
+        if ($reference_sample->reference_result == $submission_sample->interpretation) {
+            $evaluation['score'] = 'PASS';
+            $evaluation['perc_score'] = $pps;
+        } else {
+            $evaluation['score'] = 'FAIL';
+            $evaluation['perc_score'] = 0;
+        }
+        return $evaluation;
+    }
 
     public function getUserSampleResponseResult(Request $request)
     {
@@ -740,7 +884,7 @@ class PTShipmentController extends Controller
 
             foreach ($shipmentsResponses as $key => $value) {
                 $shipmentsResponses[$key]->survey_responses = json_decode($value->survey_responses);
-                if ( !empty($shipmentsResponses[$key]->survey_responses) && count($shipmentsResponses[$key]->survey_responses) > 0) {
+                if (!empty($shipmentsResponses[$key]->survey_responses) && count($shipmentsResponses[$key]->survey_responses) > 0) {
                     foreach ($shipmentsResponses[$key]->survey_responses as $key1 => $value1) {
                         $shipmentsResponses[$key]->survey_responses[$key1]->question = SurveyQuestion::find($value1->question_id)->question;
                     }

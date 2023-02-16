@@ -16,7 +16,7 @@ class PtShipement extends Model
         'pass_mark',
         'readiness_id', // change to panel
         'ptpanel_ids',
-
+        'status'
     ];
 
     protected $softDelete = true;

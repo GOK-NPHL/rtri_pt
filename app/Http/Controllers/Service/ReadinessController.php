@@ -229,6 +229,23 @@ class ReadinessController extends Controller
                 // filter out the duplicate records by user_id and lab_id
                 $readinesses = $readinesses->unique('email', 'readinesses.id');
 
+                // get sql query
+                Log::info("----------------- SQL -------------------");
+                Log::info(DB::table("laboratory_readiness") //->distinct()
+                ->join('laboratories', 'laboratories.id', '=', 'laboratory_readiness.laboratory_id')
+                ->join('readinesses', 'readinesses.id', '=', 'laboratory_readiness.readiness_id')
+                ->leftJoin('readiness_answers', function ($join) use ($request) {
+                    $join->on('readiness_answers.readiness_id', '=', 'readinesses.id')
+                        ->on('readiness_answers.laboratory_id', '=', 'laboratories.id');
+                })
+                ->leftJoin('users', 'users.id', '=', 'readiness_answers.user_id')->distinct('users.id')
+                ->leftJoin('readiness_approvals', function($join) {
+                    $join->on('readiness_approvals.readiness_id', '=', 'laboratory_readiness.readiness_id');
+                    $join->on('readiness_approvals.lab_id', '=', 'laboratory_readiness.laboratory_id');
+                })
+                ->where('laboratory_readiness.readiness_id', $request->id)->toSql());
+                Log::info("----------------- SQL -------------------");
+
             return $readinesses;
         } catch (Exception $ex) {
             return response()->json(['Message' => 'Could fetch readiness list: ' . $ex->getMessage()], 500);
