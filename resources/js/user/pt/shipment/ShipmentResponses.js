@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { v4 as uuidv4 } from 'uuid';
 import Pagination from "react-js-pagination";
-import { EvaluateSubmission, FetchShipmentResponses, EvaluateShipment } from '../../../components/utils/Helpers';
+import { EvaluateSubmission, FetchShipmentResponses, EvaluateShipment, exportToExcel } from '../../../components/utils/Helpers';
 import { matchPath } from "react-router";
 
 class ShipmentResponses extends React.Component {
@@ -105,6 +105,7 @@ class ShipmentResponses extends React.Component {
                     <td>{element.code}</td>
                     <td>{element.created_at}</td>
                     <td>{element.updated_at}</td>
+                    <td>{element.county_name}</td>
                     <td>{element.score}{!isNaN(element.score) ? '%' : ''}</td>
                     <td>
                         {element.pt_submission_file_id ? <a href={window.location.origin + '/api/resources/files/download/' + element.pt_submission_file_id} target="_blank" download={element.pt_submission_file_name}>{"File_" + element.pt_submission_file_id}</a> : <span className="badge badge-dark">No File</span>}
@@ -219,32 +220,58 @@ class ShipmentResponses extends React.Component {
                 </div>
             </div>
             <div className='col-sm-12 col-md-12'>
-                <div className="form-group mb-2">
-                    <input type="text"
-                        onChange={(event) => {
-                            let currElementsTableEl = this.state.allTableElements.filter(elemnt =>
-                                elemnt['props']['children'][1]['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
-                                elemnt['props']['children'][2]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
-                                elemnt['props']['children'][3]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
-                                elemnt['props']['children'][4]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
-                                elemnt['props']['children'][5]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
-                                elemnt['props']['children'][6]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase())
-                            );
-                            this.updatedSearchItem(currElementsTableEl);
-                        }}
-                        className="form-control" placeholder="search reponse"></input>
+                <div className="row mb-2">
+                <div className="col-md-6">
+                    <button type="button" className="btn btn-success btn-sm mx-1" onClick={() => {
+                        if (this.state.data && this.state.data.length > 0) {
+                            let final_data = this.state.data.map(element => {
+                                return {
+                                    'Round': element.code,
+                                    'Participant': element.fname+' '+element.sname,
+                                    'Lab/Facility': element.lab_name,
+                                    'County': element.county_name,
+                                    'Response date': new Date(element.created_at).toLocaleString('en-GB').replace(',', ' '),
+                                    'Score': element.score + (!isNaN(element.score) ? '%' : ''),
+                                }
+                            })
+                            exportToExcel(final_data, (this.state.round || 'Round performance'));
+                        } else {
+                            console.error('No data to export');
+                            alert('No data to export')
+                        }
+                    }}>
+                        <i className='fa fa-download'></i>&nbsp;
+                        Excel/CSV
+                    </button>
+                    </div>
+                    <div className="col-md-6">
+                        <input type="text"
+                            onChange={(event) => {
+                                let currElementsTableEl = this.state.allTableElements.filter(elemnt =>
+                                    elemnt['props']['children'][1]['props']['children'].toString().toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
+                                    elemnt['props']['children'][2]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
+                                    elemnt['props']['children'][3]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
+                                    elemnt['props']['children'][4]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
+                                    elemnt['props']['children'][5]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase()) ||
+                                    elemnt['props']['children'][6]['props']['children'].toLowerCase().trim().includes(event.target.value.trim().toLowerCase())
+                                );
+                                this.updatedSearchItem(currElementsTableEl);
+                            }}
+                            className="form-control" placeholder="search reponse"></input>
+                    </div>
                 </div>
-
+                <hr/>
                 <table className="table table-striped table-sm  table-hover">
                     <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Participant name</th>
                             <th scope="col">Responded by</th>
+                            <th scope="col">Participant name</th>
                             <th scope="col">Round name</th>
                             <th scope="col">Shipment code</th>
                             <th scope="col">Date responded</th>
                             <th scope="col">Date updated</th>
+                            <th scope="col">County</th>
                             <th scope="col">Score</th>
                             <th scope="col">PT Files</th>
                             <th scope="col">Action</th>

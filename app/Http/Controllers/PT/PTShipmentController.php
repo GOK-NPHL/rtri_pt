@@ -494,12 +494,15 @@ class PTShipmentController extends Controller
             $shipmentsResponses = DB::table("pt_shipements")->distinct()
                 ->join('ptsubmissions', 'ptsubmissions.pt_shipements_id', '=', 'pt_shipements.id')
                 ->join('laboratories', 'ptsubmissions.lab_id', '=', 'laboratories.id')
+                ->join('counties', 'laboratories.county', '=', 'counties.id')
                 ->join('users', 'ptsubmissions.user_id', '=', 'users.id')
                 ->leftJoin('resource_files', 'ptsubmissions.pt_submission_file_id', '=', 'resource_files.id')
                 ->join('pt_panels', 'pt_panels.id', '=', 'ptsubmissions.pt_panel_id')
                 // ->join('pt_samples', 'pt_samples.ptpanel_id', '=', 'pt_panels.id')
                 ->leftJoin('pt_submission_evaluations', 'pt_submission_evaluations.submission_id', '=', 'ptsubmissions.id')
                 ->where('pt_shipements.id', $request->id)
+                // only pick latest submission for each user
+                ->whereRaw('ptsubmissions.id = (select id from ptsubmissions subs where subs.user_id = users.id order by subs.created_at desc limit 1)')
                 ->get([
                     "pt_shipements.id",
                     "pt_shipements.start_date",
@@ -520,7 +523,9 @@ class PTShipmentController extends Controller
                     "laboratories.phone_number",
                     "laboratories.lab_name",
                     "laboratories.email",
+                    "counties.name as county_name",
                     "ptsubmissions.id as ptsubmission_id",
+                    "ptsubmissions.user_id as ptsubmission_user",
                     "ptsubmissions.created_at",
                     "ptsubmissions.updated_at",
                 ]);
