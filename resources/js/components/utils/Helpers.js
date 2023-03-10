@@ -49,6 +49,18 @@ export async function FetchSubmissions() {
 
 }
 
+export async function FetchSubmissionSummaries() {
+
+    try {
+        const response = await axios.get(`${settings.serverBaseApi}/get_submission_summaries`);
+        const responseData = response.data;
+        return responseData;
+    } catch (err) {
+        // Handle Error Here
+        return err.response
+    }
+}
+
 export async function FetchUserSamples() {
 
     try {

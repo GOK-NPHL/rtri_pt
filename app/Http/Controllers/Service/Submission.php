@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Service;
 
 use App\Http\Controllers\Controller;
+use App\PtShipement;
 use App\PtSubmissionResult;
 use App\ptsubmission as SubmissionModel;
 use App\ResourceFiles;
@@ -24,7 +25,7 @@ class Submission extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:sanctum');
+        $this->middleware('auth');
     }
 
     public function createSubmission(Request $request)
@@ -76,7 +77,7 @@ class Submission extends Controller
                         'message' => 'File could not be saved',
                     ])->status(400);
                 }
-            }else{
+            } else {
                 Log::info("Submission without file::" . json_encode($submission));
             }
             // else{
@@ -103,7 +104,7 @@ class Submission extends Controller
                 "qa_responses" => $submission["qa_responses"],
             ]);
 
-            Log::info('-----------------------Submission saved : '.json_encode($submissionModel));
+            Log::info('-----------------------Submission saved : ' . json_encode($submissionModel));
 
             $submissionModel->save();
             $submissionId = $submissionModel->id;
@@ -132,7 +133,7 @@ class Submission extends Controller
             return response()->json(['Message' => 'Saved successfully'], 200);
         } catch (Exception $ex) {
             Log::error($ex);
-            return response()->json(['Message' => 'Could not save sumbmission: ' . $ex->getMessage()], 500);
+            return response()->json(['Message' => 'Could not save submission: ' . $ex->getMessage()], 500);
         }
     }
 
@@ -142,7 +143,59 @@ class Submission extends Controller
         try {
             return SubmissionModel::all();
         } catch (Exception $ex) {
-            return response()->json(['Message' => 'Error getting org units: ' . $ex->getMessage()], 500);
+            return response()->json(['Message' => 'Error getting submissions: ' . $ex->getMessage()], 500);
+        }
+    }
+
+    public function getSubmissionSummaries()
+    {
+        try {
+
+            $payload = []; // round_name= total_shipment, total_responses, end_date
+
+            $shipmentsByReadinessRound = DB::select('select distinct round_id, round_name, end_date, total_participant from (select distinct pt_shipements.id as round_id, pt_shipements.code as round_name, pt_shipements.end_date, sum( json_depth( lots.participant_ids ) ) as total_participant, lots.id as lot_id from pt_shipements inner join laboratory_readiness on laboratory_readiness.readiness_id = pt_shipements.readiness_id inner join readinesses on readinesses.id = pt_shipements.readiness_id inner join lots on lots.readiness_id = readinesses.id group by round_id) as summary');
+
+            // sql
+
+
+            $totalShipments = $shipmentsByReadinessRound;
+
+
+            foreach ($totalShipments as $data) {
+                $r_id = $data->round_id;
+                $round_submissions = DB::table("pt_shipements")->distinct()
+                    ->join('ptsubmissions', 'ptsubmissions.pt_shipements_id', '=', 'pt_shipements.id')
+                    ->join('laboratories', 'ptsubmissions.lab_id', '=', 'laboratories.id')
+                    ->join('counties', 'laboratories.county', '=', 'counties.id')
+                    ->join('users', 'ptsubmissions.user_id', '=', 'users.id')
+                    ->leftJoin('resource_files', 'ptsubmissions.pt_submission_file_id', '=', 'resource_files.id')
+                    ->join('pt_panels', 'pt_panels.id', '=', 'ptsubmissions.pt_panel_id')
+                    ->leftJoin('pt_submission_evaluations', 'pt_submission_evaluations.submission_id', '=', 'ptsubmissions.id')
+                    ->where('pt_shipements.id', $r_id)
+                    // ->whereRaw('ptsubmissions.id = (select id from ptsubmissions subs where subs.user_id = users.id order by subs.created_at desc limit 1)');
+                    ->groupBy('ptsubmissions.user_id');
+
+                $round_submissions = $round_submissions->get([
+                    "laboratories.lab_name",
+                    "counties.id as county_id",
+                    "counties.name as county_name",
+                    "ptsubmissions.id as ptsubmission_id",
+                    "ptsubmissions.user_id as ptsubmission_user",
+                    "ptsubmissions.created_at",
+                    "ptsubmissions.updated_at",
+                ]);
+
+                $payload[$data->round_name] = [
+                    'total_shipment' => intval($data->total_participant),
+                    'total_responses' => $round_submissions->count(),
+                    'end_date' => $data->end_date,
+                ];
+                Log::info($round_submissions);
+            }
+            return  $payload;
+        } catch (Exception $ex) {
+            Log::error($ex->getMessage());
+            return response()->json(['Message' => 'Error getting summaries: ' . $ex->getMessage()], 500);
         }
     }
 

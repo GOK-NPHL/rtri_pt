@@ -35,6 +35,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('/save_submission', [Submission::class, 'createSubmission']);
 Route::get('/get_submissions', [Submission::class, 'getSubmissions']);
+Route::get('/get_submission_summaries', [Submission::class, 'getSubmissionSummaries'])->middleware('auth:admin');
 Route::get('/get_submission_by_id/{id}', [Submission::class, 'getSubmissionById']);
 Route::post('/update_submission', [Submission::class, 'updateSubmission']);
 
