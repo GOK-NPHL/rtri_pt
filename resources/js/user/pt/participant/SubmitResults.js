@@ -950,6 +950,24 @@ class SubmitResults extends React.Component {
                                                             Invalid
                                                         </label>
                                                     </div>
+                                                    <div className="form-check form-check-inline">
+                                                        <input className="form-check-input" type="radio" value="noline"
+                                                            name={`interpret-radio-${sample.sample_id}`}
+                                                            id="result_noline"
+                                                            defaultChecked={
+                                                                this.props.selectedElementHasSubmmisions
+                                                                    &&
+                                                                    Object.keys(this.state.samples).length !== 0
+                                                                    &&
+                                                                    this.state.samples[sample.sample_id]["interpretation"] == 'noline'
+                                                                    ? true : false
+                                                            }
+                                                            checked={this.state.samples && this.state.samples[sample.sample_id] && this.state.samples[sample.sample_id]["interpretation"] && this.state.samples[sample.sample_id]["interpretation"] == 'noline'}
+                                                        />
+                                                        <label className="form-check-label" htmlFor="result_noline">
+                                                            No line(s)
+                                                        </label>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         })
