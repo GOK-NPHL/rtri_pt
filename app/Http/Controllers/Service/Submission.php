@@ -190,7 +190,7 @@ class Submission extends Controller
                     'total_responses' => $round_submissions->count(),
                     'end_date' => $data->end_date,
                 ];
-                Log::info($round_submissions);
+                // Log::info($round_submissions);
             }
             return  $payload;
         } catch (Exception $ex) {

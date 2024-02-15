@@ -5,14 +5,17 @@ namespace App\Http\Controllers\PT;
 use App\Http\Controllers\Controller;
 use App\Laboratory;
 use App\Lot;
+use App\Mail\NewReadiness;
 use App\Readiness;
 use App\ReadinessApproval;
 use App\ReadinessQuestion;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Mail\Mailer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class PTReadinessController extends Controller
 {
@@ -68,6 +71,7 @@ class PTReadinessController extends Controller
             //////////////
 
 
+
             // // create lots with the participants
             // step 1: get all the participants
             $participants = [];
@@ -77,9 +81,12 @@ class PTReadinessController extends Controller
                 foreach ($lab_participants as $lab_participant) {
                     $participants[] = [
                         'user_id' => $lab_participant->id,
+                        'user_email' => $lab_participant->email,
+                        'lab_email' => $lab->email,
                         'user_name' => $lab_participant->name . ' - ' . $lab_participant->second_name,
                         'lab_id' => $lab->id,
                         'lab_name' => $lab->lab_name,
+                        'lab_code' => $lab->lab_code,
                     ];
                 }
             }
@@ -127,6 +134,30 @@ class PTReadinessController extends Controller
                 }
             }
             //////////////
+
+
+
+            // step 4. send email to the participants
+            if (count($randomized_participants) > 0) {
+
+                foreach ($randomized_participants as $ptcp) {
+                    try {
+                        Mail::to($ptcp['user_email'])->send(new NewReadiness([
+                            'to' => $ptcp['user_email'],
+                            'lab_name' => $ptcp['lab_name'],
+                            'readiness_name' => $readiness->name,
+                            'start_date' => $readiness->start_date,
+                            'end_date' => $readiness->end_date,
+                            'user_name' => $ptcp['user_name'],
+                        ]));
+                    } catch (Exception $e) {
+                        Log::error("Failed to send email to " . $ptcp['user_email'] . ": ".$e->getMessage());
+                        Log::error($e);
+                    }
+                }
+            }
+
+
 
             return response()->json(['Message' => 'Created successfully'], 200);
         } catch (Exception $ex) {
@@ -356,4 +387,42 @@ class PTReadinessController extends Controller
             return response()->json(['Message' => 'Could not Approval success request:  ' . $ex->getMessage()], 500);
         }
     }
+
+
+    // send email to the participants
+    // private function sendEmail($email_data)
+    // {
+    //     try {
+    //         Log::info('Sending email to participants');
+    //         $email_list = $email_data['email_list'];
+    //         $subject = $email_data['subject'];
+    //         $message = $email_data['message'];
+    //         foreach ($email_list as $email) {
+    //             $subject = $subject;
+    //             $message = $message;
+    //             // $headers = 'From: ' . env('MAIL_FROM_ADDRESS') . "\r\n" .
+    //             //     'Reply-To: ' . env('MAIL_FROM_ADDRESS') . "\r\n" .
+    //             //     'X-Mailer: PHP/' . phpversion();
+    //             // $sent_user = mail($email['user_email'], $subject, $message, $headers); // to lab participant
+    //             // if ($sent_user) {
+    //             //     Log::info('Email sent to (user): ' . $email['user_email']);
+    //             // } else {
+    //             //     Log::error('Email not sent to (user): ' . $email['user_email']);
+    //             // }
+    //             // $sent_lab = mail($email['lab_email'], $subject, $message, $headers); // to lab
+    //             // if ($sent_lab) {
+    //             //     Log::info('Email sent to (lab):' . $email['lab_email']);
+    //             // } else {
+    //             //     Log::error('Email not sent to (lab):' . $email['lab_email']);
+    //             // }
+
+    //             Mail::send('emails.readiness', ['message' => $message], function ($m) use ($email, $subject) {
+    //                 $m->from(env('MAIL_FROM_ADDRESS'), 'NPHL');
+    //                 $m->to($email['user_email'], $email['user_name'])->subject($subject);
+    //             });
+    //         }
+    //     } catch (Exception $ex) {
+    //         Log::error($ex->getMessage());
+    //     }
+    // }
 }
